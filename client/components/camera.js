@@ -290,21 +290,14 @@ function detectPoseInRealTime(video, net) {
     // scores
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (guiState.output.showPoints) {
-          //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
-          drawKeypoints([keypoints[0]], minPartConfidence, ctx)
-        }
+        // if (guiState.output.showPoints) {
+        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
+        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
+        // }
 
         if (prevPoses.length) {
           drawLineBetweenPoints([keypoints[0], prevPoses[0].keypoints[0]], ctx)
         }
-
-        // if (guiState.output.showSkeleton) {
-        //   drawSkeleton(keypoints, minPartConfidence, ctx)
-        // }
-        // if (guiState.output.showBoundingBox) {
-        //   drawBoundingBox(keypoints, ctx)
-        // }
       }
     })
 
