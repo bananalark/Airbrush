@@ -17,7 +17,16 @@ const CameraComponent = () => {
           // }}
         />
 
-        <canvas id="output" />
+        <div style={{position: 'relative'}}>
+          <canvas
+            id="background"
+            style={{position: 'absolute', left: 0, top: 0, zIndex: 0}}
+          />
+          <canvas
+            id="output"
+            style={{position: 'absolute', left: 0, top: 0, zIndex: 1}}
+          />
+        </div>
       </div>
     </div>
   )
