@@ -2,7 +2,12 @@ import * as posenet from '@tensorflow-models/posenet'
 import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
 
-import {drawBoundingBox, drawKeypoints, drawSkeleton} from './utils'
+import {
+  drawBoundingBox,
+  drawKeypoints,
+  drawSkeleton,
+  drawLineBetweenPoints
+} from './utils'
 
 export const videoWidth = 600
 const videoHeight = 500
@@ -197,13 +202,19 @@ function setupFPS() {
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
+  //current rendering of video feed:
+  const backgroundCanvas = document.getElementById('background')
+  const backgroundctx = backgroundCanvas.getContext('2d')
+
   // since images are being fed from a webcam
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
+  backgroundCanvas.width = videoWidth
+  backgroundCanvas.height = videoHeight
 
-  async function poseDetectionFrame() {
+  async function poseDetectionFrame(prevPoses = []) {
     if (guiState.changeToArchitecture) {
       // Important to purge variables and free up GPU memory
       guiState.net.dispose()
@@ -258,14 +269,20 @@ function detectPoseInRealTime(video, net) {
     }
     /*eslint-enable*/
 
-    ctx.clearRect(0, 0, videoWidth, videoHeight)
+    // ctx.clearRect(0, 0, videoWidth, videoHeight)
 
     if (guiState.output.showVideo) {
-      ctx.save()
-      ctx.scale(-1, 1)
-      ctx.translate(-videoWidth, 0)
-      ctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-      ctx.restore()
+      backgroundctx.save()
+      backgroundctx.scale(-1, 1)
+      backgroundctx.translate(-videoWidth, 0)
+      backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+      backgroundctx.restore()
+
+      // ctx.save()
+      // ctx.scale(-1, 1)
+      // ctx.translate(-videoWidth, 0)
+      // ctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+      // ctx.restore()
     }
 
     // For each pose (i.e. person) detected in an image, loop through the poses
@@ -273,14 +290,13 @@ function detectPoseInRealTime(video, net) {
     // scores
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (guiState.output.showPoints) {
-          drawKeypoints(keypoints, minPartConfidence, ctx)
-        }
-        if (guiState.output.showSkeleton) {
-          drawSkeleton(keypoints, minPartConfidence, ctx)
-        }
-        if (guiState.output.showBoundingBox) {
-          drawBoundingBox(keypoints, ctx)
+        // if (guiState.output.showPoints) {
+        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
+        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
+        // }
+
+        if (prevPoses.length) {
+          drawLineBetweenPoints([keypoints[0], prevPoses[0].keypoints[0]], ctx)
         }
       }
     })
@@ -288,7 +304,7 @@ function detectPoseInRealTime(video, net) {
     // End monitoring code for frames per second
     stats.end()
 
-    requestAnimationFrame(poseDetectionFrame)
+    requestAnimationFrame(() => poseDetectionFrame(poses))
   }
 
   poseDetectionFrame()

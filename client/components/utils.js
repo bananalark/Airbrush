@@ -64,6 +64,16 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
   })
 }
 
+export function drawLineBetweenPoints(adjacentKeyPoints, ctx, scale = 1) {
+  drawSegment(
+    toTuple(adjacentKeyPoints[0].position),
+    toTuple(adjacentKeyPoints[1].position),
+    color,
+    scale,
+    ctx
+  )
+}
+
 /**
  * Draw pose keypoints onto a canvas
  */
