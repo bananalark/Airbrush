@@ -7,12 +7,14 @@ const CameraComponent = () => {
         <video
           id="video"
           plays-inline="true"
-          //     style=" -moz-transform: scaleX(-1);
-          // -o-transform: scaleX(-1);
-          // -webkit-transform: scaleX(-1);
-          // transform: scaleX(-1);
-          // display: none;
-          // "
+          style={{display: 'none'}}
+          // style={{
+          //   '-moz-transform': scaleX(-1),
+          //   '-o-transform': scaleX(-1),
+          //   '-webkit-transform': scaleX(-1),
+          //   transform: scaleX(-1),
+          //   display: none
+          // }}
         />
 
         <canvas id="output" />
