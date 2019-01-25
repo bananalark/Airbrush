@@ -3,6 +3,7 @@ import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
 
 import {
+  draw,
   drawBoundingBox,
   drawKeypoints,
   drawSkeleton,
@@ -292,12 +293,31 @@ function detectPoseInRealTime(video, net) {
       if (score >= minPoseConfidence) {
         // if (guiState.output.showPoints) {
         //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
+
+        //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
 
-        if (prevPoses.length) {
-          drawLineBetweenPoints([keypoints[0], prevPoses[0].keypoints[0]], ctx)
+        // if (keypoints[10].score) {
+        //   console.log(keypoints[10].position, keypoints[6].position)
+
+        if (draw(keypoints, minPartConfidence)) {
+          //I'm putting drawKeypoints here because we will probably want to be working from points when we make the curves
+          // drawKeypoints([keypoints[0]], minPartConfidence, ctx)
+
+          if (prevPoses.length) {
+            drawLineBetweenPoints(
+              [keypoints[0], prevPoses[0].keypoints[0]],
+              ctx
+            )
+
+            //draw shoulder and wrist
+
+            // drawLineBetweenPoints([keypoints[10], prevPoses[0].keypoints[10]], ctx)
+            // drawLineBetweenPoints([keypoints[6], prevPoses[0].keypoints[6]], ctx)
+          }
         }
+        //}
       }
     })
 
