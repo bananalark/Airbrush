@@ -1,6 +1,6 @@
-body {
+/* body {
   font-family: sans-serif;
-}
+} */
 
 a {
   text-decoration: none;
@@ -18,4 +18,46 @@ nav a {
 form div {
   margin: 1em;
   display: inline-block;
+}
+/* color picker */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #e6e6e6;
+}
+h2 {
+  background-color: #dbdbdb;
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 10px;
+  font-family: 'Open Sans';
+}
+#color-input {
+  display: none;
+}
+#color-label {
+  margin-left: 15px;
+  position: absolute;
+  height: 30px;
+  width: 50px;
+}
+#color-input:checked ~ #color-picker {
+  opacity: 1;
+}
+#color-picker {
+  position: absolute;
+  left: 70px;
+  background-color: white;
+  height: 150px;
+  width: 185px;
+  border: solid 1px #ccc;
+  padding: 5px;
+  opacity: 0;
+  transition: all 0.3s;
+}
+canvas:hover {
+  cursor: crosshair;
+}
+#color-strip {
+  margin-left: 5px;
 }

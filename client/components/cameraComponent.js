@@ -28,6 +28,13 @@ const CameraComponent = () => {
           />
         </div>
       </div>
+      <label htmlFor="color-input" id="color-label" />
+      <input type="checkbox" id="color-input" checked />
+
+      <div id="color-picker">
+        <canvas id="color-block" height="150" width="150" />
+        <canvas id="color-strip" height="150" width="30" />
+      </div>
     </div>
   )
 }
