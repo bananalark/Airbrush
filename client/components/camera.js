@@ -3,6 +3,7 @@ import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
 
 import {
+  draw,
   drawBoundingBox,
   drawKeypoints,
   drawSkeleton,
@@ -290,29 +291,33 @@ function detectPoseInRealTime(video, net) {
       if (score >= minPoseConfidence) {
         // if (guiState.output.showPoints) {
         //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
+
+        //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
 
-        if (prevPoses.length) {
-          let eraseMode = document.getElementById('erase-button')
-          let eraseModeValue = eraseMode.attributes.value.nodeValue
+        if (draw(keypoints, minPartConfidence)) {
+          if (prevPoses.length) {
+            let eraseMode = document.getElementById('erase-button')
+            let eraseModeValue = eraseMode.attributes.value.nodeValue
 
-          if (eraseModeValue === 'false') {
-            ctx.globalCompositeOperation = 'source-over'
-            drawLineBetweenPoints(
-              [keypoints[0], prevPoses[0].keypoints[0]],
-              ctx,
-              1,
-              5
-            )
-          } else {
-            ctx.globalCompositeOperation = 'destination-out'
-            drawLineBetweenPoints(
-              [keypoints[0], prevPoses[0].keypoints[0]],
-              ctx,
-              1,
-              5
-            )
+            if (eraseModeValue === 'false') {
+              ctx.globalCompositeOperation = 'source-over'
+              drawLineBetweenPoints(
+                [keypoints[0], prevPoses[0].keypoints[0]],
+                ctx,
+                1,
+                5
+              )
+            } else {
+              ctx.globalCompositeOperation = 'destination-out'
+              drawLineBetweenPoints(
+                [keypoints[0], prevPoses[0].keypoints[0]],
+                ctx,
+                1,
+                15
+              )
+            }
           }
         }
       }
