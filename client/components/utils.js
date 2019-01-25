@@ -19,10 +19,27 @@ import * as tf from '@tensorflow/tfjs'
 
 const color = 'aqua'
 const boundingBoxColor = 'red'
-const lineWidth = 2
+let lineWidth = 2
 
 function toTuple({y, x}) {
   return [y, x]
+}
+
+export function eraseTool(keypoints, eraseMode, context) {
+  context.arc(keypoints.position.x, keypoints.position.y, 5, 0, 360)
+  context.fill()
+}
+
+export function clearCanvas() {
+  let canvas = document.getElementById('output')
+  let context = canvas.getContext('2d')
+  document.getElementById('clear-button').addEventListener(
+    'click',
+    () => {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+    },
+    false
+  )
 }
 
 export function drawPoint(ctx, y, x, r, color) {
@@ -64,7 +81,13 @@ export function drawSkeleton(keypoints, minConfidence, ctx, scale = 1) {
   })
 }
 
-export function drawLineBetweenPoints(adjacentKeyPoints, ctx, scale = 1) {
+export function drawLineBetweenPoints(
+  adjacentKeyPoints,
+  ctx,
+  scale = 1,
+  newLineWidth
+) {
+  lineWidth = newLineWidth
   drawSegment(
     toTuple(adjacentKeyPoints[0].position),
     toTuple(adjacentKeyPoints[1].position),

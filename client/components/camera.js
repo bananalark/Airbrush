@@ -6,14 +6,14 @@ import {
   drawBoundingBox,
   drawKeypoints,
   drawSkeleton,
-  drawLineBetweenPoints
+  drawLineBetweenPoints,
+  clearCanvas,
+  eraseTool
 } from './utils'
 
 export const videoWidth = 600
 const videoHeight = 500
 const stats = new Stats()
-
-console.log('ARRIVED AT CAMERA.JS')
 
 function isAndroid() {
   return /Android/i.test(navigator.userAgent)
@@ -32,7 +32,6 @@ function isMobile() {
  *
  */
 async function setupCamera() {
-  console.log('ARRIVED AT SETUP CAMERA')
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     throw new Error(
       'Browser API navigator.mediaDevices.getUserMedia not available'
@@ -296,7 +295,31 @@ function detectPoseInRealTime(video, net) {
         // }
 
         if (prevPoses.length) {
-          drawLineBetweenPoints([keypoints[0], prevPoses[0].keypoints[0]], ctx)
+          let eraseMode = document.getElementById('erase-button')
+          // let context = canvas.getContext('2d')
+
+          if (eraseMode.attributes.value.nodeValue === 'false') {
+            ctx.globalCompositeOperation = 'source-over'
+            drawLineBetweenPoints(
+              [keypoints[0], prevPoses[0].keypoints[0]],
+              ctx,
+              1,
+              5
+            )
+          } else {
+            ctx.globalCompositeOperation = 'destination-out'
+            drawLineBetweenPoints(
+              [keypoints[0], prevPoses[0].keypoints[0]],
+              ctx,
+              1,
+              5
+            )
+            // eraseTool(
+            //   prevPoses[0].keypoints[0],
+            //   eraseMode.attributes.value.nodeValue,
+            //   ctx
+            // )
+          }
         }
       }
     })
@@ -334,9 +357,10 @@ export async function bindPage() {
     throw e
   }
 
+  clearCanvas()
   setupGui([], net)
   setupFPS()
-  detectPoseInRealTime(video, net)
+  setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
 navigator.getUserMedia =
