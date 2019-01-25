@@ -3,6 +3,7 @@ const CameraComponent = () => {
   return (
     <div>
       <div id="info" />
+      <div>TESTING</div>
       <div id="main">
         <video
           id="video"
