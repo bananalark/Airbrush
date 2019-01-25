@@ -25,10 +25,10 @@ function toTuple({y, x}) {
   return [y, x]
 }
 
-export function eraseTool(keypoints, eraseMode, context) {
-  context.arc(keypoints.position.x, keypoints.position.y, 5, 0, 360)
-  context.fill()
-}
+// export function eraseTool(keypoints, eraseMode, context) {
+//   context.arc(keypoints.position.x, keypoints.position.y, 5, 0, 360)
+//   context.fill()
+// }
 
 export function clearCanvas() {
   let canvas = document.getElementById('output')

@@ -7,8 +7,7 @@ import {
   drawKeypoints,
   drawSkeleton,
   drawLineBetweenPoints,
-  clearCanvas,
-  eraseTool
+  clearCanvas
 } from './utils'
 
 export const videoWidth = 600
@@ -296,9 +295,9 @@ function detectPoseInRealTime(video, net) {
 
         if (prevPoses.length) {
           let eraseMode = document.getElementById('erase-button')
-          // let context = canvas.getContext('2d')
+          let eraseModeValue = eraseMode.attributes.value.nodeValue
 
-          if (eraseMode.attributes.value.nodeValue === 'false') {
+          if (eraseModeValue === 'false') {
             ctx.globalCompositeOperation = 'source-over'
             drawLineBetweenPoints(
               [keypoints[0], prevPoses[0].keypoints[0]],
@@ -314,11 +313,6 @@ function detectPoseInRealTime(video, net) {
               1,
               5
             )
-            // eraseTool(
-            //   prevPoses[0].keypoints[0],
-            //   eraseMode.attributes.value.nodeValue,
-            //   ctx
-            // )
           }
         }
       }
