@@ -25,6 +25,13 @@ function toTuple({y, x}) {
   return [y, x]
 }
 
+export function draw(keypoints, minPartConfidence) {
+  return (
+    keypoints[10].score >= minPartConfidence &&
+    Math.abs(keypoints[10].position.x - keypoints[6].position.x) < 100
+  )
+}
+
 export function drawPoint(ctx, y, x, r, color) {
   ctx.beginPath()
   ctx.arc(x, y, r, 0, 2 * Math.PI)
