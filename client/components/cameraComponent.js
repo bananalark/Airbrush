@@ -1,4 +1,6 @@
 import React from 'react'
+import ColorPicker from './ColorPicker'
+
 const CameraComponent = () => {
   return (
     <div>
@@ -20,20 +22,14 @@ const CameraComponent = () => {
         <div style={{position: 'relative'}}>
           <canvas
             id="background"
-            style={{position: 'absolute', left: 0, top: 0, zIndex: 0}}
+            style={{position: 'absolute', left: 50, top: 50, zIndex: 0}}
           />
           <canvas
             id="output"
-            style={{position: 'absolute', left: 0, top: 0, zIndex: 1}}
+            style={{position: 'absolute', left: 50, top: 50, zIndex: 1}}
           />
         </div>
-      </div>
-      <label htmlFor="color-input" id="color-label" />
-      <input type="checkbox" id="color-input" checked />
-
-      <div id="color-picker">
-        <canvas id="color-block" height="150" width="150" />
-        <canvas id="color-strip" height="150" width="30" />
+        <ColorPicker />
       </div>
     </div>
   )

@@ -14,10 +14,19 @@
  * limitations under the License.
  * =============================================================================
  */
+import React from 'react'
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
+import ColorPicker from './ColorPicker'
 
-const color = 'aqua'
+export function SelectedColor() {
+  return (
+    <div>
+      <ColorPicker color="color" />
+    </div>
+  )
+}
+const color = 'black'
 const boundingBoxColor = 'red'
 const lineWidth = 2
 
