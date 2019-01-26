@@ -1,41 +1,22 @@
 import React, {Component} from 'react'
 
-const VoiceComponent = () => {
-  return (
-    <div>
-      <h1>Phrase matcher</h1>
-      <p>Press the button then say the phrase to test the recognition.</p>
+class VoiceComponent extends Component {
+  render() {
+    return (
+      <div>
+        <h1>Say Start/Stop to Paint!</h1>
 
-      <button type="button">Start new test</button>
+        <button>Say something!</button>
+        {/* <input type="button" id="start-button" value="Start New Test" /> */}
 
-      <div id="phrase">
-        <p>Phrase...</p>
-        <p id="result">Right or wrong?</p>
-        <p id="output">...diagnostic messages</p>
+        <div>
+          <p className="output">You said...</p>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
-
-// class VoiceComponent extends Component {
-//   render() {
-//     return (
-//       <div>
-//         <h1>Phrase matcher</h1>
-//         <p>Press the button then say the phrase to test the recognition.</p>
-
-//         <button type="button">Start new test</button>
-
-//         <div id="phrase">
-//           <p>Phrase...</p>
-//           <p id="result">Right or wrong?</p>
-//           <p id="output">...diagnostic messages</p>
-//         </div>
-//       </div>
-//     )
-//   }
-// }
 
 export default VoiceComponent
 // require('../../web-speech-api/phrase-matcher/script.js')
-require('./voice')
+setTimeout(() => require('./voice'), 2000)
