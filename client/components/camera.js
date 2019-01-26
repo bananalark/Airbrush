@@ -1,6 +1,7 @@
 import * as posenet from '@tensorflow-models/posenet'
 import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
+const paper = require('paper')
 
 import {
   draw,
@@ -205,6 +206,9 @@ function detectPoseInRealTime(video, net) {
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
 
+  paper.install(window)
+
+  console.log('TOP paper back', paper)
   // since images are being fed from a webcam
   const flipHorizontal = true
 
@@ -212,6 +216,9 @@ function detectPoseInRealTime(video, net) {
   canvas.height = videoHeight
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
+
+  paper.setup(canvas)
+  let path
 
   async function poseDetectionFrame(prevPoses = []) {
     if (guiState.changeToArchitecture) {
@@ -287,6 +294,7 @@ function detectPoseInRealTime(video, net) {
     // For each pose (i.e. person) detected in an image, loop through the poses
     // and draw the resulting skeleton and keypoints if over certain confidence
     // scores
+
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         // if (guiState.output.showPoints) {
@@ -303,12 +311,82 @@ function detectPoseInRealTime(video, net) {
 
             if (eraseModeValue === 'false') {
               ctx.globalCompositeOperation = 'source-over'
-              drawLineBetweenPoints(
-                [keypoints[0], prevPoses[0].keypoints[0]],
-                ctx,
-                1,
-                5
+
+              const [
+                nose,
+                leftEye,
+                rightEye,
+                leftEar,
+                rightEar,
+                leftShoulder,
+                rightShoulder,
+                leftElbow,
+                rightElbow,
+                leftWrist,
+                rightWrist,
+                leftHip,
+                rightHip,
+                leftKnee,
+                rightKnee,
+                leftAnkle,
+                rightAnkle
+              ] = keypoints
+              const yDiff = Math.abs(
+                leftShoulder.position.y - leftWrist.position.y
               )
+              const xDiff = Math.abs(
+                leftShoulder.position.x - leftWrist.position.x
+              )
+              const gradient = yDiff / xDiff
+              //'d'
+              const handDistance =
+                Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2
+              const otherThing =
+                Math.sqrt(
+                  Math.pow(xDiff, 2) +
+                    Math.pow(gradient, 2) * Math.pow(xDiff, 2)
+                ) / 2
+
+              console.log(
+                handDistance,
+                otherThing,
+                leftShoulder.position.y,
+                leftShoulder.position.x
+              )
+
+              // drawLineBetweenPoints(
+              //   [keypoints[0], prevPoses[0].keypoints[0]],
+              //   ctx,
+              //   1,
+              //   5
+              // )
+
+              if (!path) {
+                path = new Path({
+                  //event.point = {x: 435, y: 487}
+                  segments: [leftWrist.position],
+                  strokeColor: 'aqua',
+                  // Select the path, so we can see its segment points:
+                  fullySelected: true
+                })
+                console.log('created path', path)
+              }
+              path.add(leftWrist.position)
+              console.log('length', path.segments.length)
+              if (path.segments.length > 6) {
+                console.log('kaboom')
+                path.simplify(10)
+
+                path = new Path({
+                  //event.point = {x: 435, y: 487}
+                  segments: [leftWrist.position],
+                  strokeColor: 'aqua',
+                  strokeWidth: 7
+                  // Select the path, so we can see its segment points:
+                })
+              }
+
+              drawKeypoints([leftWrist], minPartConfidence, ctx)
             } else {
               ctx.globalCompositeOperation = 'destination-out'
               drawLineBetweenPoints(
