@@ -2,13 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {
-  Login,
-  Signup,
-  UserHome,
-  CameraComponent,
-  VoiceComponent
-} from './components'
+import {Login, Signup, UserHome, CameraComponent} from './components'
 import {me} from './store'
 
 /**
