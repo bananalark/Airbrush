@@ -7,14 +7,13 @@ import {
   drawBoundingBox,
   drawKeypoints,
   drawSkeleton,
-  drawLineBetweenPoints
+  drawLineBetweenPoints,
+  clearCanvas
 } from './utils'
 
 export const videoWidth = 600
 const videoHeight = 500
 const stats = new Stats()
-
-console.log('ARRIVED AT CAMERA.JS')
 
 function isAndroid() {
   return /Android/i.test(navigator.userAgent)
@@ -33,7 +32,6 @@ function isMobile() {
  *
  */
 async function setupCamera() {
-  console.log('ARRIVED AT SETUP CAMERA')
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     throw new Error(
       'Browser API navigator.mediaDevices.getUserMedia not available'
@@ -298,26 +296,30 @@ function detectPoseInRealTime(video, net) {
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
 
-        // if (keypoints[10].score) {
-        //   console.log(keypoints[10].position, keypoints[6].position)
-
         if (draw(keypoints, minPartConfidence)) {
-          //I'm putting drawKeypoints here because we will probably want to be working from points when we make the curves
-          // drawKeypoints([keypoints[0]], minPartConfidence, ctx)
-
           if (prevPoses.length) {
-            drawLineBetweenPoints(
-              [keypoints[0], prevPoses[0].keypoints[0]],
-              ctx
-            )
+            let eraseMode = document.getElementById('erase-button')
+            let eraseModeValue = eraseMode.attributes.value.nodeValue
 
-            //draw shoulder and wrist
-
-            // drawLineBetweenPoints([keypoints[10], prevPoses[0].keypoints[10]], ctx)
-            // drawLineBetweenPoints([keypoints[6], prevPoses[0].keypoints[6]], ctx)
+            if (eraseModeValue === 'false') {
+              ctx.globalCompositeOperation = 'source-over'
+              drawLineBetweenPoints(
+                [keypoints[0], prevPoses[0].keypoints[0]],
+                ctx,
+                1,
+                5
+              )
+            } else {
+              ctx.globalCompositeOperation = 'destination-out'
+              drawLineBetweenPoints(
+                [keypoints[0], prevPoses[0].keypoints[0]],
+                ctx,
+                1,
+                15
+              )
+            }
           }
         }
-        //}
       }
     })
 
@@ -339,7 +341,7 @@ export async function bindPage() {
   const net = await posenet.load(0.75)
 
   // document.getElementById('loading').style.display = 'none'
-  document.getElementById('main').style.display = 'block'
+  document.getElementById('display').style.display = 'block'
 
   let video
 
@@ -354,9 +356,10 @@ export async function bindPage() {
     throw e
   }
 
+  clearCanvas()
   setupGui([], net)
   setupFPS()
-  detectPoseInRealTime(video, net)
+  setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
 navigator.getUserMedia =
