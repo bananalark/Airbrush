@@ -16,7 +16,8 @@
  */
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
-
+const paper = require('paper')
+import {project} from './camera'
 const color = 'aqua'
 const boundingBoxColor = 'red'
 let lineWidth = 2
@@ -33,10 +34,12 @@ function toTuple({y, x}) {
 export function clearCanvas() {
   let canvas = document.getElementById('output')
   let context = canvas.getContext('2d')
+  console.log('PROJECT', project)
   document.getElementById('clear-button').addEventListener(
     'click',
     () => {
       context.clearRect(0, 0, canvas.width, canvas.height)
+      project.activeLayer.removeChildren()
     },
     false
   )

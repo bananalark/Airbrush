@@ -2,7 +2,6 @@ import * as posenet from '@tensorflow-models/posenet'
 import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
 const paper = require('paper')
-
 import {
   draw,
   drawBoundingBox,
@@ -218,6 +217,8 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   paper.setup(canvas)
+
+  console.log('just below setup', paper.project)
   let path
 
   async function poseDetectionFrame(prevPoses = []) {
@@ -340,19 +341,12 @@ function detectPoseInRealTime(video, net) {
               const gradient = yDiff / xDiff
               //'d'
               const handDistance =
-                Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2
+                Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2 //half the forearm length
               const otherThing =
                 Math.sqrt(
                   Math.pow(xDiff, 2) +
                     Math.pow(gradient, 2) * Math.pow(xDiff, 2)
                 ) / 2
-
-              console.log(
-                handDistance,
-                otherThing,
-                leftShoulder.position.y,
-                leftShoulder.position.x
-              )
 
               // drawLineBetweenPoints(
               //   [keypoints[0], prevPoses[0].keypoints[0]],
@@ -366,24 +360,30 @@ function detectPoseInRealTime(video, net) {
                   //event.point = {x: 435, y: 487}
                   segments: [leftWrist.position],
                   strokeColor: 'aqua',
+                  strokeWidth: 7
                   // Select the path, so we can see its segment points:
-                  fullySelected: true
                 })
                 console.log('created path', path)
               }
               path.add(leftWrist.position)
               console.log('length', path.segments.length)
-              if (path.segments.length > 6) {
+              if (path.segments.length > 5) {
                 console.log('kaboom')
                 path.simplify(10)
 
                 path = new Path({
-                  //event.point = {x: 435, y: 487}
                   segments: [leftWrist.position],
                   strokeColor: 'aqua',
-                  strokeWidth: 7
-                  // Select the path, so we can see its segment points:
+                  strokeWidth: 5
                 })
+                console.log(
+                  'in frame',
+                  paper.project,
+                  'projects',
+                  paper.projects,
+                  'big P',
+                  paper.Project
+                )
               }
 
               drawKeypoints([leftWrist], minPartConfidence, ctx)
