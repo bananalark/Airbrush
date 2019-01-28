@@ -11,7 +11,7 @@ import {
   clearCanvas
 } from './utils.js'
 
-import {currentCommand, commandConfidence} from './utils/voiceUtilsNEW'
+// import {currentCommand, commandConfidence} from './utils/voiceUtilsNEW'
 
 export const videoWidth = 600
 const videoHeight = 500
@@ -297,7 +297,7 @@ function detectPoseInRealTime(video, net) {
         //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
-        console.log(currentCommand)
+        // console.log(currentCommand)
         // if (draw(keypoints, minPartConfidence) || currentCommand === 'start') {
         if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
