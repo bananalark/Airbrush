@@ -16,14 +16,38 @@
  */
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
+const paper = require('paper')
+import clearCanvas from './clearCanvas'
 
-let lineWidth = 6
-
-function toTuple({y, x}) {
-  return [y, x]
+export function createProject(window, canvas) {
+  paper.install(window)
+  paper.setup(canvas)
+  clearCanvas(paper.project)
 }
 
-//function to determine whether in posture for starting to draw line (left wrist to left shoulder)
+//smoother 'drawLineBetweenPoints' with paper.js project
+export function drawLine(oneKeypoint, path) {
+  const pathStyle = new Path({
+    segments: [oneKeypoint.position],
+    strokeColor: 'aqua',
+    strokeWidth: 10,
+    strokeCap: 'round'
+  })
+
+  if (!path) path = pathStyle
+
+  path.add(oneKeypoint.position)
+
+  //if there are a certain number of points, implement smoothing function and reset to a fresh path
+  if (path.segments.length > 5) {
+    path.simplify(10)
+    path = pathStyle
+  }
+
+  return path
+}
+
+//on-off switch with gesture
 export function draw(keypoints, minPartConfidence) {
   return (
     keypoints[10].score >= minPartConfidence &&
@@ -31,17 +55,19 @@ export function draw(keypoints, minPartConfidence) {
   )
 }
 
+function toTuple({y, x}) {
+  return [y, x]
+}
+
 //this will go away by replacing paper.js functionality
-export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
-  console.log('in drawsegment')
+let lineWidth
+export function drawSegment([ay, ax], [by, bx], scale, ctx) {
   ctx.beginPath()
   ctx.moveTo(ax * scale, ay * scale)
   ctx.lineTo(bx * scale, by * scale)
   ctx.lineWidth = lineWidth
-  // ctx.strokeStyle = color
   ctx.stroke()
 }
-
 //this will go away by replacing paper.js functionality
 export function drawLineBetweenPoints(
   adjacentKeyPoints,
@@ -53,7 +79,6 @@ export function drawLineBetweenPoints(
   drawSegment(
     toTuple(adjacentKeyPoints[0].position),
     toTuple(adjacentKeyPoints[1].position),
-    'aqua',
     scale,
     ctx
   )
