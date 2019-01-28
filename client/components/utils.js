@@ -19,14 +19,14 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 import ColorPicker from './ColorPicker'
 
-export function SelectedColor() {
-  return (
-    <div>
-      <ColorPicker color="color" />
-    </div>
-  )
-}
-const color = 'black'
+// export function SelectedColor(){
+//   return (
+//     <div>
+//       <ColorPicker color = 'color'/>
+//     </div>
+//   )
+// }
+const color = 'squa'
 const boundingBoxColor = 'red'
 const lineWidth = 2
 
