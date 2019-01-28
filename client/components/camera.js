@@ -40,7 +40,7 @@ async function setupCamera() {
 
   const video = document.getElementById('video')
   video.width = window.innerWidth
-  video.height = window.innerHeight
+  video.height = 5 * window.innerWidth / 6
 
   const mobile = isMobile()
   const stream = await navigator.mediaDevices.getUserMedia({
