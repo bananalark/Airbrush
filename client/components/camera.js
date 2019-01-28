@@ -1,15 +1,7 @@
 import * as posenet from '@tensorflow-models/posenet'
-import dat from '../../node_modules/dat.gui'
-import Stats from '../../node_modules/stats.js'
-
-import {
-  draw,
-  drawBoundingBox,
-  drawKeypoints,
-  drawSkeleton,
-  drawLineBetweenPoints,
-  clearCanvas
-} from './utils'
+const paper = require('paper')
+import {draw, drawLineBetweenPoints} from './utils/draw.js'
+import clearCanvas from './utils/clearCanvas'
 
 let videoHeight
 let videoWidth
@@ -22,42 +14,21 @@ if (5 * window.innerWidth / 6 > window.innerHeight) {
   videoHeight = 5 * window.innerWidth / 6
 }
 
-const stats = new Stats()
-
-function isAndroid() {
-  return /Android/i.test(navigator.userAgent)
-}
-
-function isiOS() {
-  return /iPhone|iPad|iPod/i.test(navigator.userAgent)
-}
-
-function isMobile() {
-  return isAndroid() || isiOS()
-}
-
 /**
  * Loads a the camera to be used in the demo
  *
  */
 async function setupCamera() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    throw new Error(
-      'Browser API navigator.mediaDevices.getUserMedia not available'
-    )
-  }
-
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
 
-  const mobile = isMobile()
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
       facingMode: 'user',
-      width: mobile ? undefined : videoWidth,
-      height: mobile ? undefined : videoHeight
+      width: videoWidth,
+      height: videoHeight
     }
   })
   video.srcObject = stream
@@ -79,7 +50,7 @@ async function loadVideo() {
 const guiState = {
   algorithm: 'single-pose',
   input: {
-    mobileNetArchitecture: isMobile() ? '0.50' : '0.75',
+    mobileNetArchitecture: '0.75',
     outputStride: 16,
     imageScaleFactor: 0.5
   },
@@ -87,17 +58,9 @@ const guiState = {
     minPoseConfidence: 0.1,
     minPartConfidence: 0.5
   },
-  multiPoseDetection: {
-    maxPoseDetections: 5,
-    minPoseConfidence: 0.15,
-    minPartConfidence: 0.1,
-    nmsRadius: 30.0
-  },
   output: {
     showVideo: true,
-    showSkeleton: true,
-    showPoints: true,
-    showBoundingBox: false
+    showPoints: true
   },
   net: null
 }
@@ -113,13 +76,19 @@ function detectPoseInRealTime(video, net) {
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
 
-  // since images are being fed from a webcam
+  paper.install(window)
+
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
+
+  paper.setup(canvas)
+  clearCanvas(paper.project)
+
+  let path
 
   async function poseDetectionFrame(prevPoses = []) {
     if (guiState.changeToArchitecture) {
@@ -133,9 +102,6 @@ function detectPoseInRealTime(video, net) {
       guiState.changeToArchitecture = null
     }
 
-    // Begin monitoring code for frames per second
-    stats.begin()
-
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -145,40 +111,20 @@ function detectPoseInRealTime(video, net) {
     let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
-    switch (guiState.algorithm) {
-      case 'single-pose':
-        const pose = await net.estimateSinglePose(
-          video,
-          imageScaleFactor,
-          flipHorizontal,
-          outputStride
-        )
-        poses.push(pose)
 
-        minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
-        minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
-        break
-      case 'multi-pose':
-        poses = await guiState.net.estimateMultiplePoses(
-          video,
-          imageScaleFactor,
-          flipHorizontal,
-          outputStride,
-          guiState.multiPoseDetection.maxPoseDetections,
-          guiState.multiPoseDetection.minPartConfidence,
-          guiState.multiPoseDetection.nmsRadius
-        )
+    const pose = await guiState.net.estimateSinglePose(
+      video,
+      imageScaleFactor,
+      flipHorizontal,
+      outputStride
+    )
+    poses.push(pose)
 
-        minPoseConfidence = +guiState.multiPoseDetection.minPoseConfidence
-        minPartConfidence = +guiState.multiPoseDetection.minPartConfidence
+    minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
+    minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
 
-        break
-    }
     /*eslint-enable*/
 
-    /*
-     *  This if-block allows video to play behind the canvas on which we're drawing.
-     */
     if (guiState.output.showVideo) {
       backgroundctx.save()
       backgroundctx.scale(-1, 1)
@@ -190,6 +136,7 @@ function detectPoseInRealTime(video, net) {
     // For each pose (i.e. person) detected in an image, loop through the poses
     // and draw the resulting skeleton and keypoints if over certain confidence
     // scores
+
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         let command = require('./voiceUtils')
@@ -201,18 +148,62 @@ function detectPoseInRealTime(video, net) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
 
+            const [
+              nose,
+              leftEye,
+              rightEye,
+              leftEar,
+              rightEar,
+              leftShoulder,
+              rightShoulder,
+              leftElbow,
+              rightElbow,
+              leftWrist,
+              rightWrist,
+              leftHip,
+              rightHip,
+              leftKnee,
+              rightKnee,
+              leftAnkle,
+              rightAnkle
+            ] = keypoints
+
             if (eraseModeValue === 'false') {
               ctx.globalCompositeOperation = 'source-over'
-              drawLineBetweenPoints(
-                [keypoints[0], prevPoses[0].keypoints[0]],
-                ctx,
-                1,
-                5
+
+              //beginning to map out hand
+              const yDiff = Math.abs(
+                leftShoulder.position.y - leftWrist.position.y
               )
-            } else if (eraseModeValue === 'true') {
+              const xDiff = Math.abs(
+                leftShoulder.position.x - leftWrist.position.x
+              )
+              const handDistance =
+                Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2 //half the forearm length
+
+              const pathStyle = new Path({
+                segments: [leftWrist.position],
+                strokeColor: 'aqua',
+                strokeWidth: 7,
+                strokeCap: 'round'
+              })
+
+              if (!path) {
+                path = pathStyle
+              }
+              path.add(leftWrist.position)
+
+              if (path.segments.length > 5) {
+                console.log('kaboom')
+                path.simplify(10)
+
+                path = pathStyle
+              }
+            } else {
               ctx.globalCompositeOperation = 'destination-out'
+              //keypoints[9] == leftWrist (but literally your right wrist)
               drawLineBetweenPoints(
-                [keypoints[0], prevPoses[0].keypoints[0]],
+                [keypoints[9], prevPoses[0].keypoints[9]],
                 ctx,
                 1,
                 15
@@ -222,9 +213,6 @@ function detectPoseInRealTime(video, net) {
         }
       }
     })
-
-    // End monitoring code for frames per second
-    stats.end()
 
     requestAnimationFrame(() => poseDetectionFrame(poses))
   }
@@ -242,6 +230,7 @@ export async function bindPage() {
 
   // document.getElementById('loading').style.display = 'none'
   document.getElementById('display').style.display = 'block'
+  document.getElementById('main').style.display = 'block'
 
   let video
 
@@ -260,9 +249,5 @@ export async function bindPage() {
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
-navigator.getUserMedia =
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia
 // kick off the demo
 bindPage()
