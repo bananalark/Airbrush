@@ -31,15 +31,14 @@ function toTuple({y, x}) {
 //   context.fill()
 // }
 
-export function clearCanvas() {
+export function clearCanvas(project) {
   let canvas = document.getElementById('output')
   let context = canvas.getContext('2d')
-  console.log('PROJECT', project)
   document.getElementById('clear-button').addEventListener(
     'click',
     () => {
       context.clearRect(0, 0, canvas.width, canvas.height)
-      project.activeLayer.removeChildren()
+      project.clear()
     },
     false
   )

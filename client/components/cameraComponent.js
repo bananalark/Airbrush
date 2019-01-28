@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import ColorPicker from './colorPicker'
 
 class CameraComponent extends Component {
   constructor() {
@@ -55,6 +56,7 @@ class CameraComponent extends Component {
             />
           </div>
         </div>
+        <ColorPicker />
       </div>
     )
   }

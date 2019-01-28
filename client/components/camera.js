@@ -2,53 +2,46 @@ import * as posenet from '@tensorflow-models/posenet'
 import dat from '../../node_modules/dat.gui'
 import Stats from '../../node_modules/stats.js'
 const paper = require('paper')
-import {
-  draw,
-  drawBoundingBox,
-  drawKeypoints,
-  drawSkeleton,
-  drawLineBetweenPoints,
-  clearCanvas
-} from './utils'
+import {draw, drawLineBetweenPoints, clearCanvas} from './utils'
 
 export const videoWidth = 600
 const videoHeight = 500
 const stats = new Stats()
 
-function isAndroid() {
-  return /Android/i.test(navigator.userAgent)
-}
+// function isAndroid() {
+//   return /Android/i.test(navigator.userAgent)
+// }
 
-function isiOS() {
-  return /iPhone|iPad|iPod/i.test(navigator.userAgent)
-}
+// function isiOS() {
+//   return /iPhone|iPad|iPod/i.test(navigator.userAgent)
+// }
 
-function isMobile() {
-  return isAndroid() || isiOS()
-}
+// function isMobile() {
+//   return isAndroid() || isiOS()
+// }
 
 /**
  * Loads a the camera to be used in the demo
  *
  */
 async function setupCamera() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    throw new Error(
-      'Browser API navigator.mediaDevices.getUserMedia not available'
-    )
-  }
+  // if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  //   throw new Error(
+  //     'Browser API navigator.mediaDevices.getUserMedia not available'
+  //   )
+  // }
 
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
 
-  const mobile = isMobile()
+  // const mobile = isMobile()
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
       facingMode: 'user',
-      width: mobile ? undefined : videoWidth,
-      height: mobile ? undefined : videoHeight
+      width: videoWidth,
+      height: videoHeight
     }
   })
   video.srcObject = stream
@@ -70,7 +63,7 @@ async function loadVideo() {
 const guiState = {
   algorithm: 'single-pose',
   input: {
-    mobileNetArchitecture: isMobile() ? '0.50' : '0.75',
+    mobileNetArchitecture: '0.75', //isMobile() ? '0.50' : '0.75',
     outputStride: 16,
     imageScaleFactor: 0.5
   },
@@ -78,17 +71,17 @@ const guiState = {
     minPoseConfidence: 0.1,
     minPartConfidence: 0.5
   },
-  multiPoseDetection: {
-    maxPoseDetections: 5,
-    minPoseConfidence: 0.15,
-    minPartConfidence: 0.1,
-    nmsRadius: 30.0
-  },
+  // multiPoseDetection: {
+  //   maxPoseDetections: 5,
+  //   minPoseConfidence: 0.15,
+  //   minPartConfidence: 0.1,
+  //   nmsRadius: 30.0
+  // },
   output: {
     showVideo: true,
-    showSkeleton: true,
-    showPoints: true,
-    showBoundingBox: false
+    // showSkeleton: true,
+    showPoints: true
+    // showBoundingBox: false
   },
   net: null
 }
@@ -145,27 +138,27 @@ function setupGui(cameras, net) {
   single.add(guiState.singlePoseDetection, 'minPoseConfidence', 0.0, 1.0)
   single.add(guiState.singlePoseDetection, 'minPartConfidence', 0.0, 1.0)
 
-  let multi = gui.addFolder('Multi Pose Detection')
-  multi
-    .add(guiState.multiPoseDetection, 'maxPoseDetections')
-    .min(1)
-    .max(20)
-    .step(1)
-  multi.add(guiState.multiPoseDetection, 'minPoseConfidence', 0.0, 1.0)
-  multi.add(guiState.multiPoseDetection, 'minPartConfidence', 0.0, 1.0)
-  // nms Radius: controls the minimum distance between poses that are returned
-  // defaults to 20, which is probably fine for most use cases
-  multi
-    .add(guiState.multiPoseDetection, 'nmsRadius')
-    .min(0.0)
-    .max(40.0)
-  multi.open()
+  // let multi = gui.addFolder('Multi Pose Detection')
+  // multi
+  //   .add(guiState.multiPoseDetection, 'maxPoseDetections')
+  //   .min(1)
+  //   .max(20)
+  //   .step(1)
+  // multi.add(guiState.multiPoseDetection, 'minPoseConfidence', 0.0, 1.0)
+  // multi.add(guiState.multiPoseDetection, 'minPartConfidence', 0.0, 1.0)
+  // // nms Radius: controls the minimum distance between poses that are returned
+  // // defaults to 20, which is probably fine for most use cases
+  // multi
+  //   .add(guiState.multiPoseDetection, 'nmsRadius')
+  //   .min(0.0)
+  //   .max(40.0)
+  // multi.open()
 
   let output = gui.addFolder('Output')
   output.add(guiState.output, 'showVideo')
-  output.add(guiState.output, 'showSkeleton')
+  //output.add(guiState.output, 'showSkeleton')
   output.add(guiState.output, 'showPoints')
-  output.add(guiState.output, 'showBoundingBox')
+  //output.add(guiState.output, 'showBoundingBox')
   output.open()
 
   architectureController.onChange(function(architecture) {
@@ -173,26 +166,26 @@ function setupGui(cameras, net) {
   })
 
   algorithmController.onChange(function(value) {
-    switch (guiState.algorithm) {
-      case 'single-pose':
-        multi.close()
-        single.open()
-        break
-      case 'multi-pose':
-        single.close()
-        multi.open()
-        break
-    }
+    // switch (guiState.algorithm) {
+    //   case 'single-pose':
+    //     multi.close()
+    single.open()
+    //     break
+    //   case 'multi-pose':
+    //     single.close()
+    //     multi.open()
+    //     break
+    // }
   })
 }
 
 /**
  * Sets up a frames per second panel on the top-left of the window
  */
-function setupFPS() {
-  stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-  document.body.appendChild(stats.dom)
-}
+// function setupFPS() {
+//   stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+//   document.body.appendChild(stats.dom)
+// }
 
 /**
  * Feeds an image to posenet to estimate poses - this is where the magic
@@ -207,8 +200,6 @@ function detectPoseInRealTime(video, net) {
 
   paper.install(window)
 
-  console.log('TOP paper back', paper)
-  // since images are being fed from a webcam
   const flipHorizontal = true
 
   canvas.width = videoWidth
@@ -217,8 +208,7 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   paper.setup(canvas)
-
-  console.log('just below setup', paper.project)
+  clearCanvas(paper.project)
   let path
 
   async function poseDetectionFrame(prevPoses = []) {
@@ -245,35 +235,35 @@ function detectPoseInRealTime(video, net) {
     let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
-    switch (guiState.algorithm) {
-      case 'single-pose':
-        const pose = await guiState.net.estimateSinglePose(
-          video,
-          imageScaleFactor,
-          flipHorizontal,
-          outputStride
-        )
-        poses.push(pose)
+    // switch (guiState.algorithm) {
+    //   case 'single-pose':
+    const pose = await guiState.net.estimateSinglePose(
+      video,
+      imageScaleFactor,
+      flipHorizontal,
+      outputStride
+    )
+    poses.push(pose)
 
-        minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
-        minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
-        break
-      case 'multi-pose':
-        poses = await guiState.net.estimateMultiplePoses(
-          video,
-          imageScaleFactor,
-          flipHorizontal,
-          outputStride,
-          guiState.multiPoseDetection.maxPoseDetections,
-          guiState.multiPoseDetection.minPartConfidence,
-          guiState.multiPoseDetection.nmsRadius
-        )
+    minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
+    minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
+    //  break
+    // case 'multi-pose':
+    //   poses = await guiState.net.estimateMultiplePoses(
+    //     video,
+    //     imageScaleFactor,
+    //     flipHorizontal,
+    //     outputStride,
+    //     guiState.multiPoseDetection.maxPoseDetections,
+    //     guiState.multiPoseDetection.minPartConfidence,
+    //     guiState.multiPoseDetection.nmsRadius
+    //   )
 
-        minPoseConfidence = +guiState.multiPoseDetection.minPoseConfidence
-        minPartConfidence = +guiState.multiPoseDetection.minPartConfidence
+    //   minPoseConfidence = +guiState.multiPoseDetection.minPoseConfidence
+    //minPartConfidence = +guiState.multiPoseDetection.minPartConfidence
 
-        break
-    }
+    //   break
+    //}
     /*eslint-enable*/
 
     // ctx.clearRect(0, 0, videoWidth, videoHeight)
@@ -284,12 +274,6 @@ function detectPoseInRealTime(video, net) {
       backgroundctx.translate(-videoWidth, 0)
       backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
       backgroundctx.restore()
-
-      // ctx.save()
-      // ctx.scale(-1, 1)
-      // ctx.translate(-videoWidth, 0)
-      // ctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-      // ctx.restore()
     }
 
     // For each pose (i.e. person) detected in an image, loop through the poses
@@ -332,28 +316,16 @@ function detectPoseInRealTime(video, net) {
                 leftAnkle,
                 rightAnkle
               ] = keypoints
+
+              //beginning to map out hand
               const yDiff = Math.abs(
                 leftShoulder.position.y - leftWrist.position.y
               )
               const xDiff = Math.abs(
                 leftShoulder.position.x - leftWrist.position.x
               )
-              const gradient = yDiff / xDiff
-              //'d'
               const handDistance =
                 Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2 //half the forearm length
-              const otherThing =
-                Math.sqrt(
-                  Math.pow(xDiff, 2) +
-                    Math.pow(gradient, 2) * Math.pow(xDiff, 2)
-                ) / 2
-
-              // drawLineBetweenPoints(
-              //   [keypoints[0], prevPoses[0].keypoints[0]],
-              //   ctx,
-              //   1,
-              //   5
-              // )
 
               if (!path) {
                 path = new Path({
@@ -363,10 +335,9 @@ function detectPoseInRealTime(video, net) {
                   strokeWidth: 7
                   // Select the path, so we can see its segment points:
                 })
-                console.log('created path', path)
               }
               path.add(leftWrist.position)
-              console.log('length', path.segments.length)
+
               if (path.segments.length > 5) {
                 console.log('kaboom')
                 path.simplify(10)
@@ -374,19 +345,9 @@ function detectPoseInRealTime(video, net) {
                 path = new Path({
                   segments: [leftWrist.position],
                   strokeColor: 'aqua',
-                  strokeWidth: 5
+                  strokeWidth: 7
                 })
-                console.log(
-                  'in frame',
-                  paper.project,
-                  'projects',
-                  paper.projects,
-                  'big P',
-                  paper.Project
-                )
               }
-
-              drawKeypoints([leftWrist], minPartConfidence, ctx)
             } else {
               ctx.globalCompositeOperation = 'destination-out'
               drawLineBetweenPoints(
@@ -402,7 +363,7 @@ function detectPoseInRealTime(video, net) {
     })
 
     // End monitoring code for frames per second
-    stats.end()
+    //stats.end()
 
     requestAnimationFrame(() => poseDetectionFrame(poses))
   }
@@ -436,13 +397,13 @@ export async function bindPage() {
 
   clearCanvas()
   setupGui([], net)
-  setupFPS()
+  //setupFPS()
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
-navigator.getUserMedia =
-  navigator.getUserMedia ||
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia
+// navigator.getUserMedia =
+//   navigator.getUserMedia ||
+//   navigator.webkitGetUserMedia ||
+//   navigator.mozGetUserMedia
 // kick off the demo
 bindPage()
