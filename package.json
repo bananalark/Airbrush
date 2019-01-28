@@ -52,6 +52,7 @@
     "pg-hstore": "^2.3.2",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
+    "react-burger-menu": "^2.6.2",
     "react-color": "^2.17.0",
     "react-dom": "^16.4.2",
     "react-pose": "^4.0.6",
