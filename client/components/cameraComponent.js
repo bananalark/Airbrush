@@ -4,35 +4,51 @@ import Grid from '@material-ui/core/Grid'
 import {withStyles} from '@material-ui/core/styles'
 
 //to make sure that camera is required even without refresh (ie, navigating from the landing page) - called on componentDidMount
-const setUpCamera = () => {
-  require('./camera')
-}
 
 const styles = {}
 
 class CameraComponent extends Component {
   constructor() {
     super()
-    this.state = {eraseModeOn: false}
-    this.handleEraseModeClick = this.handleEraseModeClick.bind(this)
+    this.state = {eraseModeOn: false, voiceModeOn: false}
+    this.toggleEraseMode = this.toggleEraseMode.bind(this)
+    this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
   }
-
-  handleEraseModeClick() {
+  componentDidMount() {
+    require('./camera')
+  }
+  toggleEraseMode() {
+    console.log(this.state.eraseModeOn)
     if (this.state.eraseModeOn === true) {
       this.setState({eraseModeOn: false})
     } else {
       this.setState({eraseModeOn: true})
     }
   }
-
-  componentDidMount() {
-    setUpCamera()
+  toggleVoiceMode() {
+    if (this.state.voiceModeOn === true) {
+      this.setState({voiceModeOn: false})
+    } else {
+      this.setState({voiceModeOn: true})
+    }
   }
 
   render() {
     let eraserModeOn = this.state.eraseModeOn
     return (
       <Grid container>
+        <div id="speech-recognition">
+          <h4>Turn Voice Recognition On/Off.</h4>
+          <p>
+            When voice recognition is ON, say "START" to start painting and
+            "STOP" to... well, stop!
+          </p>
+          {this.state.voiceModeOn === true ? (
+            <button onClick={this.toggleVoiceMode}>Voice Currently ON</button>
+          ) : (
+            <button onClick={this.toggleVoiceMode}>Voice Currently OFF</button>
+          )}
+        </div>
         {/* <div id="info" />  */}
         <Grid
           container
@@ -93,16 +109,20 @@ class CameraComponent extends Component {
             alignItems="center"
             id="buttons"
           >
-            <input type="button" id="clear-button" value="Clear Canvas" />
-            <p>
-              Erase Mode:{' '}
-              <input
-                type="button"
-                id="erase-button"
-                value={eraserModeOn}
-                onClick={this.handleEraseModeClick}
-              />
-            </p>
+            <div id="buttons">
+              <h5>Erase Tools!</h5>
+              <p>
+                Erase Mode:{' '}
+                <input
+                  type="button"
+                  id="erase-button"
+                  value={eraserModeOn}
+                  onClick={this.toggleEraseMode}
+                />{' '}
+                ...or...
+                <input type="button" id="clear-button" value="Clear Canvas" />
+              </p>
+            </div>
           </Grid>
         </Grid>
       </Grid>
@@ -110,6 +130,6 @@ class CameraComponent extends Component {
   }
 }
 
-require('./camera')
-
 export default CameraComponent
+
+// require('./camera')

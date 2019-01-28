@@ -295,13 +295,17 @@ function detectPoseInRealTime(video, net) {
         //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
-
-        if (draw(keypoints, minPartConfidence)) {
+        let command = require('./voiceUtils')
+        if (
+          draw(keypoints, minPartConfidence) ||
+          command.speechResult === 'start'
+        ) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
 
             if (eraseModeValue === 'false') {
+              console.log('should be drawing')
               ctx.globalCompositeOperation = 'source-over'
               drawLineBetweenPoints(
                 [keypoints[0], prevPoses[0].keypoints[0]],
@@ -309,7 +313,12 @@ function detectPoseInRealTime(video, net) {
                 1,
                 5
               )
-            } else {
+            } else if (
+              // !draw(keypoints, minPartConfidence) ||
+              // command.speechResult === 'stop'
+              eraseModeValue === 'true'
+            ) {
+              console.log('should be erasing')
               ctx.globalCompositeOperation = 'destination-out'
               drawLineBetweenPoints(
                 [keypoints[0], prevPoses[0].keypoints[0]],
