@@ -1,41 +1,20 @@
 import * as posenet from '@tensorflow-models/posenet'
-import dat from '../../node_modules/dat.gui'
-import Stats from '../../node_modules/stats.js'
 const paper = require('paper')
-import {draw, drawLineBetweenPoints, clearCanvas} from './utils'
+import {draw, drawLineBetweenPoints, createProject} from './utils/draw.js'
+import clearCanvas from './utils/clearCanvas'
 
 export const videoWidth = 600
 const videoHeight = 500
-const stats = new Stats()
-
-// function isAndroid() {
-//   return /Android/i.test(navigator.userAgent)
-// }
-
-// function isiOS() {
-//   return /iPhone|iPad|iPod/i.test(navigator.userAgent)
-// }
-
-// function isMobile() {
-//   return isAndroid() || isiOS()
-// }
 
 /**
  * Loads a the camera to be used in the demo
  *
  */
 async function setupCamera() {
-  // if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-  //   throw new Error(
-  //     'Browser API navigator.mediaDevices.getUserMedia not available'
-  //   )
-  // }
-
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
 
-  // const mobile = isMobile()
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
@@ -63,7 +42,7 @@ async function loadVideo() {
 const guiState = {
   algorithm: 'single-pose',
   input: {
-    mobileNetArchitecture: '0.75', //isMobile() ? '0.50' : '0.75',
+    mobileNetArchitecture: '0.75',
     outputStride: 16,
     imageScaleFactor: 0.5
   },
@@ -71,17 +50,9 @@ const guiState = {
     minPoseConfidence: 0.1,
     minPartConfidence: 0.5
   },
-  // multiPoseDetection: {
-  //   maxPoseDetections: 5,
-  //   minPoseConfidence: 0.15,
-  //   minPartConfidence: 0.1,
-  //   nmsRadius: 30.0
-  // },
   output: {
     showVideo: true,
-    // showSkeleton: true,
     showPoints: true
-    // showBoundingBox: false
   },
   net: null
 }
@@ -89,103 +60,9 @@ const guiState = {
 /**
  * Sets up dat.gui controller on the top-right of the window
  */
-function setupGui(cameras, net) {
+function setupGui(net) {
   guiState.net = net
-
-  if (cameras.length > 0) {
-    guiState.camera = cameras[0].deviceId
-  }
-
-  const gui = new dat.GUI({width: 300})
-
-  // The single-pose algorithm is faster and simpler but requires only one
-  // person to be in the frame or results will be innaccurate. Multi-pose works
-  // for more than 1 person
-  const algorithmController = gui.add(guiState, 'algorithm', [
-    'single-pose',
-    'multi-pose'
-  ])
-
-  // The input parameters have the most effect on accuracy and speed of the
-  // network
-  let input = gui.addFolder('Input')
-  // Architecture: there are a few PoseNet models varying in size and
-  // accuracy. 1.01 is the largest, but will be the slowest. 0.50 is the
-  // fastest, but least accurate.
-  const architectureController = input.add(
-    guiState.input,
-    'mobileNetArchitecture',
-    ['1.01', '1.00', '0.75', '0.50']
-  )
-  // Output stride:  Internally, this parameter affects the height and width of
-  // the layers in the neural network. The lower the value of the output stride
-  // the higher the accuracy but slower the speed, the higher the value the
-  // faster the speed but lower the accuracy.
-  input.add(guiState.input, 'outputStride', [8, 16, 32])
-  // Image scale factor: What to scale the image by before feeding it through
-  // the network.
-  input
-    .add(guiState.input, 'imageScaleFactor')
-    .min(0.2)
-    .max(1.0)
-  input.open()
-
-  // Pose confidence: the overall confidence in the estimation of a person's
-  // pose (i.e. a person detected in a frame)
-  // Min part confidence: the confidence that a particular estimated keypoint
-  // position is accurate (i.e. the elbow's position)
-  let single = gui.addFolder('Single Pose Detection')
-  single.add(guiState.singlePoseDetection, 'minPoseConfidence', 0.0, 1.0)
-  single.add(guiState.singlePoseDetection, 'minPartConfidence', 0.0, 1.0)
-
-  // let multi = gui.addFolder('Multi Pose Detection')
-  // multi
-  //   .add(guiState.multiPoseDetection, 'maxPoseDetections')
-  //   .min(1)
-  //   .max(20)
-  //   .step(1)
-  // multi.add(guiState.multiPoseDetection, 'minPoseConfidence', 0.0, 1.0)
-  // multi.add(guiState.multiPoseDetection, 'minPartConfidence', 0.0, 1.0)
-  // // nms Radius: controls the minimum distance between poses that are returned
-  // // defaults to 20, which is probably fine for most use cases
-  // multi
-  //   .add(guiState.multiPoseDetection, 'nmsRadius')
-  //   .min(0.0)
-  //   .max(40.0)
-  // multi.open()
-
-  let output = gui.addFolder('Output')
-  output.add(guiState.output, 'showVideo')
-  //output.add(guiState.output, 'showSkeleton')
-  output.add(guiState.output, 'showPoints')
-  //output.add(guiState.output, 'showBoundingBox')
-  output.open()
-
-  architectureController.onChange(function(architecture) {
-    guiState.changeToArchitecture = architecture
-  })
-
-  algorithmController.onChange(function(value) {
-    // switch (guiState.algorithm) {
-    //   case 'single-pose':
-    //     multi.close()
-    single.open()
-    //     break
-    //   case 'multi-pose':
-    //     single.close()
-    //     multi.open()
-    //     break
-    // }
-  })
 }
-
-/**
- * Sets up a frames per second panel on the top-left of the window
- */
-// function setupFPS() {
-//   stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
-//   document.body.appendChild(stats.dom)
-// }
 
 /**
  * Feeds an image to posenet to estimate poses - this is where the magic
@@ -209,6 +86,8 @@ function detectPoseInRealTime(video, net) {
 
   paper.setup(canvas)
   clearCanvas(paper.project)
+  //createProject(window, canvas)
+
   let path
 
   async function poseDetectionFrame(prevPoses = []) {
@@ -223,9 +102,6 @@ function detectPoseInRealTime(video, net) {
       guiState.changeToArchitecture = null
     }
 
-    // Begin monitoring code for frames per second
-    stats.begin()
-
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -235,8 +111,7 @@ function detectPoseInRealTime(video, net) {
     let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
-    // switch (guiState.algorithm) {
-    //   case 'single-pose':
+
     const pose = await guiState.net.estimateSinglePose(
       video,
       imageScaleFactor,
@@ -247,26 +122,8 @@ function detectPoseInRealTime(video, net) {
 
     minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
     minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
-    //  break
-    // case 'multi-pose':
-    //   poses = await guiState.net.estimateMultiplePoses(
-    //     video,
-    //     imageScaleFactor,
-    //     flipHorizontal,
-    //     outputStride,
-    //     guiState.multiPoseDetection.maxPoseDetections,
-    //     guiState.multiPoseDetection.minPartConfidence,
-    //     guiState.multiPoseDetection.nmsRadius
-    //   )
 
-    //   minPoseConfidence = +guiState.multiPoseDetection.minPoseConfidence
-    //minPartConfidence = +guiState.multiPoseDetection.minPartConfidence
-
-    //   break
-    //}
     /*eslint-enable*/
-
-    // ctx.clearRect(0, 0, videoWidth, videoHeight)
 
     if (guiState.output.showVideo) {
       backgroundctx.save()
@@ -282,13 +139,6 @@ function detectPoseInRealTime(video, net) {
 
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        // if (guiState.output.showPoints) {
-        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
-
-        //
-        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
-        // }
-
         if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
@@ -327,14 +177,15 @@ function detectPoseInRealTime(video, net) {
               const handDistance =
                 Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2 //half the forearm length
 
+              const pathStyle = new Path({
+                segments: [leftWrist.position],
+                strokeColor: 'aqua',
+                strokeWidth: 7,
+                strokeCap: 'round'
+              })
+
               if (!path) {
-                path = new Path({
-                  //event.point = {x: 435, y: 487}
-                  segments: [leftWrist.position],
-                  strokeColor: 'aqua',
-                  strokeWidth: 7
-                  // Select the path, so we can see its segment points:
-                })
+                path = pathStyle
               }
               path.add(leftWrist.position)
 
@@ -342,11 +193,7 @@ function detectPoseInRealTime(video, net) {
                 console.log('kaboom')
                 path.simplify(10)
 
-                path = new Path({
-                  segments: [leftWrist.position],
-                  strokeColor: 'aqua',
-                  strokeWidth: 7
-                })
+                path = pathStyle
               }
             } else {
               ctx.globalCompositeOperation = 'destination-out'
@@ -362,9 +209,6 @@ function detectPoseInRealTime(video, net) {
       }
     })
 
-    // End monitoring code for frames per second
-    //stats.end()
-
     requestAnimationFrame(() => poseDetectionFrame(poses))
   }
 
@@ -379,7 +223,6 @@ export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
 
-  // document.getElementById('loading').style.display = 'none'
   document.getElementById('main').style.display = 'block'
 
   let video
@@ -396,14 +239,9 @@ export async function bindPage() {
   }
 
   clearCanvas()
-  setupGui([], net)
-  //setupFPS()
+  setupGui(net)
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
-// navigator.getUserMedia =
-//   navigator.getUserMedia ||
-//   navigator.webkitGetUserMedia ||
-//   navigator.mozGetUserMedia
 // kick off the demo
 bindPage()
