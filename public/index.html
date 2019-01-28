@@ -6,8 +6,15 @@
     <title>AI-rbrush</title>
     <link rel="stylesheet" href="/style.css" />
     <script defer src="/bundle.js"></script>
+    <!-- Load the Paper.js library -->
+    <script type="text/javascript" src="js/paper.js"></script>
+    <!-- Define inlined PaperScript associate it with myCanvas -->
+    <script type="text/paperscript" scr='js/myScript.js' canvas="myCanvas">
+
+    </script>
   </head>
   <body>
     <div id="app"></div>
+    <canvas id="myCanvas" resize></canvas>
   </body>
 </html>
