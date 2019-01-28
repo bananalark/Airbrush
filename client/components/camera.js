@@ -9,7 +9,9 @@ import {
   drawSkeleton,
   drawLineBetweenPoints,
   clearCanvas
-} from './utils'
+} from './utils.js'
+
+import {currentCommand, commandConfidence} from './utils/voiceUtilsNEW'
 
 export const videoWidth = 600
 const videoHeight = 500
@@ -295,11 +297,9 @@ function detectPoseInRealTime(video, net) {
         //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
-        let command = require('./voiceUtils')
-        if (
-          draw(keypoints, minPartConfidence) ||
-          command.speechResult === 'start'
-        ) {
+        console.log(currentCommand)
+        // if (draw(keypoints, minPartConfidence) || currentCommand === 'start') {
+        if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue

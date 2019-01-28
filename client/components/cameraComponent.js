@@ -10,6 +10,7 @@ class CameraComponent extends Component {
   }
   componentDidMount() {
     require('./camera')
+    require('./utils/voiceUtilsNEW')
   }
   toggleEraseMode() {
     if (this.state.eraseModeOn === true) {
