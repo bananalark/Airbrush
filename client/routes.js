@@ -2,35 +2,40 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {Login, Signup, UserHome, CameraComponent} from './components'
+import {Login, Signup, UserHome, CameraComponent, About} from './components'
 import {me} from './store'
+import posed, {PoseGroup} from 'react-pose'
 
-/**
- * COMPONENT
- */
 class Routes extends Component {
   componentDidMount() {
     this.props.loadInitialData()
   }
 
   render() {
+    const RouteContainer = posed.div({
+      enter: {opacity: 1, delay: 300, beforeChildren: true},
+      exit: {opacity: 0}
+    })
+
     const {isLoggedIn} = this.props
 
     return (
-      <Switch>
-        {/* Routes placed here are available to all visitors */}
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/camera" component={CameraComponent} />
-        {isLoggedIn && (
+      <PoseGroup>
+        <RouteContainer key={location.pathname}>
+          <Switch location={location}>
+            <Route path="/login" component={Login} key="login" />
+            <Route path="/signup" component={Signup} key="signup" />
+            <Route path="/camera" component={CameraComponent} key="camera" />
+            <Route path="/about" component={About} key="about" />
+            {/* {isLoggedIn && (
           <Switch>
-            {/* Routes placed here are only available after logging in */}
-            <Route path="/home" component={UserHome} />
+            <Route path="/home" component={UserHome} key="home"/>
           </Switch>
         )}
-        {/* Displays our Login component as a fallback */}
-        <Route component={Login} />
-      </Switch>
+        <Route component={Login} /> */}
+          </Switch>
+        </RouteContainer>
+      </PoseGroup>
     )
   }
 }
