@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {Link} from 'react-router-dom'
 import {logout} from '../store'
-
 const Navbar = ({handleClick, isLoggedIn}) => (
   <div>
     <h1>AI-rbrush</h1>
@@ -27,7 +26,6 @@ const Navbar = ({handleClick, isLoggedIn}) => (
     <hr />
   </div>
 )
-
 /**
  * CONTAINER
  */
@@ -36,7 +34,6 @@ const mapState = state => {
     isLoggedIn: !!state.user.id
   }
 }
-
 const mapDispatch = dispatch => {
   return {
     handleClick() {
@@ -44,9 +41,7 @@ const mapDispatch = dispatch => {
     }
   }
 }
-
 export default connect(mapState, mapDispatch)(Navbar)
-
 /**
  * PROP TYPES
  */
