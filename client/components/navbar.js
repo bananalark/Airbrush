@@ -24,7 +24,7 @@ class Navbar extends React.Component {
           <a id="login" className="menu-item" href="/login">
             Login
           </a>
-          <a id="signup" className="menu-item" href="/login">
+          <a id="signup" className="menu-item" href="/signup">
             Signup
           </a>
           <a onClick={this.showSettings} className="menu-item--small" href="">
