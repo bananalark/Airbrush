@@ -11,8 +11,17 @@ import {
   clearCanvas
 } from './utils'
 
-export const videoWidth = window.innerWidth
-const videoHeight = 5 * window.innerWidth / 6
+let videoHeight
+let videoWidth
+
+if (5 * window.innerWidth / 6 > window.innerHeight) {
+  videoHeight = window.innerHeight
+  videoWidth = 6 * window.innerHeight / 5
+} else {
+  videoWidth = window.innerWidth
+  videoHeight = 5 * window.innerWidth / 6
+}
+
 const stats = new Stats()
 
 function isAndroid() {
@@ -39,8 +48,8 @@ async function setupCamera() {
   }
 
   const video = document.getElementById('video')
-  video.width = window.innerWidth
-  video.height = 5 * window.innerWidth / 6
+  video.width = videoWidth
+  video.height = videoHeight
 
   const mobile = isMobile()
   const stream = await navigator.mediaDevices.getUserMedia({
@@ -107,10 +116,10 @@ function detectPoseInRealTime(video, net) {
   // since images are being fed from a webcam
   const flipHorizontal = true
 
-  canvas.width = window.innerWidth
-  canvas.height = 5 * window.innerWidth / 6
-  backgroundCanvas.width = window.innerWidth
-  backgroundCanvas.height = 5 * window.innerWidth / 6
+  canvas.width = videoWidth
+  canvas.height = videoHeight
+  backgroundCanvas.width = videoWidth
+  backgroundCanvas.height = videoHeight
 
   async function poseDetectionFrame(prevPoses = []) {
     if (guiState.changeToArchitecture) {

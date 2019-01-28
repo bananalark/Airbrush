@@ -3,6 +3,13 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import {withStyles} from '@material-ui/core/styles'
 import ColorPicker from './colorPicker'
+import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
+import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
+import Pencil from 'mdi-material-ui/Pencil'
+import Eraser from 'mdi-material-ui/Eraser'
+import PencilOff from 'mdi-material-ui/PencilOff'
+import Clear from '@material-ui/icons/Clear'
+import Toolbar from './toolbar'
 
 //to make sure that camera is required even without refresh (ie, navigating from the landing page) - called on componentDidMount
 
@@ -38,6 +45,30 @@ class CameraComponent extends Component {
     let eraserModeOn = this.state.eraseModeOn
     return (
       <div>
+        <Toolbar />
+        <Grid
+          container
+          direction="column"
+          alignContent="center"
+          alignItems="center"
+          id="buttons"
+        >
+          <div id="buttons">
+            <h5>Erase Tools!</h5>
+            <p>
+              Erase Mode:{' '}
+              <input
+                type="button"
+                id="erase-button"
+                value={eraserModeOn}
+                onClick={this.toggleEraseMode}
+              />{' '}
+              ...or...
+              <input type="button" id="clear-button" value="Clear Canvas" />
+            </p>
+          </div>
+        </Grid>
+
         <Grid container>
           <div id="speech-recognition">
             <h4>Turn Voice Recognition On/Off.</h4>
@@ -103,31 +134,7 @@ class CameraComponent extends Component {
                 />
               </div>
             </Grid>
-
-            <Grid
-              container
-              direction="column"
-              alignContent="center"
-              alignItems="center"
-              id="buttons"
-            >
-              <div id="buttons">
-                <h5>Erase Tools!</h5>
-                <p>
-                  Erase Mode:{' '}
-                  <input
-                    type="button"
-                    id="erase-button"
-                    value={eraserModeOn}
-                    onClick={this.toggleEraseMode}
-                  />{' '}
-                  ...or...
-                  <input type="button" id="clear-button" value="Clear Canvas" />
-                </p>
-              </div>
-            </Grid>
           </Grid>
-          <ColorPicker />
         </Grid>
       </div>
     )
