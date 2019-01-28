@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import {withStyles} from '@material-ui/core/styles'
+import ColorPicker from './colorPicker'
 
 //to make sure that camera is required even without refresh (ie, navigating from the landing page) - called on componentDidMount
 
@@ -125,6 +126,7 @@ class CameraComponent extends Component {
             </div>
           </Grid>
         </Grid>
+        <ColorPicker />
       </Grid>
     )
   }
@@ -132,4 +134,4 @@ class CameraComponent extends Component {
 
 export default CameraComponent
 
-// require('./camera')
+//require('./camera')

@@ -200,11 +200,7 @@ function detectPoseInRealTime(video, net) {
                 1,
                 5
               )
-            } else if (
-              // !draw(keypoints, minPartConfidence) ||
-              // command.speechResult === 'stop'
-              eraseModeValue === 'true'
-            ) {
+            } else if (eraseModeValue === 'true') {
               ctx.globalCompositeOperation = 'destination-out'
               drawLineBetweenPoints(
                 [keypoints[0], prevPoses[0].keypoints[0]],

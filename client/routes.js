@@ -7,37 +7,37 @@ import {
   Signup,
   UserHome,
   CameraComponent,
+  About,
   LandingPage
 } from './components'
 import {me} from './store'
+import posed, {PoseGroup} from 'react-pose'
 
-/**
- * COMPONENT
- */
 class Routes extends Component {
   componentDidMount() {
     this.props.loadInitialData()
   }
 
   render() {
+    const RouteContainer = posed.div({
+      enter: {opacity: 1, delay: 300, beforeChildren: true},
+      exit: {opacity: 0}
+    })
+
     const {isLoggedIn} = this.props
 
     return (
-      <Switch>
-        {/* Routes placed here are available to all visitors */}
-        <Route exact path="/" component={LandingPage} />
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
-        <Route path="/camera" component={CameraComponent} />
-        {isLoggedIn && (
-          <Switch>
-            {/* Routes placed here are only available after logging in */}
-            <Route path="/home" component={UserHome} />
+      <PoseGroup>
+        <RouteContainer key={location.pathname}>
+          <Switch location={location}>
+            <Route path="/" component={LandingPage} key="landingPage" />
+            <Route path="/login" component={Login} key="login" />
+            <Route path="/signup" component={Signup} key="signup" />
+            <Route path="/camera" component={CameraComponent} key="camera" />
+            <Route path="/about" component={About} key="about" />
           </Switch>
-        )}
-        {/* Displays our Login component as a fallback */}
-        <Route component={Login} />
-      </Switch>
+        </RouteContainer>
+      </PoseGroup>
     )
   }
 }
