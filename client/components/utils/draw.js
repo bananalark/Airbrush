@@ -16,15 +16,8 @@
  */
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
-//const paper = require('paper')
 
-let lineWidth = 2
-
-// export function createProject(window, canvas) {
-//   paper.install(window)
-//   paper.setup(canvas)
-//   clearCanvas(paper.project)
-// }
+let lineWidth = 6
 
 function toTuple({y, x}) {
   return [y, x]
@@ -38,25 +31,18 @@ export function draw(keypoints, minPartConfidence) {
   )
 }
 
-export function drawPoint(ctx, y, x, r, color) {
-  ctx.beginPath()
-  ctx.arc(x, y, r, 0, 2 * Math.PI)
-  ctx.fillStyle = color
-  ctx.fill()
-}
-
-/**
- * Draws a line on a canvas, i.e. a joint
- */
-export function drawSegment([ay, ax], [by, bx], color = 'aqua', scale, ctx) {
+//this will go away by replacing paper.js functionality
+export function drawSegment([ay, ax], [by, bx], color, scale, ctx) {
+  console.log('in drawsegment')
   ctx.beginPath()
   ctx.moveTo(ax * scale, ay * scale)
   ctx.lineTo(bx * scale, by * scale)
   ctx.lineWidth = lineWidth
-  ctx.strokeStyle = color
+  // ctx.strokeStyle = color
   ctx.stroke()
 }
 
+//this will go away by replacing paper.js functionality
 export function drawLineBetweenPoints(
   adjacentKeyPoints,
   ctx,
@@ -67,7 +53,7 @@ export function drawLineBetweenPoints(
   drawSegment(
     toTuple(adjacentKeyPoints[0].position),
     toTuple(adjacentKeyPoints[1].position),
-    (color = 'aqua'),
+    'aqua',
     scale,
     ctx
   )

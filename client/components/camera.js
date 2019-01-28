@@ -1,6 +1,6 @@
 import * as posenet from '@tensorflow-models/posenet'
 const paper = require('paper')
-import {draw, drawLineBetweenPoints, createProject} from './utils/draw.js'
+import {draw, drawLineBetweenPoints} from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
 
 export const videoWidth = 600
@@ -86,7 +86,6 @@ function detectPoseInRealTime(video, net) {
 
   paper.setup(canvas)
   clearCanvas(paper.project)
-  //createProject(window, canvas)
 
   let path
 
@@ -144,28 +143,28 @@ function detectPoseInRealTime(video, net) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
 
+            const [
+              nose,
+              leftEye,
+              rightEye,
+              leftEar,
+              rightEar,
+              leftShoulder,
+              rightShoulder,
+              leftElbow,
+              rightElbow,
+              leftWrist,
+              rightWrist,
+              leftHip,
+              rightHip,
+              leftKnee,
+              rightKnee,
+              leftAnkle,
+              rightAnkle
+            ] = keypoints
+
             if (eraseModeValue === 'false') {
               ctx.globalCompositeOperation = 'source-over'
-
-              const [
-                nose,
-                leftEye,
-                rightEye,
-                leftEar,
-                rightEar,
-                leftShoulder,
-                rightShoulder,
-                leftElbow,
-                rightElbow,
-                leftWrist,
-                rightWrist,
-                leftHip,
-                rightHip,
-                leftKnee,
-                rightKnee,
-                leftAnkle,
-                rightAnkle
-              ] = keypoints
 
               //beginning to map out hand
               const yDiff = Math.abs(
@@ -197,8 +196,9 @@ function detectPoseInRealTime(video, net) {
               }
             } else {
               ctx.globalCompositeOperation = 'destination-out'
+              //keypoints[9] == leftWrist (but literally your right wrist)
               drawLineBetweenPoints(
-                [keypoints[0], prevPoses[0].keypoints[0]],
+                [keypoints[9], prevPoses[0].keypoints[9]],
                 ctx,
                 1,
                 15

@@ -4,7 +4,7 @@ export default function clearCanvas(project) {
   document.getElementById('clear-button').addEventListener(
     'click',
     () => {
-      context.clearRect(0, 0, canvas.width, canvas.height)
+      //context.clearRect(0, 0, canvas.width, canvas.height)
       project.clear()
     },
     false
