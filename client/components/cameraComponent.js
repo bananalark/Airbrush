@@ -37,97 +37,99 @@ class CameraComponent extends Component {
   render() {
     let eraserModeOn = this.state.eraseModeOn
     return (
-      <Grid container>
-        <div id="speech-recognition">
-          <h4>Turn Voice Recognition On/Off.</h4>
-          <p>
-            When voice recognition is ON, say "START" to start painting and
-            "STOP" to... well, stop!
-          </p>
-          {this.state.voiceModeOn === true ? (
-            <button onClick={this.toggleVoiceMode}>Voice Currently ON</button>
-          ) : (
-            <button onClick={this.toggleVoiceMode}>Voice Currently OFF</button>
-          )}
-        </div>
-        {/* <div id="info" />  */}
-        <Grid
-          container
-          direction="column"
-          justify="center"
-          alignContent="center"
-          id="main"
-        >
-          <Grid item>
-            <video
-              id="video"
-              // plays-inline="true"
-              style={{display: 'none'}}
-              // style={{
-              //   '-moz-transform': scaleX(-1),
-              //   '-o-transform': scaleX(-1),
-              //   '-webkit-transform': scaleX(-1),
-              //   transform: scaleX(-1),
-              //   display: none
-              // }}
-            />
-          </Grid>
-
+      <div>
+        <Grid container>
+          <div id="speech-recognition">
+            <h4>Turn Voice Recognition On/Off.</h4>
+            <p>
+              When voice recognition is ON, say "START" to start painting and
+              "STOP" to... well, stop!
+            </p>
+            {this.state.voiceModeOn === true ? (
+              <button onClick={this.toggleVoiceMode}>Voice Currently ON</button>
+            ) : (
+              <button onClick={this.toggleVoiceMode}>
+                Voice Currently OFF
+              </button>
+            )}
+          </div>
+          {/* <div id="info" />  */}
           <Grid
             container
             direction="column"
+            justify="center"
             alignContent="center"
-            alignItems="center"
+            id="main"
           >
-            <div style={{position: 'relative'}} id="display">
-              <canvas
-                id="background"
-                style={{
-                  position: 'absolute',
-                  left: -300,
-                  top: '50vh',
-                  marginTop: -250,
-                  zIndex: 1
-                }}
+            <Grid item>
+              <video
+                id="video"
+                // plays-inline="true"
+                style={{display: 'none'}}
+                // style={{
+                //   '-moz-transform': scaleX(-1),
+                //   '-o-transform': scaleX(-1),
+                //   '-webkit-transform': scaleX(-1),
+                //   transform: scaleX(-1),
+                //   display: none
+                // }}
               />
-              <canvas
-                id="output"
-                style={{
-                  position: 'absolute',
-                  left: -300,
-                  top: '50vh',
-                  marginTop: -250,
-                  zIndex: 2
-                }}
-              />
-            </div>
-          </Grid>
+            </Grid>
 
-          <Grid
-            container
-            direction="column"
-            alignContent="center"
-            alignItems="center"
-            id="buttons"
-          >
-            <div id="buttons">
-              <h5>Erase Tools!</h5>
-              <p>
-                Erase Mode:{' '}
-                <input
-                  type="button"
-                  id="erase-button"
-                  value={eraserModeOn}
-                  onClick={this.toggleEraseMode}
-                />{' '}
-                ...or...
-                <input type="button" id="clear-button" value="Clear Canvas" />
-              </p>
-            </div>
+            <Grid
+              container
+              direction="column"
+              // alignContent="center"
+              // alignItems="center"
+            >
+              <div style={{position: 'relative'}} id="display">
+                <canvas
+                  id="background"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    zIndex: 1
+                  }}
+                />
+                <canvas
+                  id="output"
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    zIndex: 2
+                  }}
+                />
+              </div>
+            </Grid>
+
+            <Grid
+              container
+              direction="column"
+              alignContent="center"
+              alignItems="center"
+              id="buttons"
+            >
+              <div id="buttons">
+                <h5>Erase Tools!</h5>
+                <p>
+                  Erase Mode:{' '}
+                  <input
+                    type="button"
+                    id="erase-button"
+                    value={eraserModeOn}
+                    onClick={this.toggleEraseMode}
+                  />{' '}
+                  ...or...
+                  <input type="button" id="clear-button" value="Clear Canvas" />
+                </p>
+              </div>
+            </Grid>
           </Grid>
+          <ColorPicker />
         </Grid>
-        <ColorPicker />
-      </Grid>
+      </div>
     )
   }
 }

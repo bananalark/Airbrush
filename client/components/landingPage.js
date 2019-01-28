@@ -6,18 +6,20 @@ import {Link} from 'react-router-dom'
 
 const LandingPage = () => {
   return (
-    <Grid container direction="column" justify="center" alignItems="center">
-      <Grid item>
-        <Typography variant="h1">ai rbrush</Typography>
+    <div>
+      <Grid container direction="column" justify="center" alignItems="center">
+        <Grid item>
+          <Typography variant="h1">ai rbrush</Typography>
+        </Grid>
+        <Grid item>
+          <Link to="/camera">
+            <Button>
+              <Typography variant="h5">start drawing</Typography>
+            </Button>
+          </Link>
+        </Grid>
       </Grid>
-      <Grid item>
-        <Link to="/camera">
-          <Button>
-            <Typography variant="h5">start drawing</Typography>
-          </Button>
-        </Link>
-      </Grid>
-    </Grid>
+    </div>
   )
 }
 

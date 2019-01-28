@@ -30,7 +30,12 @@ class Routes extends Component {
       <PoseGroup>
         <RouteContainer key={location.pathname}>
           <Switch location={location}>
-            <Route path="/" component={LandingPage} key="landingPage" />
+            <Route
+              exact
+              path="/landingPage"
+              component={LandingPage}
+              key="landingPage"
+            />
             <Route path="/login" component={Login} key="login" />
             <Route path="/signup" component={Signup} key="signup" />
             <Route path="/camera" component={CameraComponent} key="camera" />
