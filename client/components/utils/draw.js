@@ -20,7 +20,6 @@ const paper = require('paper')
 const {Path} = paper
 import clearCanvas from './clearCanvas'
 let command = require('../voiceUtils')
-let drawMode = document.getElementById('draw-button').value
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -55,6 +54,7 @@ export function drawLine(oneKeypoint, path) {
 
 //on-off switch with gesture
 export function draw(keypoints, minPartConfidence) {
+  let drawMode = document.getElementById('draw-button').value
   return (
     (keypoints[10].score >= minPartConfidence &&
       Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
