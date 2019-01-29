@@ -12,12 +12,18 @@ import {Path} from 'paper'
 let videoHeight
 let videoWidth
 
-if (3 * window.innerWidth / 4 > window.innerHeight) {
-  videoHeight = window.innerHeight
-  videoWidth = Math.ceil(4 * window.innerHeight / 3)
+if (3 * parent.innerWidth / 4 > parent.innerHeight) {
+  videoHeight = parent.innerHeight
+  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
 } else {
-  videoWidth = window.innerWidth
-  videoHeight = Math.ceil(3 * window.innerWidth / 4)
+  videoWidth = parent.innerWidth
+  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
+}
+
+//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+if (videoHeight > 723 || videoWidth > 964) {
+  videoHeight = 723
+  videoWidth = 964
 }
 
 /**
@@ -81,16 +87,11 @@ let hand
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
-  //current rendering of video feed:kjasf]
-  // const backgroundCanvas = document.getElementById('background')
-  // const backgroundctx = backgroundCanvas.getContext('2d')
 
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
-  // backgroundCanvas.width = videoWidth
-  // backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
@@ -121,24 +122,9 @@ function detectPoseInRealTime(video, net) {
 
     /*eslint-enable*/
 
-    // if (guiState.output.showVideo) {
-    //   backgroundctx.save()
-    //   backgroundctx.scale(-1, 1)
-    //   backgroundctx.translate(-videoWidth, 0)
-    //   backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-    //   backgroundctx.restore()
-    // }
-
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        // if (guiState.output.showPoints) {
-        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
-
-        //
-        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
-        // }
-
         //'if we want to draw a line now'
         if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {

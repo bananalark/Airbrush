@@ -37,9 +37,10 @@ class Toolbar extends Component {
   toggleDrawMode() {
     this.setState(prevState => ({drawModeOn: !prevState.drawModeOn}))
   }
+
   // componentDidMount() {
-  //   const output = document.getElementById('output')
-  //   console.log('OUTPUT COORDS', output.style.left, output.style.top)
+  //   const navbar = document.getElementById('navbar')
+  //   navbar.height = document.getElementById('output').height
   // }
 
   render() {
@@ -47,7 +48,7 @@ class Toolbar extends Component {
     let {drawModeOn} = this.state
 
     return (
-      <div className="navbar">
+      <div id="navbar">
         <Button
           id="draw-button"
           value={drawModeOn}

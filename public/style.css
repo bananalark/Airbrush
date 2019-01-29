@@ -24,14 +24,20 @@ form div {
   display: inline-block;
 }
 
-.navbar {
+#navbar {
   width: 160px;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 5;
   margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   align-content: center;
+}
+
+#color-picker {
+  text-align: center;
 }
 
 #video {
@@ -47,18 +53,17 @@ form div {
   padding: 0;
 }
 
-/* #output * {
-  border: 1px solid red;
-}
-/* */
-#video * {
-  border: 1px solid blue;
-}
-
-.navbar > * {
+#navbar > * {
   margin-bottom: 10px;
 }
 
-.navbar * {
-  border: 1px black solid;
+#display {
+  position: relative;
+}
+
+#output {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
 }
