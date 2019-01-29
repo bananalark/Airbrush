@@ -18,6 +18,8 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
 import clearCanvas from './clearCanvas'
+let command = require('../voiceUtils')
+let drawMode = document.getElementById('draw-button').value
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -39,8 +41,11 @@ export function drawLine(oneKeypoint, path) {
   path.add(oneKeypoint.position)
 
   //if there are a certain number of points, implement smoothing function and reset to a fresh path
-  if (path.segments.length > 5) {
-    path.simplify(10)
+  //this is another variable worth playing around with
+  if (path.segments.length > 10) {
+    // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
+    path.simplify(20)
+
     path = pathStyle
   }
 
@@ -50,8 +55,10 @@ export function drawLine(oneKeypoint, path) {
 //on-off switch with gesture
 export function draw(keypoints, minPartConfidence) {
   return (
-    keypoints[10].score >= minPartConfidence &&
-    Math.abs(keypoints[10].position.x - keypoints[6].position.x) < 100
+    (keypoints[10].score >= minPartConfidence &&
+      Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
+    command.speechResult === 'start' ||
+    drawMode === 'true'
   )
 }
 
