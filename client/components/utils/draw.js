@@ -18,7 +18,6 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
 import clearCanvas from './clearCanvas'
-let command = require('../voiceUtils')
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -57,7 +56,6 @@ export function draw(keypoints, minPartConfidence) {
   return (
     (keypoints[10].score >= minPartConfidence &&
       Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
-    command.speechResult === 'start' ||
     drawMode === 'true'
   )
 }
