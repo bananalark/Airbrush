@@ -8,6 +8,7 @@ import {
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
 import {Path} from 'paper'
+import store from '../store'
 
 let videoHeight
 let videoWidth
@@ -26,9 +27,8 @@ if (videoHeight > 723 || videoWidth > 964) {
   videoWidth = 964
 }
 
-import store from '../store'
+const getCurrentCommand = () => store.getState().speech.currentCommand
 
-let currentCommand = store.getState().speech.currentCommand
 /**
  * Loads a the camera to be used in the demo
  *
@@ -131,12 +131,10 @@ function detectPoseInRealTime(video, net) {
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         //'if we want to draw a line now'
-        const getCurrentCommand = () => store.getState().speech.currentCommand
-        // console.log('CURRENTCOMMAND---->', getCurrentCommand())
-        // console.log('DRAW TRUE??--->', draw(keypoints, minPartConfidence))
+        console.log('CURRENTCOMMAND---->', getCurrentCommand())
         if (
           draw(keypoints, minPartConfidence) ||
-          getCurrentCommand() === 'start'
+          (getCurrentCommand() === 'start' && getCurrentCommand() !== 'stop')
         ) {
           // if (currentCommand) {
           // }
@@ -172,7 +170,7 @@ function detectPoseInRealTime(video, net) {
             keypoints[17] = hand
 
             // console.log(rightWrist.position, rightShoulder.position)
-            console.log('ERASEMODEVAL, CURRENTLY---->', eraseModeValue)
+            // console.log('ERASEMODEVAL, CURRENTLY---->', eraseModeValue)
             if (hand.score > minPartConfidence) {
               ctx.globalCompositeOperation = 'source-over'
               const thisPath = drawLine(hand, path)

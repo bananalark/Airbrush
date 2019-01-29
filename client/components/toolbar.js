@@ -9,33 +9,42 @@ import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 
+import {connect} from 'react-redux'
+
+import {fetchCommand} from '../store'
+
 class Toolbar extends Component {
   constructor() {
     super()
     this.state = {eraseModeOn: false, voiceModeOn: false, drawModeOn: false}
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
-    this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
     this.toggleDrawMode = this.toggleDrawMode.bind(this)
   }
 
   toggleEraseMode() {
-    console.log(this.state.eraseModeOn)
+    console.log('ERASE MODE IS...', this.state.eraseModeOn)
     if (this.state.eraseModeOn === true) {
       this.setState({eraseModeOn: false})
     } else {
       this.setState({eraseModeOn: true})
     }
   }
-  toggleVoiceMode() {
-    if (this.state.voiceModeOn === true) {
-      this.setState({voiceModeOn: false})
-    } else {
-      this.setState({voiceModeOn: true})
-    }
-  }
 
   toggleDrawMode() {
     this.setState(prevState => ({drawModeOn: !prevState.drawModeOn}))
+  }
+
+  async handleSpeak() {
+    if (this.state.voiceModeOn === true) {
+      console.log('Not recording - voice mode is off!')
+    } else {
+      console.log('SPEAK MODE TURNED ON')
+      await this.props.fetchCommand()
+      setInterval(async () => {
+        await this.props.fetchCommand()
+      }, 6000)
+    }
+    this.setState({voiceModeOn: !this.state.voiceModeOn})
   }
 
   // componentDidMount() {
@@ -86,7 +95,7 @@ class Toolbar extends Component {
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
         </Button>
-        <Button onClick={this.toggleVoiceMode}>
+        <Button onClick={() => this.handleSpeak()}>
           {this.state.voiceModeOn === true ? (
             <div>
               <RecordVoiceOver />
@@ -105,4 +114,12 @@ class Toolbar extends Component {
   }
 }
 
-export default Toolbar
+const mapStateToProps = state => ({
+  currentCommand: state.speech.currentCommand
+})
+const mapDispatchToProps = dispatch => ({
+  fetchCommand: () => dispatch(fetchCommand())
+})
+
+// export default Toolbar
+export default connect(mapStateToProps, mapDispatchToProps)(Toolbar)

@@ -8,33 +8,15 @@ import Toolbar from './toolbar'
 import {fetchCommand} from '../store'
 
 class CameraComponent extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      eraseModeOn: false,
-      voiceModeOn: false
-    }
-    this.toggleEraseMode = this.toggleEraseMode.bind(this)
-    this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
-    this.handleSpeak = this.handleSpeak.bind(this)
-  }
+  // constructor(props) {
+  //   super(props)
+  //   this.state = {
+  //     eraseModeOn: false,
+  //     voiceModeOn: false
+  //   }
+  // }
   componentDidMount() {
     require('./camera')
-  }
-  toggleEraseMode() {
-    if (this.state.eraseModeOn === true) {
-      this.setState({eraseModeOn: false})
-    } else {
-      this.setState({eraseModeOn: true})
-    }
-  }
-  toggleVoiceMode() {
-    this.setState({voiceModeOn: !this.state.voiceModeOn})
-  }
-  handleSpeak() {
-    this.setState({voiceModeOn: !this.state.voiceModeOn})
-    this.props.fetchCommand()
-    setInterval(() => this.props.fetchCommand(), 7000)
   }
 
   render() {
