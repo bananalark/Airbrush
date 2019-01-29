@@ -54,7 +54,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.5
+    minPartConfidence: 0.7
   },
   output: {
     showVideo: true,
@@ -148,11 +148,9 @@ function detectPoseInRealTime(video, net) {
         //
         //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
         // }
-        let command = require('./voiceUtils')
-        if (
-          draw(keypoints, minPartConfidence) ||
-          command.speechResult === 'start'
-        ) {
+
+        //'if we want to draw a line now'
+        if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
@@ -182,27 +180,36 @@ function detectPoseInRealTime(video, net) {
             const handY = yDiff / 2 + leftWrist.position.y
             const xDiff = leftWrist.position.x - leftElbow.position.x
             const handX = xDiff / 2 + leftWrist.position.x
-            hand = {position: {y: handY, x: handX}}
+            hand = {score: leftWrist.score, position: {y: handY, x: handX}}
+            keypoints[17] = hand
 
-            if (eraseModeValue === 'false') {
-              ctx.globalCompositeOperation = 'source-over'
+            console.log(rightWrist.position, rightShoulder.position)
 
-              const thisPath = drawLine(hand, path)
+            if (hand.score > minPartConfidence) {
+              if (eraseModeValue === 'false') {
+                ctx.globalCompositeOperation = 'source-over'
+                const thisPath = drawLine(hand, path)
 
-              path = thisPath
-            } else {
-              ctx.globalCompositeOperation = 'destination-out'
+                path = thisPath
+              } else {
+                ctx.globalCompositeOperation = 'destination-out'
 
-              //needs refactor for using hand - having trouble passing into loop
-              //keypoints[9] == leftWrist (but literally your right wrist)
-              drawLineBetweenPoints(
-                [keypoints[9], prevPoses[0].keypoints[9]],
-                ctx,
-                1,
-                15
-              )
+                //needs refactor for using hand - having trouble passing into loop
+                //keypoints[9] == leftWrist (but literally your right wrist)
+                drawLineBetweenPoints(
+                  [hand, prevPoses[0].keypoints[17]],
+                  ctx,
+                  1,
+                  15
+                )
+              }
             }
           }
+        } else if (
+          keypoints[10].score >= minPartConfidence &&
+          Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
+        ) {
+          path = null
         }
       }
       prevKeypoints = keypoints
