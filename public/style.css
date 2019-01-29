@@ -19,3 +19,21 @@ form div {
   margin: 1em;
   display: inline-block;
 }
+
+.navbar {
+  width: 160px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  margin-left: 10px;
+  align-content: center;
+}
+
+.navbar > * {
+  margin-bottom: 10px;
+}
+
+.navbar * {
+  border: 1px black solid;
+}

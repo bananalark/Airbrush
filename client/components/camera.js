@@ -91,17 +91,6 @@ function detectPoseInRealTime(video, net) {
   let path
 
   async function poseDetectionFrame(prevPoses = []) {
-    if (guiState.changeToArchitecture) {
-      // Important to purge variables and free up GPU memory
-      guiState.net.dispose()
-
-      // Load the PoseNet model weights for either the 0.50, 0.75, 1.00, or 1.01
-      // version
-      guiState.net = await posenet.load(+guiState.changeToArchitecture)
-
-      guiState.changeToArchitecture = null
-    }
-
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -112,7 +101,7 @@ function detectPoseInRealTime(video, net) {
     let minPartConfidence
     /*eslint-disable*/
 
-    const pose = await guiState.net.estimateSinglePose(
+    const pose = await net.estimateSinglePose(
       video,
       imageScaleFactor,
       flipHorizontal,
