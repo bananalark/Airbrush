@@ -9,11 +9,12 @@ import {
 import clearCanvas from './utils/clearCanvas'
 import {Path} from 'paper'
 
-// import {test} from './utils/voiceUtilsNEW'
-
 export const videoWidth = 600
 const videoHeight = 500
 
+import store from '../store'
+
+let currentCommand = store.getState().speech.currentCommand
 /**
  * Loads a the camera to be used in the demo
  *
@@ -143,6 +144,7 @@ function detectPoseInRealTime(video, net) {
     }
 
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
+    /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         // if (guiState.output.showPoints) {
@@ -153,7 +155,11 @@ function detectPoseInRealTime(video, net) {
         // }
 
         //'if we want to draw a line now'
-        if (draw(keypoints, minPartConfidence)) {
+        const getVoiceMode = () => store.getState().speech.currentCommand
+        console.log('CURRENTCOMMAND---->', getVoiceMode())
+        if (draw(keypoints, minPartConfidence) || getVoiceMode() === 'start') {
+          // if (currentCommand) {
+          // }
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
@@ -223,6 +229,7 @@ function detectPoseInRealTime(video, net) {
 
   poseDetectionFrame()
 }
+/*eslint-enable*/
 
 /**
  * Kicks off the demo by loading the posenet model, finding and loading

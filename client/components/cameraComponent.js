@@ -31,7 +31,6 @@ class CameraComponent extends Component {
   }
   handleSpeak() {
     this.setState({voiceModeOn: !this.state.voiceModeOn})
-    console.log('SPEAK BUTTON CLICKED')
     this.props.fetchCommand()
     setInterval(() => this.props.fetchCommand(), 7000)
   }
@@ -47,11 +46,11 @@ class CameraComponent extends Component {
             "STOP" to... well, stop!
           </p>
           {this.state.voiceModeOn ? (
-            <button onClick={() => this.handleSpeak()}>
-              Voice Currently ON
-            </button>
+            <button onClick={this.toggleVoiceMode}>Voice Currently ON</button>
           ) : (
-            <button onClick={this.toggleVoiceMode}>Voice Currently OFF</button>
+            <button onClick={() => this.handleSpeak()}>
+              Voice Currently OFF
+            </button>
           )}
         </div>
         <div id="info" />

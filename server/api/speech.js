@@ -57,7 +57,6 @@ router.get('/', (req, res, next) => {
         .pipe(recognizeStream)
       console.log('Listening, press Ctrl+C to stop.')
     }
-
     recordMe()
   } catch (err) {
     next(err)
