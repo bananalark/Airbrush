@@ -6,15 +6,18 @@ import {connect} from 'react-redux'
 import {fetchCommand} from '../store'
 
 class CameraComponent extends Component {
-  constructor() {
-    super()
-    this.state = {eraseModeOn: false, voiceModeOn: false}
+  constructor(props) {
+    super(props)
+    this.state = {
+      eraseModeOn: false,
+      voiceModeOn: false
+    }
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
     this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
+    this.handleSpeak = this.handleSpeak.bind(this)
   }
   componentDidMount() {
     require('./camera')
-    this.props.fetchCommand()
   }
   toggleEraseMode() {
     if (this.state.eraseModeOn === true) {
@@ -24,11 +27,13 @@ class CameraComponent extends Component {
     }
   }
   toggleVoiceMode() {
-    if (this.state.voiceModeOn === true) {
-      this.setState({voiceModeOn: false})
-    } else {
-      this.setState({voiceModeOn: true})
-    }
+    this.setState({voiceModeOn: !this.state.voiceModeOn})
+  }
+  handleSpeak() {
+    this.setState({voiceModeOn: !this.state.voiceModeOn})
+    console.log('SPEAK BUTTON CLICKED')
+    this.props.fetchCommand()
+    setInterval(() => this.props.fetchCommand(), 7000)
   }
   render() {
     let eraserModeOn = this.state.eraseModeOn
@@ -41,8 +46,10 @@ class CameraComponent extends Component {
             When voice recognition is ON, say "START" to start painting and
             "STOP" to... well, stop!
           </p>
-          {this.state.voiceModeOn === true ? (
-            <button onClick={this.toggleVoiceMode}>Voice Currently ON</button>
+          {this.state.voiceModeOn ? (
+            <button onClick={() => this.handleSpeak()}>
+              Voice Currently ON
+            </button>
           ) : (
             <button onClick={this.toggleVoiceMode}>Voice Currently OFF</button>
           )}

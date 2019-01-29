@@ -186,7 +186,7 @@ function detectPoseInRealTime(video, net) {
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
 
-            console.log(rightWrist.position, rightShoulder.position)
+            // console.log(rightWrist.position, rightShoulder.position)
 
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import history from '../history'
 
 /**
  * ACTION TYPES
@@ -23,7 +22,6 @@ const getCommand = command => ({type: GET_COMMAND, command})
  */
 export const fetchCommand = () => async dispatch => {
   try {
-    console.log(`FETCHING YO COMMAND`)
     const res = await axios.get('/api/speech')
     dispatch(getCommand(res.data))
   } catch (err) {
