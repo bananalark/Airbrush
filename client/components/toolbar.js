@@ -19,6 +19,7 @@ class Toolbar extends Component {
     this.state = {eraseModeOn: false, voiceModeOn: false, drawModeOn: false}
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
     this.toggleDrawMode = this.toggleDrawMode.bind(this)
+    this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
   }
 
   toggleEraseMode() {
@@ -34,17 +35,25 @@ class Toolbar extends Component {
     this.setState(prevState => ({drawModeOn: !prevState.drawModeOn}))
   }
 
-  async handleSpeak() {
-    if (this.state.voiceModeOn === true) {
-      console.log('Not recording - voice mode is off!')
-    } else {
-      console.log('SPEAK MODE TURNED ON')
-      await this.props.fetchCommand()
-      setInterval(async () => {
-        await this.props.fetchCommand()
-      }, 6000)
-    }
+  toggleVoiceMode() {
     this.setState({voiceModeOn: !this.state.voiceModeOn})
+  }
+
+  async handleSpeak() {
+    if (this.state.voiceModeOn === false) {
+      console.log(`TURNING SPEAK MODE ON`)
+      this.toggleVoiceMode()
+      await this.props.fetchCommand()
+
+      setInterval(async () => {
+        while (this.state.voiceModeOn === true) {
+          await this.props.fetchCommand()
+        }
+      }, 6000)
+    } else {
+      console.log(`TURNING SPEAK MODE OFF`)
+      this.toggleVoiceMode()
+    }
   }
 
   // componentDidMount() {
