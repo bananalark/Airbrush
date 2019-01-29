@@ -172,11 +172,12 @@ function detectPoseInRealTime(video, net) {
             // console.log(rightWrist.position, rightShoulder.position)
             // console.log('ERASEMODEVAL, CURRENTLY---->', eraseModeValue)
             if (hand.score > minPartConfidence) {
-              ctx.globalCompositeOperation = 'source-over'
-              const thisPath = drawLine(hand, path)
+              if (eraseModeValue === 'false') {
+                ctx.globalCompositeOperation = 'source-over'
+                const thisPath = drawLine(hand, path)
 
-              path = thisPath
-              if (eraseModeValue === true) {
+                path = thisPath
+              } else {
                 ctx.globalCompositeOperation = 'destination-out'
 
                 //needs refactor for using hand - having trouble passing into loop
