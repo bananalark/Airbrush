@@ -44,12 +44,26 @@ class Toolbar extends Component {
 
   render() {
     let eraserModeOn = this.state.eraseModeOn
+    let {drawModeOn} = this.state
 
     return (
-      <div className="navbar" style={{position: 'absolute'}}>
-        <Button id="draw-button">
-          <Pencil />
-          draw mode button
+      <div className="navbar">
+        <Button
+          id="draw-button"
+          value={drawModeOn}
+          onClick={this.toggleDrawMode}
+        >
+          {this.state.drawModeOn ? (
+            <div>
+              <Pencil />
+              Draw Mode ON
+            </div>
+          ) : (
+            <div>
+              <PencilOff />
+              Draw Mode OFF
+            </div>
+          )}
         </Button>
         <Button
           id="erase-button"

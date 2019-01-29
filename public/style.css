@@ -1,3 +1,7 @@
+* {
+  border: 1px solid red;
+}
+
 body {
   font-family: sans-serif;
 }
@@ -22,12 +26,22 @@ form div {
 
 .navbar {
   width: 160px;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  z-index: 3;
+  z-index: 5;
   margin-left: 10px;
   align-content: center;
+}
+
+#video {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+  -moz-transform: rotateY(180deg); /* Firefox */
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
 }
 
 .navbar > * {

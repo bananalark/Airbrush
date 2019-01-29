@@ -14,10 +14,10 @@ let videoWidth
 
 if (5 * window.innerWidth / 6 > window.innerHeight) {
   videoHeight = window.innerHeight
-  videoWidth = 6 * window.innerHeight / 5
+  videoWidth = Math.ceil(6 * window.innerHeight / 5)
 } else {
   videoWidth = window.innerWidth
-  videoHeight = 5 * window.innerWidth / 6
+  videoHeight = Math.ceil(5 * window.innerWidth / 6)
 }
 
 /**
@@ -81,16 +81,16 @@ let hand
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
-  //current rendering of video feed:
-  const backgroundCanvas = document.getElementById('background')
-  const backgroundctx = backgroundCanvas.getContext('2d')
+  //current rendering of video feed:kjasf]
+  // const backgroundCanvas = document.getElementById('background')
+  // const backgroundctx = backgroundCanvas.getContext('2d')
 
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
-  backgroundCanvas.width = videoWidth
-  backgroundCanvas.height = videoHeight
+  // backgroundCanvas.width = videoWidth
+  // backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
@@ -121,21 +121,23 @@ function detectPoseInRealTime(video, net) {
 
     /*eslint-enable*/
 
-    if (guiState.output.showVideo) {
-      backgroundctx.save()
-      backgroundctx.scale(-1, 1)
-      backgroundctx.translate(-videoWidth, 0)
-      backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-      backgroundctx.restore()
-    }
+    // if (guiState.output.showVideo) {
+    //   backgroundctx.save()
+    //   backgroundctx.scale(-1, 1)
+    //   backgroundctx.translate(-videoWidth, 0)
+    //   backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+    //   backgroundctx.restore()
+    // }
 
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         let command = require('./voiceUtils')
+        let drawMode = document.getElementById('draw-button').value
         if (
           draw(keypoints, minPartConfidence) ||
-          command.speechResult === 'start'
+          command.speechResult === 'start' ||
+          drawMode === 'true'
         ) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
