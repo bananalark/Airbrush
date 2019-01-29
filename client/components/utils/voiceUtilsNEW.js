@@ -1,10 +1,14 @@
-const record = require('node-record-lpcm16')
-
 // Imports the Google Cloud client library
 const speech = require('@google-cloud/speech')
+const fs = require('fs')
+const record = require('node-record-lpcm16')
 
 // Creates a client
-const client = new speech.SpeechClient()
+const client = new speech.SpeechClient({
+  projectId: 'airbrush-1548453310071',
+  keyFilename:
+    '/Users/amberrodriguez/Documents/Grace-Hopper/capstone/Airbrush/Airbrush-0520a40964a5.json'
+})
 
 /**
  * TODO(developer): Uncomment the following lines before running the sample.
@@ -13,8 +17,10 @@ const encoding = 'LINEAR16'
 const sampleRateHertz = 16000
 const languageCode = 'en-US'
 
-let currentCommand
-let commandConfidence
+export let test = 'test'
+
+var currentCommand
+var commandConfidence
 
 const request = {
   config: {
@@ -30,10 +36,8 @@ const recognizeStream = client
   .streamingRecognize(request)
   .on('error', console.error)
   .on('data', data => {
-    console.log(process.env)
     commandConfidence = data.results[0].alternatives[0].confidence
     currentCommand = data.results[0].alternatives[0].transcript
-    console.log(currentCommand)
   })
 
 // Start recording and send the microphone input to the Speech API

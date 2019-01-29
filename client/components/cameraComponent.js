@@ -1,5 +1,9 @@
 import React, {Component} from 'react'
 import ColorPicker from './colorPicker'
+import axios from 'axios'
+import {connect} from 'react-redux'
+
+import {fetchCommand} from '../store'
 
 class CameraComponent extends Component {
   constructor() {
@@ -10,6 +14,7 @@ class CameraComponent extends Component {
   }
   componentDidMount() {
     require('./camera')
+    this.props.fetchCommand()
   }
   toggleEraseMode() {
     if (this.state.eraseModeOn === true) {
@@ -29,6 +34,7 @@ class CameraComponent extends Component {
     let eraserModeOn = this.state.eraseModeOn
     return (
       <div>
+        <h1>You said {this.props.currentCommand}</h1>
         <div id="speech-recognition">
           <h4>Turn Voice Recognition On/Off.</h4>
           <p>
@@ -87,6 +93,15 @@ class CameraComponent extends Component {
   }
 }
 
-export default CameraComponent
+const mapStateToProps = state => ({
+  currentCommand: state.speech.currentCommand
+})
+const mapDispatchToProps = dispatch => ({
+  fetchCommand: () => dispatch(fetchCommand())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(CameraComponent)
+
+// export default CameraComponent
 
 //require('./camera')

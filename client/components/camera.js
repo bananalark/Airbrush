@@ -9,6 +9,8 @@ import {
 import clearCanvas from './utils/clearCanvas'
 import {Path} from 'paper'
 
+// import {test} from './utils/voiceUtilsNEW'
+
 export const videoWidth = 600
 const videoHeight = 500
 
@@ -17,6 +19,7 @@ const videoHeight = 500
  *
  */
 async function setupCamera() {
+  // console.log(test)
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
