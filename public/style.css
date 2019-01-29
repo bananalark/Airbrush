@@ -19,3 +19,47 @@ form div {
   margin: 1em;
   display: inline-block;
 }
+
+#navbar {
+  width: 160px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  align-content: center;
+}
+
+#color-picker {
+  text-align: center;
+}
+
+#video {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+  -moz-transform: rotateY(180deg); /* Firefox */
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+#navbar > * {
+  margin-bottom: 10px;
+}
+
+#display {
+  position: relative;
+}
+
+#output {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+}

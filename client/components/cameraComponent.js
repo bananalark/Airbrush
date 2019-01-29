@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import ColorPicker from './colorPicker'
 import axios from 'axios'
 import {connect} from 'react-redux'
+import Grid from '@material-ui/core/Grid'
+import Toolbar from './toolbar'
 
 import {fetchCommand} from '../store'
 
@@ -34,8 +36,8 @@ class CameraComponent extends Component {
     this.props.fetchCommand()
     setInterval(() => this.props.fetchCommand(), 7000)
   }
+
   render() {
-    let eraserModeOn = this.state.eraseModeOn
     return (
       <div>
         <h1>You said {this.props.currentCommand}</h1>
@@ -54,46 +56,23 @@ class CameraComponent extends Component {
           )}
         </div>
         <div id="info" />
-        <div id="main">
-          <video
-            id="video"
-            plays-inline="true"
-            style={{display: 'none'}}
-            // style={{
-            //   '-moz-transform': scaleX(-1),
-            //   '-o-transform': scaleX(-1),
-            //   '-webkit-transform': scaleX(-1),
-            //   transform: scaleX(-1),
-            //   display: none
-            // }}
-          />
-          <div id="buttons">
-            <h5>Erase Tools!</h5>
-            <p>
-              Erase Mode:{' '}
-              <input
-                type="button"
-                id="erase-button"
-                value={eraserModeOn}
-                onClick={this.toggleEraseMode}
-              />{' '}
-              ...or...
-              <input type="button" id="clear-button" value="Clear Canvas" />
-            </p>
-          </div>
-
-          <div style={{position: 'relative'}}>
-            <canvas
-              id="background"
-              style={{position: 'absolute', left: 50, top: 50, zIndex: 0}}
-            />
-            <canvas
-              id="output"
-              style={{position: 'absolute', left: 50, top: 50, zIndex: 1}}
-            />
-          </div>
-        </div>
-        <ColorPicker />
+        <Grid
+          container
+          direction="column"
+          justify="center"
+          alignContent="center"
+          id="main"
+        >
+          <Grid container direction="column">
+            <div id="display">
+              <Grid item>
+                <video id="video" plays-inline="true" />
+              </Grid>
+              <Toolbar />
+              <canvas id="output" />
+            </div>
+          </Grid>
+        </Grid>
       </div>
     )
   }

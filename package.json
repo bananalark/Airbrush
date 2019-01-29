@@ -37,6 +37,9 @@
   "author": "Fullstack Academy of Code",
   "license": "MIT",
   "dependencies": {
+    "@material-ui/core": "^3.9.0",
+    "@material-ui/icons": "^3.0.2",
+    "@mdi/font": "^3.3.92",
     "@tensorflow-models/posenet": "^0.2.3",
     "@tensorflow/tfjs": "^0.14.2",
     "axios": "^0.15.3",
@@ -45,6 +48,7 @@
     "express": "^4.16.3",
     "express-session": "^1.15.1",
     "history": "^4.6.3",
+    "mdi-material-ui": "^5.8.0",
     "json-loader": "^0.5.7",
     "morgan": "^1.9.1",
     "node-loader": "^0.6.0",

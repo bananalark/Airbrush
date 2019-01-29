@@ -9,8 +9,22 @@ import {
 import clearCanvas from './utils/clearCanvas'
 import {Path} from 'paper'
 
-export const videoWidth = 600
-const videoHeight = 500
+let videoHeight
+let videoWidth
+
+if (3 * parent.innerWidth / 4 > parent.innerHeight) {
+  videoHeight = parent.innerHeight
+  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
+} else {
+  videoWidth = parent.innerWidth
+  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
+}
+
+//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+if (videoHeight > 723 || videoWidth > 964) {
+  videoHeight = 723
+  videoWidth = 964
+}
 
 import store from '../store'
 
@@ -68,13 +82,6 @@ const guiState = {
 }
 
 /**
- * Sets up dat.gui controller on the top-right of the window
- */
-function setupGui(net) {
-  guiState.net = net
-}
-
-/**
  * Feeds an image to posenet to estimate poses - this is where the magic
  * happens. This function loops with a requestAnimationFrame method.
  */
@@ -84,32 +91,16 @@ let hand
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
-  //current rendering of video feed:
-  const backgroundCanvas = document.getElementById('background')
-  const backgroundctx = backgroundCanvas.getContext('2d')
 
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
-  backgroundCanvas.width = videoWidth
-  backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
 
   async function poseDetectionFrame(prevPoses = [], innerPath = path) {
-    if (guiState.changeToArchitecture) {
-      // Important to purge variables and free up GPU memory
-      guiState.net.dispose()
-
-      // Load the PoseNet model weights for either the 0.50, 0.75, 1.00, or 1.01
-      // version
-      guiState.net = await posenet.load(+guiState.changeToArchitecture)
-
-      guiState.changeToArchitecture = null
-    }
-
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -122,7 +113,7 @@ function detectPoseInRealTime(video, net) {
     let minPartConfidence
     /*eslint-disable*/
 
-    const pose = await guiState.net.estimateSinglePose(
+    const pose = await net.estimateSinglePose(
       video,
       imageScaleFactor,
       flipHorizontal,
@@ -135,25 +126,10 @@ function detectPoseInRealTime(video, net) {
 
     /*eslint-enable*/
 
-    if (guiState.output.showVideo) {
-      backgroundctx.save()
-      backgroundctx.scale(-1, 1)
-      backgroundctx.translate(-videoWidth, 0)
-      backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-      backgroundctx.restore()
-    }
-
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        // if (guiState.output.showPoints) {
-        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
-
-        //
-        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
-        // }
-
         //'if we want to draw a line now'
         const getCurrentCommand = () => store.getState().speech.currentCommand
         console.log('CURRENTCOMMAND---->', getCurrentCommand())
@@ -243,6 +219,7 @@ export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
 
+  document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
 
   let video
@@ -259,7 +236,6 @@ export async function bindPage() {
   }
 
   clearCanvas()
-  setupGui(net)
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
