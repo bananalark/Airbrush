@@ -1,5 +1,4 @@
 import * as posenet from '@tensorflow-models/posenet'
-const paper = require('paper')
 import {
   draw,
   drawLineBetweenPoints,
@@ -7,7 +6,6 @@ import {
   drawLine
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
-import {Path} from 'paper'
 
 let videoHeight
 let videoWidth
