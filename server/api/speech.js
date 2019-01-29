@@ -1,6 +1,8 @@
 const router = require('express').Router()
 module.exports = router
 
+console.log(process.env.PWD)
+
 router.get('/', (req, res, next) => {
   try {
     const recordMe = () => {
@@ -22,8 +24,7 @@ router.get('/', (req, res, next) => {
       // Creates a client
       const client = new speech.SpeechClient({
         projectId: 'airbrush-1548453310071',
-        keyFilename:
-          '/Users/amberrodriguez/Documents/Grace-Hopper/capstone/Airbrush/Airbrush-0520a40964a5.json'
+        keyFilename: `${process.env.PWD}/Airbrush-0520a40964a5.json`
       })
 
       // Start recording and send the microphone input to the Speech API
