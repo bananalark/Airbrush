@@ -132,8 +132,8 @@ function detectPoseInRealTime(video, net) {
       if (score >= minPoseConfidence) {
         //'if we want to draw a line now'
         const getCurrentCommand = () => store.getState().speech.currentCommand
-        console.log('CURRENTCOMMAND---->', getCurrentCommand())
-        console.log('DRAW TRUE??--->', draw(keypoints, minPartConfidence))
+        // console.log('CURRENTCOMMAND---->', getCurrentCommand())
+        // console.log('DRAW TRUE??--->', draw(keypoints, minPartConfidence))
         if (
           draw(keypoints, minPartConfidence) ||
           getCurrentCommand() === 'start'
@@ -143,7 +143,6 @@ function detectPoseInRealTime(video, net) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
-
             const [
               nose,
               leftEye,
@@ -173,24 +172,25 @@ function detectPoseInRealTime(video, net) {
             keypoints[17] = hand
 
             // console.log(rightWrist.position, rightShoulder.position)
-
+            console.log('ERASEMODEVAL, CURRENTLY---->', eraseModeValue)
             if (hand.score > minPartConfidence) {
-              if (!eraseModeValue) {
-                ctx.globalCompositeOperation = 'source-over'
-                const thisPath = drawLine(hand, path)
+              ctx.globalCompositeOperation = 'source-over'
+              const thisPath = drawLine(hand, path)
 
-                path = thisPath
-              } else if (getCurrentCommand() === 'erase' || eraseModeValue) {
+              path = thisPath
+              if (eraseModeValue === true) {
                 ctx.globalCompositeOperation = 'destination-out'
 
                 //needs refactor for using hand - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
-                drawLineBetweenPoints(
-                  [hand, prevPoses[0].keypoints[17]],
-                  ctx,
-                  1,
-                  15
-                )
+                if (prevPoses[0].keypoints[17]) {
+                  drawLineBetweenPoints(
+                    [hand, prevPoses[0].keypoints[17]],
+                    ctx,
+                    1,
+                    15
+                  )
+                }
               }
             }
           }

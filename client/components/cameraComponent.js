@@ -40,7 +40,7 @@ class CameraComponent extends Component {
   render() {
     return (
       <div>
-        <h1>You said {this.props.currentCommand}</h1>
+        {/* <h1>You said {this.props.currentCommand}</h1>
         <div id="speech-recognition">
           <h4>Turn Voice Recognition On/Off.</h4>
           <p>
@@ -54,7 +54,7 @@ class CameraComponent extends Component {
               Voice Currently OFF
             </button>
           )}
-        </div>
+        </div> */}
         <div id="info" />
         <Grid
           container
