@@ -1,7 +1,13 @@
 import * as posenet from '@tensorflow-models/posenet'
 const paper = require('paper')
-import {draw, drawLineBetweenPoints} from './utils/draw.js'
+import {
+  draw,
+  drawLineBetweenPoints,
+  createProject,
+  drawLine
+} from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
+import {Path} from 'paper'
 
 export const videoWidth = 600
 const videoHeight = 500
@@ -68,14 +74,15 @@ function setupGui(net) {
  * Feeds an image to posenet to estimate poses - this is where the magic
  * happens. This function loops with a requestAnimationFrame method.
  */
+let path
+let hand
+
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
   //current rendering of video feed:
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
-
-  paper.install(window)
 
   const flipHorizontal = true
 
@@ -84,12 +91,10 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
 
-  paper.setup(canvas)
-  clearCanvas(paper.project)
+  //begin the paper.js project, located in utils/draw.js
+  createProject(window, canvas)
 
-  let path
-
-  async function poseDetectionFrame(prevPoses = []) {
+  async function poseDetectionFrame(prevPoses = [], innerPath = path) {
     if (guiState.changeToArchitecture) {
       // Important to purge variables and free up GPU memory
       guiState.net.dispose()
@@ -107,6 +112,8 @@ function detectPoseInRealTime(video, net) {
     const outputStride = +guiState.input.outputStride
 
     let poses = []
+    let prevKeypoints
+    let prevScore
     let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
@@ -132,10 +139,7 @@ function detectPoseInRealTime(video, net) {
       backgroundctx.restore()
     }
 
-    // For each pose (i.e. person) detected in an image, loop through the poses
-    // and draw the resulting skeleton and keypoints if over certain confidence
-    // scores
-
+    // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         // if (guiState.output.showPoints) {
@@ -171,39 +175,23 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
+            //beginning to map out hand. will implement after finish integrating paper.js
+            const yDiff = leftWrist.position.y - leftElbow.position.y
+            const handY = yDiff / 2 + leftWrist.position.y
+            const xDiff = leftWrist.position.x - leftElbow.position.x
+            const handX = xDiff / 2 + leftWrist.position.x
+            hand = {position: {y: handY, x: handX}}
+
             if (eraseModeValue === 'false') {
               ctx.globalCompositeOperation = 'source-over'
 
-              //beginning to map out hand
-              const yDiff = Math.abs(
-                leftShoulder.position.y - leftWrist.position.y
-              )
-              const xDiff = Math.abs(
-                leftShoulder.position.x - leftWrist.position.x
-              )
-              const handDistance =
-                Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2)) / 2 //half the forearm length
+              const thisPath = drawLine(hand, path)
 
-              const pathStyle = new Path({
-                segments: [leftWrist.position],
-                strokeColor: 'aqua',
-                strokeWidth: 7,
-                strokeCap: 'round'
-              })
-
-              if (!path) {
-                path = pathStyle
-              }
-              path.add(leftWrist.position)
-
-              if (path.segments.length > 5) {
-                console.log('kaboom')
-                path.simplify(10)
-
-                path = pathStyle
-              }
+              path = thisPath
             } else {
               ctx.globalCompositeOperation = 'destination-out'
+
+              //needs refactor for using hand - having trouble passing into loop
               //keypoints[9] == leftWrist (but literally your right wrist)
               drawLineBetweenPoints(
                 [keypoints[9], prevPoses[0].keypoints[9]],
@@ -215,9 +203,10 @@ function detectPoseInRealTime(video, net) {
           }
         }
       }
+      prevKeypoints = keypoints
+      prevScore = score
     })
-
-    requestAnimationFrame(() => poseDetectionFrame(poses))
+    requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }
 
   poseDetectionFrame()
