@@ -1,8 +1,6 @@
 const router = require('express').Router()
 module.exports = router
 
-console.log(process.env.PWD)
-
 router.get('/', (req, res, next) => {
   try {
     const recordMe = () => {
