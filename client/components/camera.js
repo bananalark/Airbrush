@@ -6,6 +6,7 @@ import {
   drawLine
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
+import store from '../store'
 
 let videoHeight
 let videoWidth
@@ -24,11 +25,14 @@ if (videoHeight > 723 || videoWidth > 964) {
   videoWidth = 964
 }
 
+const getCurrentCommand = () => store.getState().speech.currentCommand
+
 /**
  * Loads a the camera to be used in the demo
  *
  */
 async function setupCamera() {
+  // console.log(test)
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
@@ -121,14 +125,20 @@ function detectPoseInRealTime(video, net) {
     /*eslint-enable*/
 
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
+    /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         //'if we want to draw a line now'
-        if (draw(keypoints, minPartConfidence)) {
+        console.log('CURRENTCOMMAND---->', getCurrentCommand())
+        if (
+          draw(keypoints, minPartConfidence) ||
+          (getCurrentCommand() === 'start' && getCurrentCommand() !== 'stop')
+        ) {
+          // if (currentCommand) {
+          // }
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
-
             const [
               nose,
               leftEye,
@@ -168,12 +178,14 @@ function detectPoseInRealTime(video, net) {
 
                 //needs refactor for using hand - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
-                drawLineBetweenPoints(
-                  [hand, prevPoses[0].keypoints[17]],
-                  ctx,
-                  1,
-                  15
-                )
+                if (prevPoses[0].keypoints[17]) {
+                  drawLineBetweenPoints(
+                    [hand, prevPoses[0].keypoints[17]],
+                    ctx,
+                    1,
+                    15
+                  )
+                }
               }
             }
           }
@@ -192,6 +204,7 @@ function detectPoseInRealTime(video, net) {
 
   poseDetectionFrame()
 }
+/*eslint-enable*/
 
 /**
  * Kicks off the demo by loading the posenet model, finding and loading

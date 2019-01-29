@@ -1,7 +1,6 @@
 'use strict'
 
-const db = require('../server/db')
-const {User} = require('../server/db/models')
+const {db, User} = require('../server/db')
 
 async function seed() {
   await db.sync({force: true})

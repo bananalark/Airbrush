@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
+import ColorPicker from './colorPicker'
+import {connect} from 'react-redux'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
 
-//to make sure that camera is required even without refresh (ie, navigating from the landing page) - called on componentDidMount
+import {fetchCommand} from '../store'
 
 class CameraComponent extends Component {
   componentDidMount() {
@@ -35,6 +37,11 @@ class CameraComponent extends Component {
   }
 }
 
-export default CameraComponent
+const mapStateToProps = state => ({
+  currentCommand: state.speech.currentCommand
+})
+const mapDispatchToProps = dispatch => ({
+  fetchCommand: () => dispatch(fetchCommand())
+})
 
-//require('./camera')
+export default connect(mapStateToProps, mapDispatchToProps)(CameraComponent)
