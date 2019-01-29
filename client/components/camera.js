@@ -96,7 +96,7 @@ function detectPoseInRealTime(video, net) {
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
 
-  async function poseDetectionFrame(prevPoses = []) {
+  async function poseDetectionFrame(prevPoses = [], innerPath = path) {
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -205,7 +205,6 @@ export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
 
-  // document.getElementById('loading').style.display = 'none'
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
 
