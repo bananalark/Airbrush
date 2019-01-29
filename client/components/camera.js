@@ -12,12 +12,12 @@ import {Path} from 'paper'
 let videoHeight
 let videoWidth
 
-if (5 * window.innerWidth / 6 > window.innerHeight) {
+if (3 * window.innerWidth / 4 > window.innerHeight) {
   videoHeight = window.innerHeight
-  videoWidth = Math.ceil(6 * window.innerHeight / 5)
+  videoWidth = Math.ceil(4 * window.innerHeight / 3)
 } else {
   videoWidth = window.innerWidth
-  videoHeight = Math.ceil(5 * window.innerWidth / 6)
+  videoHeight = Math.ceil(3 * window.innerWidth / 4)
 }
 
 /**

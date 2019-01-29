@@ -1,5 +1,5 @@
 * {
-  border: 1px solid red;
+  /* border: 1px solid red; */
 }
 
 body {
@@ -41,7 +41,14 @@ form div {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 1;
+  z-index: 3;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+#output {
+  border: 1px solid red;
 }
 
 .navbar > * {
