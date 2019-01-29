@@ -34,7 +34,6 @@ function startStopPainting() {
   }
   recognition.terminate = function() {
     recognition.stop()
-    
   }
 
   recognition.onerror = function(event) {

@@ -2,7 +2,14 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {withRouter, Route, Switch} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {Login, Signup, UserHome, CameraComponent, About} from './components'
+import {
+  Login,
+  Signup,
+  UserHome,
+  CameraComponent,
+  About,
+  LandingPage
+} from './components'
 import {me} from './store'
 import posed, {PoseGroup} from 'react-pose'
 
@@ -23,16 +30,11 @@ class Routes extends Component {
       <PoseGroup>
         <RouteContainer key={location.pathname}>
           <Switch location={location}>
+            <Route exact path="/" component={LandingPage} key="landingPage" />
             <Route path="/login" component={Login} key="login" />
-            <Route path="/signup" component={Signup} key="signup" />
             <Route path="/camera" component={CameraComponent} key="camera" />
-            <Route path="/about" component={About} key="about" />
-            {/* {isLoggedIn && (
-          <Switch>
-            <Route path="/home" component={UserHome} key="home"/>
-          </Switch>
-        )}
-        <Route component={Login} /> */}
+            {/* <Route path="/signup" component={Signup} key="signup" /> */}
+            {/* <Route path="/about" component={About} key="about" /> */}
           </Switch>
         </RouteContainer>
       </PoseGroup>
