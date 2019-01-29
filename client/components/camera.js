@@ -142,7 +142,17 @@ function detectPoseInRealTime(video, net) {
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (draw(keypoints, minPartConfidence)) {
+        // if (guiState.output.showPoints) {
+        //   //ATTENTION - note the odd syntax here for keypoints. this is because the "drawKeyPoints" function MUST be given an array. I want to pass it only one keypoint, but must wrap that in an array to maintain proper function
+
+        //
+        //   drawKeypoints([keypoints[0]], minPartConfidence, ctx)
+        // }
+        let command = require('./voiceUtils')
+        if (
+          draw(keypoints, minPartConfidence) ||
+          command.speechResult === 'start'
+        ) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
