@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import ColorPicker from './colorPicker'
 
 class CameraComponent extends Component {
   constructor() {
@@ -72,14 +73,15 @@ class CameraComponent extends Component {
           <div style={{position: 'relative'}}>
             <canvas
               id="background"
-              style={{position: 'absolute', left: 0, top: 0, zIndex: 0}}
+              style={{position: 'absolute', left: 50, top: 50, zIndex: 0}}
             />
             <canvas
               id="output"
-              style={{position: 'absolute', left: 0, top: 0, zIndex: 1}}
+              style={{position: 'absolute', left: 50, top: 50, zIndex: 1}}
             />
           </div>
         </div>
+        <ColorPicker />
       </div>
     )
   }
@@ -87,4 +89,4 @@ class CameraComponent extends Component {
 
 export default CameraComponent
 
-// require('./camera')
+//require('./camera')
