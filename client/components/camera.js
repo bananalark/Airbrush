@@ -122,9 +122,12 @@ function detectPoseInRealTime(video, net) {
 
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     poses.forEach(({score, keypoints}) => {
+      console.log('ABOVE', score, minPoseConfidence)
+      console.log('true??', draw(keypoints, minPartConfidence))
       if (score >= minPoseConfidence) {
         //'if we want to draw a line now'
         if (draw(keypoints, minPartConfidence)) {
+          console.log('draw?', prevPoses.length)
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
@@ -157,8 +160,7 @@ function detectPoseInRealTime(video, net) {
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
 
-            console.log(rightWrist.position, rightShoulder.position)
-
+            console.log(minPartConfidence, hand.score)
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
