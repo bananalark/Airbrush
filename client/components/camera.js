@@ -155,9 +155,13 @@ function detectPoseInRealTime(video, net) {
         // }
 
         //'if we want to draw a line now'
-        const getVoiceMode = () => store.getState().speech.currentCommand
-        console.log('CURRENTCOMMAND---->', getVoiceMode())
-        if (draw(keypoints, minPartConfidence) || getVoiceMode() === 'start') {
+        const getCurrentCommand = () => store.getState().speech.currentCommand
+        console.log('CURRENTCOMMAND---->', getCurrentCommand())
+        console.log('DRAW TRUE??--->', draw(keypoints, minPartConfidence))
+        if (
+          draw(keypoints, minPartConfidence) ||
+          getCurrentCommand() === 'start'
+        ) {
           // if (currentCommand) {
           // }
           if (prevPoses.length) {
@@ -195,12 +199,12 @@ function detectPoseInRealTime(video, net) {
             // console.log(rightWrist.position, rightShoulder.position)
 
             if (hand.score > minPartConfidence) {
-              if (eraseModeValue === 'false') {
+              if (!eraseModeValue) {
                 ctx.globalCompositeOperation = 'source-over'
                 const thisPath = drawLine(hand, path)
 
                 path = thisPath
-              } else {
+              } else if (getCurrentCommand() === 'erase' || eraseModeValue) {
                 ctx.globalCompositeOperation = 'destination-out'
 
                 //needs refactor for using hand - having trouble passing into loop

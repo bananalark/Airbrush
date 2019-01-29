@@ -48,7 +48,8 @@ router.get('/', (req, res, next) => {
       record
         .start({
           sampleRateHertz: 16000,
-          threshold: 0, //silence threshold
+          // threshold: 0, //silence threshold
+          thresholdStart: 0,
           recordProgram: 'rec', // Try also "arecord" or "sox"
           silence: '2.0' //seconds of silence before ending
         })
