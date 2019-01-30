@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
       // Creates a client
       const client = new speech.SpeechClient({
         projectId: 'airbrush-1548453310071',
-        keyFilename: `${process.env.PWD}/Airbrush-0520a40964a5.json`
+        keyFilename: `${process.env.PWD}/Airbrush-a0b3a7478447.json`
       })
 
       // Start recording and send the microphone input to the Speech API
