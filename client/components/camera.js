@@ -32,7 +32,6 @@ const getCurrentCommand = () => store.getState().speech.currentCommand
  *
  */
 async function setupCamera() {
-  // console.log(test)
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
@@ -70,7 +69,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.7
+    minPartConfidence: 0.75
   },
   output: {
     showVideo: true,
@@ -128,8 +127,7 @@ function detectPoseInRealTime(video, net) {
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        //'if we want to draw a line now'
-        console.log('CURRENTCOMMAND---->', getCurrentCommand())
+        //i.e. 'if we want to start drawing now'
         if (
           draw(keypoints, minPartConfidence) ||
           (getCurrentCommand() === 'start' && getCurrentCommand() !== 'stop')
@@ -166,7 +164,6 @@ function detectPoseInRealTime(video, net) {
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
