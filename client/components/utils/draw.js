@@ -17,6 +17,7 @@
 import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
+const {Path} = paper
 import clearCanvas from './clearCanvas'
 
 export function createProject(window, canvas) {

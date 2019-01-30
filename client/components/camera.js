@@ -1,5 +1,4 @@
 import * as posenet from '@tensorflow-models/posenet'
-const paper = require('paper')
 import {
   draw,
   drawLineBetweenPoints,
@@ -7,7 +6,6 @@ import {
   drawLine
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
-import {Path} from 'paper'
 import store from '../store'
 
 let videoHeight
@@ -169,8 +167,6 @@ function detectPoseInRealTime(video, net) {
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
 
-            // console.log(rightWrist.position, rightShoulder.position)
-            // console.log('ERASEMODEVAL, CURRENTLY---->', eraseModeValue)
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
