@@ -46,7 +46,7 @@ class Toolbar extends Component {
       await this.props.fetchCommand()
 
       setInterval(async () => {
-        while (this.state.voiceModeOn === true) {
+        if (this.state.voiceModeOn === true) {
           await this.props.fetchCommand()
         }
       }, 6000)
