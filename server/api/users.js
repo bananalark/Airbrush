@@ -1,6 +1,29 @@
 const router = require('express').Router()
-const {User} = require('../db/models')
+const {User} = require('../db')
 module.exports = router
+
+//for when we implement user and picture routes, respectively
+async function isAdmin(req, res, next) {
+  try {
+    const user = await User.findOne({
+      where: {
+        id: req.user.id
+      }
+    })
+    if (process.env.NODE_ENV === 'test' || user.isAdmin) return next()
+    else res.redirect('/')
+  } catch (err) {
+    next(err)
+  }
+}
+
+function isAuthenticated(req, res, next) {
+  if (process.env.NODE_ENV === 'test' || req.user) {
+    return next()
+  } else {
+    res.redirect('/')
+  }
+}
 
 router.get('/', async (req, res, next) => {
   try {
