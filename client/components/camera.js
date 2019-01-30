@@ -164,10 +164,11 @@ function detectPoseInRealTime(video, net) {
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-            if (hand.score > minPartConfidence) {
+            if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                const thisPath = drawLine(hand, path)
+                console.log('HI')
+                const thisPath = drawLine(nose, path)
 
                 path = thisPath
               } else {
@@ -175,9 +176,9 @@ function detectPoseInRealTime(video, net) {
 
                 //needs refactor for using hand - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
-                if (prevPoses[0].keypoints[17]) {
+                if (prevPoses[0].keypoints[0]) {
                   drawLineBetweenPoints(
-                    [hand, prevPoses[0].keypoints[17]],
+                    [nose, prevPoses[0].keypoints[0]],
                     ctx,
                     1,
                     15

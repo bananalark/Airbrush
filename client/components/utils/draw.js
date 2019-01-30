@@ -27,6 +27,12 @@ export function createProject(window, canvas) {
   clearCanvas(paper.project)
 }
 
+export function saveCanvas(bg, canvas) {
+  const projectString = paper.project.exportSVG({asString: true})
+  const backgroundString = bg.toDataUrl()
+  const canvasString = canvas.toDataUrl()
+  console.log(projectString, canvasString, backgroundString)
+}
 //smoother 'drawLineBetweenPoints' with paper.js project
 export function drawLine(oneKeypoint, path) {
   let color = store.getState().color.color
@@ -49,6 +55,7 @@ export function drawLine(oneKeypoint, path) {
   //this is another variable worth playing around with
   if (path.segments.length > 10) {
     // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
+    path.simplify(20)
     path.simplify(20)
 
     path = pathStyle

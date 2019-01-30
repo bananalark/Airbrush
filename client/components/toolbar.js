@@ -7,7 +7,10 @@ import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
+import Save from '@material-ui/icons/Save'
 import Button from '@material-ui/core/Button'
+
+import {saveCanvas} from './utils/draw'
 
 import {connect} from 'react-redux'
 
@@ -20,6 +23,7 @@ class Toolbar extends Component {
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
     this.toggleDrawMode = this.toggleDrawMode.bind(this)
     this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
+    this.handleSave = this.handleSave.bind(this)
   }
 
   toggleEraseMode() {
@@ -37,6 +41,12 @@ class Toolbar extends Component {
 
   toggleVoiceMode() {
     this.setState({voiceModeOn: !this.state.voiceModeOn})
+  }
+
+  handleSave() {
+    const background = document.getElementById('background')
+    const canvas = document.getElementById('output')
+    saveCanvas(background, canvas)
   }
 
   async handleSpeak() {
@@ -103,6 +113,9 @@ class Toolbar extends Component {
         </Button>{' '}
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
+        </Button>
+        <Button id="save-sanvas" value="Save Canvas">
+          <Save />Save Canvas
         </Button>
         <Button onClick={() => this.handleSpeak()}>
           {this.state.voiceModeOn === true ? (
