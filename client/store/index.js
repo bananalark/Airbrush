@@ -14,5 +14,5 @@ const store = createStore(reducer, middleware)
 
 export default store
 export * from './user'
-export * from './speech'
 export * from './color'
+export * from './speech'

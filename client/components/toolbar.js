@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
 
 import ColorPicker from './colorPicker'
 import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
@@ -9,21 +10,32 @@ import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 
-import {connect} from 'react-redux'
+import testSpeech, {speechResult} from './utils/speechUtil'
 
-import {fetchCommand} from '../store'
+// let startVoiceInterval = setInterval(testSpeech, 3000)
+// function stopVoiceInterval() {
+//   clearInterval(startVoiceInterval)
+// }
 
 class Toolbar extends Component {
-  constructor() {
-    super()
-    this.state = {eraseModeOn: false, voiceModeOn: false, drawModeOn: false}
+  constructor(props) {
+    super(props)
+    this.state = {
+      eraseModeOn: false,
+      voiceModeOn: false,
+      drawModeOn: false
+    }
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
     this.toggleDrawMode = this.toggleDrawMode.bind(this)
     this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
+    this.analyzeCurrentCommand = this.analyzeCurrentCommand.bind(this)
+  }
+
+  componentDidUpdate() {
+    this.analyzeCurrentCommand()
   }
 
   toggleEraseMode() {
-    console.log('ERASE MODE IS...', this.state.eraseModeOn)
     if (this.state.eraseModeOn === true) {
       this.setState({eraseModeOn: false})
     } else {
@@ -36,34 +48,50 @@ class Toolbar extends Component {
   }
 
   toggleVoiceMode() {
-    this.setState({voiceModeOn: !this.state.voiceModeOn})
+    this.setState(prevState => ({voiceModeOn: !prevState.voiceModeOn}))
+    // let newVoiceMode = !this.state.voiceModeOn
+    // this.setState({voiceModeOn: newVoiceMode})
   }
 
-  async handleSpeak() {
-    if (this.state.voiceModeOn === false) {
-      console.log(`TURNING SPEAK MODE ON`)
-      this.toggleVoiceMode()
-      await this.props.fetchCommand()
-
-      setInterval(async () => {
-        if (this.state.voiceModeOn === true) {
-          await this.props.fetchCommand()
-        }
-      }, 6000)
-    } else {
-      console.log(`TURNING SPEAK MODE OFF`)
-      this.toggleVoiceMode()
+  analyzeCurrentCommand() {
+    let {currentCommand} = this.props
+    if (currentCommand === 'start') {
+      this.setState({drawModeOn: true})
+    } else if (currentCommand === 'stop') {
+      this.setState({drawModeOn: false})
+    } else if (currentCommand === 'erase') {
+      this.setState({eraseModeOn: true})
+      this.setState({drawModeOn: true})
+    } else if (currentCommand === 'erase off') {
+      this.setState({eraseModeOn: false})
     }
   }
+  /*eslint-disable*/
+  async handleSpeak() {
+    console.log('VOICE MODE BEFORE--->', this.state.voiceModeOn)
+    await this.toggleVoiceMode()
+    console.log('VOICE MODE AFTER--->', this.state.voiceModeOn)
 
-  // componentDidMount() {
-  //   const navbar = document.getElementById('navbar')
-  //   navbar.height = document.getElementById('output').height
-  // }
+    //   if (this.state.voiceModeOn === true) {
+    //     testSpeech(true)
+    //     setInterval(() => {
+    //       testSpeech(this.state.voiceModeOn)
+    //     }, 5000)
+    //   } else {
+    //     setInterval(() => {
+    //       this.handleSpeak()
+    //     }, 5000)
+    //   }
+  }
+
+  /*eslint-enable*/
 
   render() {
     let eraserModeOn = this.state.eraseModeOn
     let {drawModeOn} = this.state
+    // setInterval(() => {
+    //   this.analyzeCurrentCommand()
+    // }, 1000)
 
     return (
       <div id="navbar">
@@ -104,7 +132,10 @@ class Toolbar extends Component {
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
         </Button>
-        <Button onClick={() => this.handleSpeak()}>
+        <Button
+          id="voice-button"
+          onClick={() => this.handleSpeak(this.state.voiceModeOn)}
+        >
           {this.state.voiceModeOn === true ? (
             <div>
               <RecordVoiceOver />
@@ -127,8 +158,7 @@ const mapStateToProps = state => ({
   currentCommand: state.speech.currentCommand
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCommand: () => dispatch(fetchCommand())
+  // getCommand: () => dispatch(getCommand())
 })
 
-// export default Toolbar
 export default connect(mapStateToProps, mapDispatchToProps)(Toolbar)

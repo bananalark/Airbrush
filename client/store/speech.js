@@ -15,19 +15,19 @@ const initialState = {
 /**
  * ACTION CREATORS
  */
-const getCommand = command => ({type: GET_COMMAND, command})
+export const getCommand = command => ({type: GET_COMMAND, command})
 
 /**
  * THUNK CREATORS
  */
-export const fetchCommand = () => async dispatch => {
-  try {
-    const res = await axios.get('/api/speech')
-    dispatch(getCommand(res.data))
-  } catch (err) {
-    console.error(err)
-  }
-}
+// export const fetchCommand = () => async dispatch => {
+//   try {
+//     const res = await axios.get('/api/speech')
+//     dispatch(getCommand(res.data))
+//   } catch (err) {
+//     console.error(err)
+//   }
+// }
 
 /**
  * REDUCER

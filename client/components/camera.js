@@ -6,7 +6,6 @@ import {
   drawLine
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
-import store from '../store'
 
 let videoHeight
 let videoWidth
@@ -24,8 +23,6 @@ if (videoHeight > 723 || videoWidth > 964) {
   videoHeight = 723
   videoWidth = 964
 }
-
-const getCurrentCommand = () => store.getState().speech.currentCommand
 
 /**
  * Loads a the camera to be used in the demo
@@ -128,12 +125,7 @@ function detectPoseInRealTime(video, net) {
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
         //i.e. 'if we want to start drawing now'
-        if (
-          draw(keypoints, minPartConfidence) ||
-          (getCurrentCommand() === 'start' && getCurrentCommand() !== 'stop')
-        ) {
-          // if (currentCommand) {
-          // }
+        if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
             let eraseModeValue = eraseMode.attributes.value.nodeValue
