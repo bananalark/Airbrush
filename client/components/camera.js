@@ -32,7 +32,6 @@ const getCurrentCommand = () => store.getState().speech.currentCommand
  *
  */
 async function setupCamera() {
-  // console.log(test)
   const video = document.getElementById('video')
   video.width = videoWidth
   video.height = videoHeight
@@ -70,7 +69,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.7
+    minPartConfidence: 0.75
   },
   output: {
     showVideo: true,
@@ -90,10 +89,16 @@ function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
 
+  const backgroundCanvas = document.getElementById('background')
+  const backgroundctx = backgroundCanvas.getContext('2d')
+
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
+
+  backgroundCanvas.width = videoWidth
+  backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
@@ -124,12 +129,17 @@ function detectPoseInRealTime(video, net) {
 
     /*eslint-enable*/
 
+    backgroundctx.save()
+    backgroundctx.scale(-1, 1)
+    backgroundctx.translate(-videoWidth, 0)
+    backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+    backgroundctx.restore()
+
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        //'if we want to draw a line now'
-        console.log('CURRENTCOMMAND---->', getCurrentCommand())
+        //i.e. 'if we want to start drawing now'
         if (
           draw(keypoints, minPartConfidence) ||
           (getCurrentCommand() === 'start' && getCurrentCommand() !== 'stop')
@@ -166,7 +176,6 @@ function detectPoseInRealTime(video, net) {
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
