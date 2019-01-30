@@ -70,7 +70,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.7
+    minPartConfidence: 0.75
   },
   output: {
     showVideo: true,
@@ -166,7 +166,7 @@ function detectPoseInRealTime(video, net) {
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-
+            console.log('hand confidence:', hand.score)
             if (hand.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'

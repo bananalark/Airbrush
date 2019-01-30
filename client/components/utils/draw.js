@@ -19,6 +19,7 @@ import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
 const {Path} = paper
 import clearCanvas from './clearCanvas'
+import store from '../../store'
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -28,9 +29,14 @@ export function createProject(window, canvas) {
 
 //smoother 'drawLineBetweenPoints' with paper.js project
 export function drawLine(oneKeypoint, path) {
+  let color = store.getState().color.color
+  const red = color.r / 255
+  const green = color.g / 255
+  const blue = color.b / 255
+
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
-    strokeColor: 'aqua',
+    strokeColor: new Color(red, green, blue),
     strokeWidth: 10,
     strokeCap: 'round'
   })

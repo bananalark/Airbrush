@@ -1,15 +1,13 @@
 import React from 'react'
 import reactCSS from 'reactcss'
-import {SketchPicker} from 'react-color'
+import {SwatchesPicker} from 'react-color'
+import {connect} from 'react-redux'
 
 class ColorPicker extends React.Component {
-  state = {
-    displayColorPicker: false,
-    color: {
-      r: '241',
-      g: '112',
-      b: '19',
-      a: '1'
+  constructor(props) {
+    super(props)
+    this.state = {
+      displayColorPicker: false
     }
   }
 
@@ -22,7 +20,7 @@ class ColorPicker extends React.Component {
   }
 
   handleChange = color => {
-    this.setState({color: color.rgb})
+    this.props.setColor(color.rgb)
   }
 
   render() {
@@ -32,9 +30,9 @@ class ColorPicker extends React.Component {
           width: '36px',
           height: '14px',
           borderRadius: '2px',
-          background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${
-            this.state.color.b
-          }, ${this.state.color.a})`
+          background: `rgba(${this.props.selectedColor.r}, ${
+            this.props.selectedColor.g
+          }, ${this.props.selectedColor.b}, ${this.props.selectedColor.a})`
         },
         swatch: {
           padding: '5px',
@@ -65,8 +63,8 @@ class ColorPicker extends React.Component {
         {this.state.displayColorPicker ? (
           <div style={styles.popover}>
             <div style={styles.cover} onClick={this.handleClose} />
-            <SketchPicker
-              color={this.state.color}
+            <SwatchesPicker
+              color={this.props.selectedColor}
               onChange={this.handleChange}
             />
           </div>
@@ -76,4 +74,18 @@ class ColorPicker extends React.Component {
   }
 }
 
-export default ColorPicker
+const mapStateToProps = function(state) {
+  return {
+    selectedColor: state.color
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    setColor(color) {
+      dispatch({type: 'GET_COLOR', color})
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ColorPicker)
