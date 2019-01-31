@@ -6,7 +6,8 @@ import {
   drawLine,
   drawCircle,
   drawRectangle,
-  drawEllipse
+  drawEllipse,
+  drawTriangle
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
 import store from '../store'
@@ -157,7 +158,7 @@ function detectPoseInRealTime(video, net) {
             if (eraseModeValue === 'false') {
               ctx.globalCompositeOperation = 'source-over'
               //const thisPath = drawLine(nose, path)
-              const thisPath = drawEllipse(nose, leftWrist)
+              const thisPath = drawTriangle(nose, leftWrist)
 
               path = thisPath
             } else {

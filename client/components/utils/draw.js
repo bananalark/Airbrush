@@ -116,6 +116,22 @@ export function drawEllipse(oneKeypoint, secondKeypoint) {
   })
   return shape
 }
+//draw triangle
+export function drawTriangle(oneKeypoint) {
+  let color = store.getState().color.color
+  const red = color.r / 255
+  const green = color.g / 255
+  const blue = color.b / 255
+
+  const triangle = new Path.RegularPolygon(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    3,
+    30
+  )
+  triangle.strokeColor = new Color(red, green, blue)
+
+  return triangle
+}
 
 //on-off switch with gesture
 export function draw(keypoints, minPartConfidence) {
