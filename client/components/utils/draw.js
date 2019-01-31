@@ -26,16 +26,43 @@ export function createProject(window, canvas) {
   clearCanvas(paper.project)
 }
 
-//draw lines
-export function drawLine(oneKeypoint, path) {
+function getColor() {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
   const blue = color.b / 255
+  return {red: red, green: green, blue: blue}
+}
+
+export function drawAnything(nose, leftWrist, rightWrist, /*hand,*/ path) {
+  let chosenBrush = store.getState().speech.chosenBrush
+  // let color = getColor()
+  console.log(chosenBrush)
+  switch (chosenBrush) {
+    case 'defaultLine':
+      return drawLine(leftWrist, path)
+    case 'circleLine':
+      return drawCircleLine(nose)
+    case 'circleShape':
+      return drawCircleShape(nose, leftWrist)
+    case 'rectangle':
+      return drawRectangleShape(leftWrist, rightWrist)
+    case 'ellipse':
+      return drawEllipseShape(nose, rightWrist)
+    case 'triangleLine':
+      return drawTriangleLine(nose)
+    case 'triangleShape':
+      return drawTriangleShape(nose, leftWrist)
+  }
+}
+
+//draw lines
+function drawLine(oneKeypoint, path) {
+  let color = getColor()
 
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
-    strokeColor: new Color(red, green, blue),
+    strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 5,
     strokeCap: 'round'
   })
@@ -51,27 +78,21 @@ export function drawLine(oneKeypoint, path) {
 }
 
 //draw circle as line
-export function drawCircleLine(oneKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
+function drawCircleLine(oneKeypoint) {
+  let color = getColor()
 
   const shape = new Shape.Circle({
     center: [oneKeypoint.position.x, oneKeypoint.position.y],
     radius: 30,
-    strokeColor: new Color(red, green, blue),
+    strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 3
   })
   return shape
 }
 
 //draw circle as a shape
-export function drawCircleShape(oneKeypoint, secondKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
+function drawCircleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
   const r = Math.sqrt(
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
       Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
@@ -79,18 +100,15 @@ export function drawCircleShape(oneKeypoint, secondKeypoint) {
   const shape = new Shape.Circle({
     center: [oneKeypoint.position.x, oneKeypoint.position.y],
     radius: r,
-    strokeColor: new Color(red, green, blue),
+    strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 5
   })
   return shape
 }
 
 //draw rectangle as a shape
-export function drawRectangleShape(oneKeypoint, secondKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
+function drawRectangleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
 
   const shape = new Shape.Rectangle({
     point: [oneKeypoint.position.x, oneKeypoint.position.y], //rightWrist
@@ -98,18 +116,15 @@ export function drawRectangleShape(oneKeypoint, secondKeypoint) {
       secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
       secondKeypoint.position.y - oneKeypoint.position.y
     ],
-    strokeColor: new Color(red, green, blue),
+    strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 5
   })
   return shape
 }
 
 //draw ellipse as a shape
-export function drawEllipseShape(oneKeypoint, secondKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
+function drawEllipseShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
 
   const shape = new Shape.Ellipse({
     center: [oneKeypoint.position.x, oneKeypoint.position.y],
@@ -117,36 +132,30 @@ export function drawEllipseShape(oneKeypoint, secondKeypoint) {
       secondKeypoint.position.x - oneKeypoint.position.x,
       secondKeypoint.position.y - oneKeypoint.position.y
     ],
-    strokeColor: new Color(red, green, blue),
+    strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 5
   })
   return shape
 }
 
 //draw triangle as a line
-export function drawTriangleLine(oneKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
+function drawTriangleLine(oneKeypoint) {
+  let color = getColor()
 
   const triangle = new Path.RegularPolygon(
     new Point(oneKeypoint.position.x, oneKeypoint.position.y),
     3,
     30
   )
-  triangle.strokeColor = new Color(red, green, blue)
+  triangle.strokeColor = new Color(color.red, color.green, color.blue)
 
   return triangle
 }
 
 //draw triangle as a shape
-export function drawTriangleShape(oneKeypoint, secondKeypoint) {
-  let color = store.getState().color.color
-  const red = color.r / 255
-  const green = color.g / 255
-  const blue = color.b / 255
-  //still need to work on it
+function drawTriangleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
+
   let side = Math.sqrt(
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
       Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
@@ -156,7 +165,7 @@ export function drawTriangleShape(oneKeypoint, secondKeypoint) {
     3,
     side
   )
-  triangle.strokeColor = new Color(red, green, blue)
+  triangle.strokeColor = new Color(color.red, color.green, color.blue)
 
   return triangle
 }

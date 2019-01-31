@@ -9,7 +9,8 @@ import {
   drawRectangleShape,
   drawEllipseShape,
   drawTriangleLine,
-  drawTriangleShape
+  drawTriangleShape,
+  drawAnything
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
 
@@ -172,7 +173,16 @@ function detectPoseInRealTime(video, net) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
                 //const thisPath = drawLine(nose, path)
-                const thisPath = drawTriangleShape(nose, leftWrist)
+
+                //THIS is where we will choose which function to draw w/
+
+                const thisPath = drawAnything(
+                  nose,
+                  leftWrist,
+                  rightWrist,
+                  hand,
+                  path
+                )
 
                 path = thisPath
               } else {

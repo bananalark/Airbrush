@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import ColorPicker from './colorPicker'
 import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
+import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
@@ -14,7 +15,18 @@ import testSpeech, {evaluateCommand} from './utils/speechUtil'
 
 import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
 
+import BrushOptions from './brushOptions'
+import {Drawer} from '@material-ui/core'
+
 class Toolbar extends Component {
+  constructor() {
+    super()
+    this.state = {
+      open: false
+    }
+    this.toggleOpen = this.toggleOpen.bind(this)
+  }
+
   async handleSpeak() {
     let {
       toggleVoice,
@@ -34,6 +46,10 @@ class Toolbar extends Component {
     }
   }
 
+  toggleOpen() {
+    this.setState(prevState => ({open: !prevState.open}))
+  }
+
   render() {
     let {
       eraseModeOn,
@@ -45,6 +61,19 @@ class Toolbar extends Component {
 
     return (
       <div id="navbar">
+        <Button id="voice-button" onClick={() => this.handleSpeak()}>
+          {voiceModeOn ? (
+            <div>
+              <RecordVoiceOver />
+              Voice Currently ON
+            </div>
+          ) : (
+            <div>
+              <VoiceOverOff />
+              Voice Currently OFF
+            </div>
+          )}
+        </Button>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -61,6 +90,13 @@ class Toolbar extends Component {
               Draw Mode OFF
             </div>
           )}
+        </Button>
+        <Button id="brush-button" onClick={this.toggleOpen}>
+          <Brush />
+          Brush option
+          <Drawer anchor="left" open={this.state.open}>
+            <BrushOptions />
+          </Drawer>
         </Button>
         <Button
           id="erase-button"
@@ -79,23 +115,10 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>{' '}
+        <ColorPicker />
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
         </Button>
-        <Button id="voice-button" onClick={() => this.handleSpeak()}>
-          {voiceModeOn ? (
-            <div>
-              <RecordVoiceOver />
-              Voice Currently ON
-            </div>
-          ) : (
-            <div>
-              <VoiceOverOff />
-              Voice Currently OFF
-            </div>
-          )}
-        </Button>
-        <ColorPicker />
       </div>
     )
   }

@@ -8,6 +8,7 @@ const GET_COMMAND = 'GET_COMMAND'
 const TOGGLE_ERASE = 'TOGGLE_ERASE'
 const TOGGLE_VOICE = 'TOGGLE_VOICE'
 const TOGGLE_DRAW = 'TOGGLE_DRAW'
+const CHOOSE_BRUSH = 'CHOOSE_BRUSH'
 
 /**
  * INITIAL STATE
@@ -16,7 +17,8 @@ const initialState = {
   currentCommand: '',
   eraseModeOn: false,
   voiceModeOn: false,
-  drawModeOn: false
+  drawModeOn: false,
+  chosenBrush: 'defaultLine'
 }
 
 /**
@@ -26,6 +28,7 @@ export const getCommand = command => ({type: GET_COMMAND, command})
 export const toggleErase = () => ({type: TOGGLE_ERASE})
 export const toggleVoice = () => ({type: TOGGLE_VOICE})
 export const toggleDraw = () => ({type: TOGGLE_DRAW})
+export const chooseBrush = brush => ({type: CHOOSE_BRUSH, brush: brush})
 
 /**
  * REDUCER
@@ -45,6 +48,9 @@ export default function speechReducer(state = initialState, action) {
       return newState
     case TOGGLE_DRAW:
       newState.drawModeOn = !state.drawModeOn
+      return newState
+    case CHOOSE_BRUSH:
+      newState.chosenBrush = action.brush
       return newState
     default:
       return state
