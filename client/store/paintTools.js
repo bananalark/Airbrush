@@ -30,7 +30,7 @@ export const toggleDraw = () => ({type: TOGGLE_DRAW})
 /**
  * REDUCER
  */
-export default function speechReducer(state = initialState, action) {
+const paintTools = (state = initialState, action) => {
   let newState = {...state}
   switch (action.type) {
     case GET_COMMAND:
@@ -50,3 +50,5 @@ export default function speechReducer(state = initialState, action) {
       return state
   }
 }
+
+export default paintTools
