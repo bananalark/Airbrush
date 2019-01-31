@@ -86,10 +86,16 @@ function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
 
+  const backgroundCanvas = document.getElementById('background')
+  const backgroundctx = backgroundCanvas.getContext('2d')
+
   const flipHorizontal = true
 
   canvas.width = videoWidth
   canvas.height = videoHeight
+
+  backgroundCanvas.width = videoWidth
+  backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas)
@@ -119,6 +125,12 @@ function detectPoseInRealTime(video, net) {
     minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
 
     /*eslint-enable*/
+
+    backgroundctx.save()
+    backgroundctx.scale(-1, 1)
+    backgroundctx.translate(-videoWidth, 0)
+    backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+    backgroundctx.restore()
 
     // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     /*eslint-disable*/
