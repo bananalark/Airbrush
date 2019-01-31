@@ -50,17 +50,3 @@ export default function speechReducer(state = initialState, action) {
       return state
   }
 }
-
-// analyzeCurrentCommand() {
-//   let {currentCommand} = this.props
-//   if (currentCommand === 'start') {
-//     this.setState({drawModeOn: true})
-//   } else if (currentCommand === 'stop') {
-//     this.setState({drawModeOn: false})
-//   } else if (currentCommand === 'erase') {
-//     this.setState({eraseModeOn: true})
-//     this.setState({drawModeOn: true})
-//   } else if (currentCommand === 'erase off') {
-//     this.setState({eraseModeOn: false})
-//   }
-// }

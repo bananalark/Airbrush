@@ -10,35 +10,29 @@ import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 
-import testSpeech, {evaluateCommand} from './utils/speechUtil'
+import voiceRecognition from './utils/speechUtil'
 
-import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
+import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 class Toolbar extends Component {
   async handleSpeak() {
     let {
-      toggleVoice,
       drawModeOn,
       eraseModeOn,
       voiceModeOn,
-      getCommand,
-      currentCommand
+      currentCommand,
+      toggleVoice
     } = this.props
 
-    let isVoiceModeOn = voiceModeOn
-    let isDrawModeOn = drawModeOn
-    let isEraseModeOn = eraseModeOn
     await toggleVoice()
 
-    let currentState = {
-      currentCommand,
-      eraseModeOn,
-      voiceModeOn,
-      drawModeOn
-    }
-
-    if (!isVoiceModeOn) {
-      testSpeech(!isVoiceModeOn, currentState)
+    if (store.getState().paintTools.voiceModeOn === true) {
+      voiceRecognition(store.getState().paintTools)
+      setInterval(() => {
+        if (store.getState().paintTools.voiceModeOn === true) {
+          voiceRecognition(store.getState().paintTools)
+        }
+      }, 5000)
     }
   }
 
@@ -110,10 +104,10 @@ class Toolbar extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentCommand: state.speech.currentCommand,
-  eraseModeOn: state.speech.eraseModeOn,
-  voiceModeOn: state.speech.voiceModeOn,
-  drawModeOn: state.speech.drawModeOn
+  currentCommand: state.paintTools.currentCommand,
+  eraseModeOn: state.paintTools.eraseModeOn,
+  voiceModeOn: state.paintTools.voiceModeOn,
+  drawModeOn: state.paintTools.drawModeOn
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
