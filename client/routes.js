@@ -8,7 +8,8 @@ import {
   UserHome,
   CameraComponent,
   About,
-  LandingPage
+  LandingPage,
+  Privacy
 } from './components'
 import {me} from './store'
 import posed, {PoseGroup} from 'react-pose'
@@ -33,8 +34,7 @@ class Routes extends Component {
             <Route exact path="/" component={LandingPage} key="landingPage" />
             <Route path="/login" component={Login} key="login" />
             <Route path="/camera" component={CameraComponent} key="camera" />
-            {/* <Route path="/signup" component={Signup} key="signup" /> */}
-            {/* <Route path="/about" component={About} key="about" /> */}
+            <Route path="/privacy" component={Privacy} key="privacy" />
           </Switch>
         </RouteContainer>
       </PoseGroup>
