@@ -2,11 +2,12 @@ const passport = require('passport')
 const router = require('express').Router()
 const FacebookStrategy = require('passport-facebook')
 const {User} = require('../db')
+
 module.exports = router
 
 require('../../secrets')
 
-if (!process.env.FACEBOOK_CLIENT_ID || !process.env.FACEBOOK_CLIENT_SECRET) {
+if (!process.env.FACEBOOK_ACCOUNT_KIT_API_VERSION) {
   console.log('FACEBOOK client ID / secret not found. Skipping FACEBOOK OAuth.')
 } else {
   const FacebookConfig = {
@@ -19,7 +20,6 @@ if (!process.env.FACEBOOK_CLIENT_ID || !process.env.FACEBOOK_CLIENT_SECRET) {
     FacebookConfig,
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('PROFILE', profile)
         const FacebookId = profile.id
         const user = await User.findOrCreate({
           where: {FacebookId}
@@ -32,11 +32,11 @@ if (!process.env.FACEBOOK_CLIENT_ID || !process.env.FACEBOOK_CLIENT_SECRET) {
     }
   )
 
-  router.get('/', passport.authenticate('FACEBOOK'))
+  router.get('/', passport.authenticate('facebook'))
 
   router.get(
     '/callback',
-    passport.authenticate('FACEBOOK', {
+    passport.authenticate('facebook', {
       successRedirect: '/camera',
       failureRedirect: '/auth'
     })
