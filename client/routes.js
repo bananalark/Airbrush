@@ -35,6 +35,7 @@ class Routes extends Component {
             <Route path="/login" component={Login} key="login" />
             <Route path="/camera" component={CameraComponent} key="camera" />
             <Route path="/privacy" component={Privacy} key="privacy" />
+            <Route path="/auth" component={Signup} key="auth" />
           </Switch>
         </RouteContainer>
       </PoseGroup>
