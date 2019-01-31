@@ -4,8 +4,6 @@ import {connect} from 'react-redux'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
 
-import {fetchCommand} from '../store'
-
 class CameraComponent extends Component {
   componentDidMount() {
     require('./camera')
@@ -40,11 +38,4 @@ class CameraComponent extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  currentCommand: state.speech.currentCommand
-})
-const mapDispatchToProps = dispatch => ({
-  fetchCommand: () => dispatch(fetchCommand())
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(CameraComponent)
+export default CameraComponent
