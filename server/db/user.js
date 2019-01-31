@@ -5,8 +5,7 @@ const db = require('../db')
 const User = db.define('user', {
   email: {
     type: Sequelize.STRING,
-    unique: true,
-    allowNull: false
+    unique: true
   },
   password: {
     type: Sequelize.STRING,
@@ -24,7 +23,7 @@ const User = db.define('user', {
       return () => this.getDataValue('salt')
     }
   },
-  instagramId: {
+  facebookId: {
     type: Sequelize.STRING
   },
   isAdmin: {
