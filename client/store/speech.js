@@ -1,5 +1,5 @@
 import axios from 'axios'
-import store from './'
+import store from './index'
 
 /**
  * ACTION TYPES
@@ -27,28 +27,6 @@ export const toggleErase = () => ({type: TOGGLE_ERASE})
 export const toggleVoice = () => ({type: TOGGLE_VOICE})
 export const toggleDraw = () => ({type: TOGGLE_DRAW})
 
-//Util
-/*eslint-disable*/
-export const evaluateCommand = (command, state) => {
-  try {
-    console.log('evaluating your command!')
-    if (state.voiceModeOn === true) {
-      if (command === 'start' && state.drawModeOn === false) {
-        speechReducer.dispatch(toggleDraw())
-      } else if (command === 'stop' && state.drawModeOn === true) {
-        speechReducer.dispatch(toggleDraw())
-      } else if (command === 'erase' && state.eraseModeOn === false) {
-        speechReducer.dispatch(toggleErase())
-      } else {
-        console.log('No command fired...?')
-      }
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
-/*eslint-enable*/
-
 /**
  * REDUCER
  */
@@ -57,7 +35,6 @@ export default function speechReducer(state = initialState, action) {
   switch (action.type) {
     case GET_COMMAND:
       newState.currentCommand = action.command
-      evaluateCommand(newState.currentCommand, newState)
       return newState
     case TOGGLE_VOICE:
       newState.voiceModeOn = !state.voiceModeOn

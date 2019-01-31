@@ -6,7 +6,29 @@ var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
 var SpeechRecognitionEvent =
   SpeechRecognitionEvent || webkitSpeechRecognitionEvent
 
-export default function testSpeech(voiceMode) {
+/*eslint-disable*/
+export const evaluateCommand = (command, state) => {
+  try {
+    console.log('evaluating your command, which is---->', command)
+    console.log('this is your state---->', state)
+    if (state.voiceModeOn === true) {
+      if (command === 'start' && state.drawModeOn === false) {
+        store.dispatch(toggleDraw())
+      } else if (command === 'stop' && state.drawModeOn === true) {
+        store.dispatch(toggleDraw())
+      } else if (command === 'erase' && state.eraseModeOn === false) {
+        store.dispatch(toggleErase())
+      } else {
+        console.log('No command fired...?')
+      }
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+/*eslint-enable*/
+
+export default function testSpeech(voiceMode, state) {
   if (voiceMode === true) {
     var recognition = new SpeechRecognition()
     // var speechRecognitionList = new SpeechGrammarList()
@@ -27,6 +49,7 @@ export default function testSpeech(voiceMode) {
         event.results[0][0].confidence
       )
       store.dispatch(getCommand(speechResult))
+      evaluateCommand(speechResult, state)
     }
 
     recognition.onspeechend = function() {

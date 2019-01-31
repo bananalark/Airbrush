@@ -10,7 +10,7 @@ import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 
-import testSpeech, {speechResult} from './utils/speechUtil'
+import testSpeech, {evaluateCommand} from './utils/speechUtil'
 
 import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
 
@@ -30,7 +30,7 @@ class Toolbar extends Component {
     await toggleVoice()
 
     if (!isVoiceModeOn) {
-      testSpeech(!isVoiceModeOn)
+      testSpeech(!isVoiceModeOn, this.props.state)
     }
   }
 
