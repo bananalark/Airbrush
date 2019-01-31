@@ -18,13 +18,48 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
 const {Path} = paper
-import clearCanvas from './clearCanvas'
 import store from '../../store'
 
-export function createProject(window, canvas) {
+export function createProject(window, cnv, ctx) {
   paper.install(window)
-  paper.setup(canvas)
-  clearCanvas(paper.project)
+  paper.setup(cnv)
+}
+
+export function clearCanvas() {
+  const canvas = document.getElementById('output')
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, ctx.width, ctx.height)
+  paper.project.clear()
+}
+
+export function saveCanvas() {
+  //the three layers
+  const backgroundCanvas = document.getElementById('background')
+  const projectViewStr = paper.view.element.toDataURL()
+  const canvas = document.getElementById('output')
+
+  //a canvas for meshing all together: display-none
+  const canvasForSave = document.getElementById('saved-image')
+  const saveCtx = canvasForSave.getContext('2d')
+
+  canvasForSave.width = canvas.width
+  canvasForSave.height = canvas.height
+
+  //draw video snapshot
+  saveCtx.drawImage(backgroundCanvas, 0, 0)
+
+  //draw paper project
+  var image = new Image()
+  image.onload = function() {
+    saveCtx.drawImage(image, 0, 0)
+  }
+  image.src = projectViewStr
+
+  //finally draw any erasures.
+  saveCtx.drawImage(canvas, 0, 0)
+
+  //save all as one string
+  const fullImageStr = saveCtx.canvas.toDataURL()
 }
 
 //smoother 'drawLineBetweenPoints' with paper.js project
@@ -47,9 +82,9 @@ export function drawLine(oneKeypoint, path) {
 
   //if there are a certain number of points, implement smoothing function and reset to a fresh path
   //this is another variable worth playing around with
-  if (path.segments.length > 10) {
+  if (path.segments.length > 5) {
     // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
-    path.simplify(20)
+    path.smooth({type: 'continuous'})
 
     path = pathStyle
   }

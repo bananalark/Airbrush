@@ -8,9 +8,12 @@ import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
+import Save from '@material-ui/icons/Save'
 import Button from '@material-ui/core/Button'
 
-import testSpeech, {evaluateCommand} from './utils/speechUtil'
+import {saveCanvas, clearCanvas} from './utils/draw'
+
+import {connect} from 'react-redux'
 
 import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
 
@@ -79,11 +82,22 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>{' '}
-        <Button id="clear-button" value="Clear Canvas">
+        <Button
+          id="clear-button"
+          value="Clear Canvas"
+          onClick={() => clearCanvas()}
+        >
           <Clear />Clear Canvas
         </Button>
-        <Button id="voice-button" onClick={() => this.handleSpeak()}>
-          {voiceModeOn ? (
+        <Button
+          id="save-sanvas"
+          value="Save Canvas"
+          onClick={() => saveCanvas()}
+        >
+          <Save />Save Canvas
+        </Button>
+        <Button onClick={() => this.handleSpeak()}>
+          {this.state.voiceModeOn === true ? (
             <div>
               <RecordVoiceOver />
               Voice Currently ON
