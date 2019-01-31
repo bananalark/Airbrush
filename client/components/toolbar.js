@@ -10,7 +10,7 @@ import Clear from '@material-ui/icons/Clear'
 import Save from '@material-ui/icons/Save'
 import Button from '@material-ui/core/Button'
 
-import {saveCanvas} from './utils/draw'
+import {saveCanvas, clearCanvas} from './utils'
 
 import {connect} from 'react-redux'
 
@@ -23,7 +23,6 @@ class Toolbar extends Component {
     this.toggleEraseMode = this.toggleEraseMode.bind(this)
     this.toggleDrawMode = this.toggleDrawMode.bind(this)
     this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
-    this.handleSave = this.handleSave.bind(this)
   }
 
   toggleEraseMode() {
@@ -43,10 +42,6 @@ class Toolbar extends Component {
     this.setState({voiceModeOn: !this.state.voiceModeOn})
   }
 
-  handleSave() {
-    saveCanvas()
-  }
-
   async handleSpeak() {
     if (this.state.voiceModeOn === false) {
       console.log(`TURNING SPEAK MODE ON`)
@@ -63,11 +58,6 @@ class Toolbar extends Component {
       this.toggleVoiceMode()
     }
   }
-
-  // componentDidMount() {
-  //   const navbar = document.getElementById('navbar')
-  //   navbar.height = document.getElementById('output').height
-  // }
 
   render() {
     let eraserModeOn = this.state.eraseModeOn
@@ -109,10 +99,18 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>{' '}
-        <Button id="clear-button" value="Clear Canvas">
+        <Button
+          id="clear-button"
+          value="Clear Canvas"
+          onClick={() => clearCanvas()}
+        >
           <Clear />Clear Canvas
         </Button>
-        <Button id="save-sanvas" value="Save Canvas" onClick={this.handleSave}>
+        <Button
+          id="save-sanvas"
+          value="Save Canvas"
+          onClick={() => saveCanvas()}
+        >
           <Save />Save Canvas
         </Button>
         <Button onClick={() => this.handleSpeak()}>

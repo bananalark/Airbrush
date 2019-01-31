@@ -21,12 +21,12 @@ const {Path} = paper
 import clearCanvas from './clearCanvas'
 import store from '../../store'
 
-export function createProject(window, cnv) {
+export function createProject(window, cnv, ctx) {
+  console.log('in draw', ctx)
   paper.install(window)
   paper.setup(cnv)
-  paper.project.stroke = 'transparent'
 
-  clearCanvas(paper.project)
+  clearCanvas(paper.project, ctx)
 }
 
 //this should be in its own utils folder but here now for easy access to project
@@ -80,10 +80,9 @@ export function drawLine(oneKeypoint, path) {
 
   //if there are a certain number of points, implement smoothing function and reset to a fresh path
   //this is another variable worth playing around with
-  if (path.segments.length > 10) {
+  if (path.segments.length > 5) {
     // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
-    path.simplify(20)
-    path.simplify(20)
+    path.smooth({type: 'continuous'})
 
     path = pathStyle
   }

@@ -1,12 +1,5 @@
-export default function clearCanvas(project) {
-  let canvas = document.getElementById('output')
-  let context = canvas.getContext('2d')
-  document.getElementById('clear-button').addEventListener(
-    'click',
-    () => {
-      //context.clearRect(0, 0, canvas.width, canvas.height)
-      project.clear()
-    },
-    false
-  )
+export default function clearCanvas(project, ctx) {
+  console.log('in clear', ctx)
+  ctx.clearRect(0, 0, ctx.width, ctx.height)
+  project.clear()
 }

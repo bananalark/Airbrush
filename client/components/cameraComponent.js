@@ -8,7 +8,7 @@ import {fetchCommand} from '../store'
 
 class CameraComponent extends Component {
   componentDidMount() {
-    require('./camera')
+    require('./utils/camera')
   }
 
   render() {
@@ -35,8 +35,7 @@ class CameraComponent extends Component {
             </div>
           </Grid>
         </Grid>
-        <canvas id="saved-image" />
-        <canvas id="loaded-image" />
+        <canvas id="saved-image" display="none" />
       </div>
     )
   }

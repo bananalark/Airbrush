@@ -1,12 +1,10 @@
 import * as posenet from '@tensorflow-models/posenet'
-import {
-  draw,
-  drawLineBetweenPoints,
-  createProject,
-  drawLine
-} from './utils/draw.js'
-import clearCanvas from './utils/clearCanvas'
-import store from '../store'
+import {draw, drawLineBetweenPoints, createProject, drawLine} from './draw.js'
+import clearCanvas from './clearCanvas'
+import store from '../../store'
+
+//will be moved to UI
+let minPartConfidence = 0.75
 
 let videoHeight
 let videoWidth
@@ -69,7 +67,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.75
+    minPartConfidence //moved to top for ease of change
   },
   output: {
     showVideo: true,
@@ -101,7 +99,8 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
-  createProject(window, canvas)
+  console.log('in camera', ctx)
+  createProject(window, canvas, ctx)
 
   async function poseDetectionFrame(prevPoses = [], innerPath = path) {
     // Scale an image down to a certain factor. Too large of an image will slow
@@ -176,10 +175,11 @@ function detectPoseInRealTime(video, net) {
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-            if (nose.score >= minPartConfidence) {
+
+            if (hand.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                const thisPath = drawLine(nose, path)
+                const thisPath = drawLine(hand, path)
 
                 path = thisPath
               } else {
@@ -189,7 +189,7 @@ function detectPoseInRealTime(video, net) {
                 //keypoints[9] == leftWrist (but literally your right wrist)
                 if (prevPoses[0].keypoints[0]) {
                   drawLineBetweenPoints(
-                    [nose, prevPoses[0].keypoints[0]],
+                    [hand, prevPoses[0].keypoints[17]],
                     ctx,
                     1,
                     15
@@ -239,7 +239,6 @@ export async function bindPage() {
     throw e
   }
 
-  clearCanvas()
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
