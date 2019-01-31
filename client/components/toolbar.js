@@ -12,28 +12,29 @@ import Save from '@material-ui/icons/Save'
 import Button from '@material-ui/core/Button'
 
 import {saveCanvas, clearCanvas} from './utils/draw'
+import voiceRecognition from './utils/speechUtil'
 
-import {connect} from 'react-redux'
-
-import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
+import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 class Toolbar extends Component {
   async handleSpeak() {
     let {
-      toggleVoice,
       drawModeOn,
       eraseModeOn,
       voiceModeOn,
-      getCommand
+      currentCommand,
+      toggleVoice
     } = this.props
 
-    let isVoiceModeOn = voiceModeOn
-    let isDrawModeOn = drawModeOn
-    let isEraseModeOn = eraseModeOn
     await toggleVoice()
 
-    if (!isVoiceModeOn) {
-      testSpeech(!isVoiceModeOn, this.props.state)
+    if (store.getState().paintTools.voiceModeOn === true) {
+      voiceRecognition(store.getState().paintTools)
+      setInterval(() => {
+        if (store.getState().paintTools.voiceModeOn === true) {
+          voiceRecognition(store.getState().paintTools)
+        }
+      }, 5000)
     }
   }
 
@@ -116,10 +117,10 @@ class Toolbar extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentCommand: state.speech.currentCommand,
-  eraseModeOn: state.speech.eraseModeOn,
-  voiceModeOn: state.speech.voiceModeOn,
-  drawModeOn: state.speech.drawModeOn
+  currentCommand: state.paintTools.currentCommand,
+  eraseModeOn: state.paintTools.eraseModeOn,
+  voiceModeOn: state.paintTools.voiceModeOn,
+  drawModeOn: state.paintTools.drawModeOn
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
