@@ -15,10 +15,10 @@
  * =============================================================================
  */
 const paper = require('paper')
-const {Path} = paper
+// const {Path} = paper
 import clearCanvas from './clearCanvas'
 import store from '../../store'
-import {Shape, Size} from 'paper'
+import {Size, Path} from 'paper'
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -35,9 +35,7 @@ function getColor() {
 }
 
 export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
-  let chosenBrush = store.getState().speech.chosenBrush
-
-  //shape to line has a bug - the path object no longer has an 'add' function
+  let chosenBrush = store.getState().paintTools.chosenBrush
 
   switch (chosenBrush) {
     case 'defaultLine':
@@ -54,6 +52,8 @@ export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
       return drawTriangleLine(nose)
     case 'triangleShape':
       return drawTriangleShape(nose, leftWrist)
+    default:
+      return drawLine(hand, path)
   }
 }
 
@@ -90,12 +90,7 @@ function drawCircleLine(oneKeypoint) {
   )
   shape.strokeColor = new Color(color.red, color.green, color.blue)
   shape.strokeWidth = 3
-  // const shape = new Shape.Circle({
-  //   center: [oneKeypoint.position.x, oneKeypoint.position.y],
-  //   radius: 30,
-  //   strokeColor: new Color(color.red, color.green, color.blue),
-  //   strokeWidth: 3
-  // })
+
   return shape
 }
 
@@ -114,28 +109,12 @@ function drawCircleShape(oneKeypoint, secondKeypoint) {
   shape.strokeColor = new Color(color.red, color.green, color.blue)
   shape.strokeWidth = 5
 
-  // const shape = new Shape.Circle({
-  //   center: [oneKeypoint.position.x, oneKeypoint.position.y],
-  //   radius: r,
-  //   strokeColor: new Color(color.red, color.green, color.blue),
-  //   strokeWidth: 5
-  // })
   return shape
 }
 
 //draw rectangle as a shape
 function drawRectangleShape(oneKeypoint, secondKeypoint) {
   let color = getColor()
-
-  // const shape = new Shape.Rectangle({
-  //   point: [oneKeypoint.position.x, oneKeypoint.position.y], //rightWrist
-  //   size: [
-  //     secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
-  //     secondKeypoint.position.y - oneKeypoint.position.y
-  //   ],
-  //   strokeColor: new Color(color.red, color.green, color.blue),
-  //   strokeWidth: 5
-  // })
 
   const shape = new Path.Rectangle(
     new Point(oneKeypoint.position.x, oneKeypoint.position.y),

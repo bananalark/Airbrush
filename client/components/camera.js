@@ -3,13 +3,6 @@ import {
   draw,
   drawLineBetweenPoints,
   createProject,
-  drawLine,
-  drawCircleLine,
-  drawCircleShape,
-  drawRectangleShape,
-  drawEllipseShape,
-  drawTriangleLine,
-  drawTriangleShape,
   drawAnything
 } from './utils/draw.js'
 import clearCanvas from './utils/clearCanvas'
@@ -182,8 +175,7 @@ function detectPoseInRealTime(video, net) {
                 ctx.globalCompositeOperation = 'source-over'
                 //const thisPath = drawLine(nose, path)
 
-                //THIS is where we will choose which function to draw w/
-
+                //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(
                   nose,
                   leftWrist,
@@ -211,35 +203,7 @@ function detectPoseInRealTime(video, net) {
           }
         }
       }
-      // beginning to map out hand. will implement after finish integrating paper.js
-      //     const yDiff = leftWrist.position.y - leftElbow.position.y
-      //     const handY = yDiff / 2 + leftWrist.position.y
-      //     const xDiff = leftWrist.position.x - leftElbow.position.x
-      //     const handX = xDiff / 2 + leftWrist.position.x
-      //     hand = {score: leftWrist.score, position: {y: handY, x: handX}}
-      //     keypoints[17] = hand
-      //     if (hand.score > minPartConfidence) {
-      //       if (eraseModeValue === 'false') {
-      //         ctx.globalCompositeOperation = 'source-over'
-      //         const thisPath = drawLine(hand, path)
 
-      //         path = thisPath
-      //       } else {
-      //         ctx.globalCompositeOperation = 'destination-out'
-
-      //         //needs refactor for using hand - having trouble passing into loop
-      //         //keypoints[9] == leftWrist (but literally your right wrist)
-      //         if (prevPoses[0].keypoints[17]) {
-      //           drawLineBetweenPoints(
-      //             [hand, prevPoses[0].keypoints[17]],
-      //             ctx,
-      //             1,
-      //             15
-      //           )
-      //         }
-      //       }
-      //     }
-      //   }
       // } else if (
       //   keypoints[10].score >= minPartConfidence &&
       //   Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
