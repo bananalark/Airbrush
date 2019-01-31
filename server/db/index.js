@@ -19,5 +19,9 @@ if (process.env.NODE_ENV === 'test') {
 
 //to access User model from index
 const User = require('./user')
+const Image = require('./image')
 
-module.exports = {db, User}
+User.hasMany(Image)
+Image.belongsTo(User)
+
+module.exports = {db, User, Image}

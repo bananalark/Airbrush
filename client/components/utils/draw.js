@@ -20,18 +20,35 @@ const paper = require('paper')
 const {Path} = paper
 import clearCanvas from './clearCanvas'
 import store from '../../store'
+import canvg from 'canvg'
 
-export function createProject(window, canvas) {
+export function createProject(window, cnv) {
   paper.install(window)
-  paper.setup(canvas)
+  paper.setup(cnv)
   clearCanvas(paper.project)
 }
 
-export function saveCanvas(bg, canvas) {
-  const projectString = paper.project.exportSVG({asString: true})
-  const backgroundString = bg.toDataUrl()
-  const canvasString = canvas.toDataUrl()
-  console.log(projectString, canvasString, backgroundString)
+export function saveCanvas() {
+  const canvas = document.getElementById('output')
+  const ctx = canvas.getContext('2d')
+
+  const backgroundCanvas = document.getElementById('background')
+  const backgroundctx = backgroundCanvas.getContext('2d')
+
+  const canvasString = ctx.canvas.toDataURL()
+  const backgroundString = backgroundctx.canvas.toDataURL()
+
+  const projectSvgEl = paper.project.exportSVG()
+  const txt = projectSvgEl.innerHTML
+
+  const canvasForSave = document.getElementById('saved-image')
+  const saveCtx = canvasForSave.getContext('2d')
+  canvasForSave.width = backgroundCanvas.width
+  canvasForSave.height = backgroundCanvas.height
+
+  //saveCtx.drawImage(backgroundCanvas, 0, 0)
+
+  canvg(canvasForSave, txt)
 }
 //smoother 'drawLineBetweenPoints' with paper.js project
 export function drawLine(oneKeypoint, path) {

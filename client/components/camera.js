@@ -179,7 +179,6 @@ function detectPoseInRealTime(video, net) {
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                console.log('HI')
                 const thisPath = drawLine(nose, path)
 
                 path = thisPath

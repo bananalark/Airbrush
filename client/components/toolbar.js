@@ -44,9 +44,7 @@ class Toolbar extends Component {
   }
 
   handleSave() {
-    const background = document.getElementById('background')
-    const canvas = document.getElementById('output')
-    saveCanvas(background, canvas)
+    saveCanvas()
   }
 
   async handleSpeak() {
@@ -114,7 +112,7 @@ class Toolbar extends Component {
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
         </Button>
-        <Button id="save-sanvas" value="Save Canvas">
+        <Button id="save-sanvas" value="Save Canvas" onClick={this.handleSave}>
           <Save />Save Canvas
         </Button>
         <Button onClick={() => this.handleSpeak()}>
