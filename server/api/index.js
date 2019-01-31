@@ -2,7 +2,6 @@ const router = require('express').Router()
 module.exports = router
 
 router.use('/users', require('./users'))
-router.use('/speech', require('./speech'))
 router.use('/images', require('./images'))
 
 router.use((req, res, next) => {
