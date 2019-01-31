@@ -30,7 +30,7 @@ export const toggleDraw = () => ({type: TOGGLE_DRAW})
 /**
  * REDUCER
  */
-export default function speechReducer(state = initialState, action) {
+const paintTools = (state = initialState, action) => {
   let newState = {...state}
   switch (action.type) {
     case GET_COMMAND:
@@ -51,16 +51,4 @@ export default function speechReducer(state = initialState, action) {
   }
 }
 
-// analyzeCurrentCommand() {
-//   let {currentCommand} = this.props
-//   if (currentCommand === 'start') {
-//     this.setState({drawModeOn: true})
-//   } else if (currentCommand === 'stop') {
-//     this.setState({drawModeOn: false})
-//   } else if (currentCommand === 'erase') {
-//     this.setState({eraseModeOn: true})
-//     this.setState({drawModeOn: true})
-//   } else if (currentCommand === 'erase off') {
-//     this.setState({eraseModeOn: false})
-//   }
-// }
+export default paintTools
