@@ -12,95 +12,45 @@ import Button from '@material-ui/core/Button'
 
 import testSpeech, {speechResult} from './utils/speechUtil'
 
-// let startVoiceInterval = setInterval(testSpeech, 3000)
-// function stopVoiceInterval() {
-//   clearInterval(startVoiceInterval)
-// }
+import {getCommand, toggleErase, toggleVoice, toggleDraw} from '../store'
 
 class Toolbar extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      eraseModeOn: false,
-      voiceModeOn: false,
-      drawModeOn: false
-    }
-    this.toggleEraseMode = this.toggleEraseMode.bind(this)
-    this.toggleDrawMode = this.toggleDrawMode.bind(this)
-    this.toggleVoiceMode = this.toggleVoiceMode.bind(this)
-    this.analyzeCurrentCommand = this.analyzeCurrentCommand.bind(this)
-  }
-
-  componentDidUpdate() {
-    this.analyzeCurrentCommand()
-  }
-
-  toggleEraseMode() {
-    if (this.state.eraseModeOn === true) {
-      this.setState({eraseModeOn: false})
-    } else {
-      this.setState({eraseModeOn: true})
-    }
-  }
-
-  toggleDrawMode() {
-    this.setState(prevState => ({drawModeOn: !prevState.drawModeOn}))
-  }
-
-  toggleVoiceMode() {
-    this.setState(prevState => ({voiceModeOn: !prevState.voiceModeOn}))
-    // let newVoiceMode = !this.state.voiceModeOn
-    // this.setState({voiceModeOn: newVoiceMode})
-  }
-
-  analyzeCurrentCommand() {
-    let {currentCommand} = this.props
-    if (currentCommand === 'start') {
-      this.setState({drawModeOn: true})
-    } else if (currentCommand === 'stop') {
-      this.setState({drawModeOn: false})
-    } else if (currentCommand === 'erase') {
-      this.setState({eraseModeOn: true})
-      this.setState({drawModeOn: true})
-    } else if (currentCommand === 'erase off') {
-      this.setState({eraseModeOn: false})
-    }
-  }
-  /*eslint-disable*/
   async handleSpeak() {
-    console.log('VOICE MODE BEFORE--->', this.state.voiceModeOn)
-    await this.toggleVoiceMode()
-    console.log('VOICE MODE AFTER--->', this.state.voiceModeOn)
+    let {
+      toggleVoice,
+      drawModeOn,
+      eraseModeOn,
+      voiceModeOn,
+      getCommand
+    } = this.props
 
-    //   if (this.state.voiceModeOn === true) {
-    //     testSpeech(true)
-    //     setInterval(() => {
-    //       testSpeech(this.state.voiceModeOn)
-    //     }, 5000)
-    //   } else {
-    //     setInterval(() => {
-    //       this.handleSpeak()
-    //     }, 5000)
-    //   }
+    let isVoiceModeOn = voiceModeOn
+    let isDrawModeOn = drawModeOn
+    let isEraseModeOn = eraseModeOn
+    await toggleVoice()
+
+    if (!isVoiceModeOn) {
+      testSpeech(!isVoiceModeOn)
+    }
   }
-
-  /*eslint-enable*/
 
   render() {
-    let eraserModeOn = this.state.eraseModeOn
-    let {drawModeOn} = this.state
-    // setInterval(() => {
-    //   this.analyzeCurrentCommand()
-    // }, 1000)
+    let {
+      eraseModeOn,
+      drawModeOn,
+      voiceModeOn,
+      toggleErase,
+      toggleDraw
+    } = this.props
 
     return (
       <div id="navbar">
         <Button
           id="draw-button"
           value={drawModeOn}
-          onClick={this.toggleDrawMode}
+          onClick={() => toggleDraw()}
         >
-          {this.state.drawModeOn ? (
+          {drawModeOn ? (
             <div>
               <Pencil />
               Draw Mode ON
@@ -114,10 +64,10 @@ class Toolbar extends Component {
         </Button>
         <Button
           id="erase-button"
-          value={eraserModeOn}
-          onClick={this.toggleEraseMode}
+          value={eraseModeOn}
+          onClick={() => toggleErase()}
         >
-          {eraserModeOn === true ? (
+          {eraseModeOn ? (
             <div>
               <Eraser />
               Eraser Mode ON
@@ -132,11 +82,8 @@ class Toolbar extends Component {
         <Button id="clear-button" value="Clear Canvas">
           <Clear />Clear Canvas
         </Button>
-        <Button
-          id="voice-button"
-          onClick={() => this.handleSpeak(this.state.voiceModeOn)}
-        >
-          {this.state.voiceModeOn === true ? (
+        <Button id="voice-button" onClick={() => this.handleSpeak()}>
+          {voiceModeOn ? (
             <div>
               <RecordVoiceOver />
               Voice Currently ON
@@ -155,10 +102,16 @@ class Toolbar extends Component {
 }
 
 const mapStateToProps = state => ({
-  currentCommand: state.speech.currentCommand
+  currentCommand: state.speech.currentCommand,
+  eraseModeOn: state.speech.eraseModeOn,
+  voiceModeOn: state.speech.voiceModeOn,
+  drawModeOn: state.speech.drawModeOn
 })
 const mapDispatchToProps = dispatch => ({
-  // getCommand: () => dispatch(getCommand())
+  getCommand: command => dispatch(getCommand(command)),
+  toggleErase: () => dispatch(toggleErase()),
+  toggleVoice: () => dispatch(toggleVoice()),
+  toggleDraw: () => dispatch(toggleDraw())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Toolbar)

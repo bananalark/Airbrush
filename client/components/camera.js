@@ -163,10 +163,9 @@ function detectPoseInRealTime(video, net) {
 
                 path = thisPath
               } else {
-                ctx.globalCompositeOperation = 'destination-out'
-
-                //needs refactor for using hand - having trouble passing into loop
-                //keypoints[9] == leftWrist (but literally your right wrist)
+                if (eraseModeValue === 'true') {
+                  ctx.globalCompositeOperation = 'destination-out'
+                }
                 if (prevPoses[0].keypoints[17]) {
                   drawLineBetweenPoints(
                     [hand, prevPoses[0].keypoints[17]],
@@ -175,6 +174,9 @@ function detectPoseInRealTime(video, net) {
                     15
                   )
                 }
+
+                //needs refactor for using hand - having trouble passing into loop
+                //keypoints[9] == leftWrist (but literally your right wrist)
               }
             }
           }
