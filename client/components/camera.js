@@ -169,6 +169,14 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
+            //here we define "hand" using wrist and elbow position
+            const yDiff = leftWrist.position.y - leftElbow.position.y
+            const handY = yDiff / 2 + leftWrist.position.y
+            const xDiff = leftWrist.position.x - leftElbow.position.x
+            const handX = xDiff / 2 + leftWrist.position.x
+            hand = {score: leftWrist.score, position: {y: handY, x: handX}}
+            keypoints[17] = hand
+
             if (nose.score > minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
@@ -192,7 +200,7 @@ function detectPoseInRealTime(video, net) {
                 //keypoints[9] == leftWrist (but literally your right wrist)
                 if (prevPoses[0].keypoints[17]) {
                   drawLineBetweenPoints(
-                    [nose, prevPoses[0].keypoints[17]],
+                    [hand, prevPoses[0].keypoints[17]],
                     ctx,
                     1,
                     15
@@ -203,7 +211,7 @@ function detectPoseInRealTime(video, net) {
           }
         }
       }
-      //beginning to map out hand. will implement after finish integrating paper.js
+      // beginning to map out hand. will implement after finish integrating paper.js
       //     const yDiff = leftWrist.position.y - leftElbow.position.y
       //     const handY = yDiff / 2 + leftWrist.position.y
       //     const xDiff = leftWrist.position.x - leftElbow.position.x

@@ -18,7 +18,7 @@ const paper = require('paper')
 const {Path} = paper
 import clearCanvas from './clearCanvas'
 import store from '../../store'
-import {Shape} from 'paper'
+import {Shape, Size} from 'paper'
 
 export function createProject(window, canvas) {
   paper.install(window)
@@ -34,13 +34,14 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
-export function drawAnything(nose, leftWrist, rightWrist, /*hand,*/ path) {
+export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
   let chosenBrush = store.getState().speech.chosenBrush
-  // let color = getColor()
-  console.log(chosenBrush)
+
+  //shape to line has a bug - the path object no longer has an 'add' function
+
   switch (chosenBrush) {
     case 'defaultLine':
-      return drawLine(leftWrist, path)
+      return drawLine(hand, path)
     case 'circleLine':
       return drawCircleLine(nose)
     case 'circleShape':
@@ -59,6 +60,7 @@ export function drawAnything(nose, leftWrist, rightWrist, /*hand,*/ path) {
 //draw lines
 function drawLine(oneKeypoint, path) {
   let color = getColor()
+  console.log('path', typeof path)
 
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
@@ -68,6 +70,7 @@ function drawLine(oneKeypoint, path) {
   })
 
   if (!path) path = pathStyle
+
   path.add(oneKeypoint.position)
   if (path.segments.length > 10) {
     // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
@@ -81,12 +84,18 @@ function drawLine(oneKeypoint, path) {
 function drawCircleLine(oneKeypoint) {
   let color = getColor()
 
-  const shape = new Shape.Circle({
-    center: [oneKeypoint.position.x, oneKeypoint.position.y],
-    radius: 30,
-    strokeColor: new Color(color.red, color.green, color.blue),
-    strokeWidth: 3
-  })
+  const shape = new Path.Circle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    30
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 3
+  // const shape = new Shape.Circle({
+  //   center: [oneKeypoint.position.x, oneKeypoint.position.y],
+  //   radius: 30,
+  //   strokeColor: new Color(color.red, color.green, color.blue),
+  //   strokeWidth: 3
+  // })
   return shape
 }
 
@@ -97,12 +106,20 @@ function drawCircleShape(oneKeypoint, secondKeypoint) {
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
       Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
   )
-  const shape = new Shape.Circle({
-    center: [oneKeypoint.position.x, oneKeypoint.position.y],
-    radius: r,
-    strokeColor: new Color(color.red, color.green, color.blue),
-    strokeWidth: 5
-  })
+
+  const shape = new Path.Circle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    r
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 5
+
+  // const shape = new Shape.Circle({
+  //   center: [oneKeypoint.position.x, oneKeypoint.position.y],
+  //   radius: r,
+  //   strokeColor: new Color(color.red, color.green, color.blue),
+  //   strokeWidth: 5
+  // })
   return shape
 }
 
@@ -110,15 +127,26 @@ function drawCircleShape(oneKeypoint, secondKeypoint) {
 function drawRectangleShape(oneKeypoint, secondKeypoint) {
   let color = getColor()
 
-  const shape = new Shape.Rectangle({
-    point: [oneKeypoint.position.x, oneKeypoint.position.y], //rightWrist
-    size: [
+  // const shape = new Shape.Rectangle({
+  //   point: [oneKeypoint.position.x, oneKeypoint.position.y], //rightWrist
+  //   size: [
+  //     secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
+  //     secondKeypoint.position.y - oneKeypoint.position.y
+  //   ],
+  //   strokeColor: new Color(color.red, color.green, color.blue),
+  //   strokeWidth: 5
+  // })
+
+  const shape = new Path.Rectangle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    new Size(
       secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
       secondKeypoint.position.y - oneKeypoint.position.y
-    ],
-    strokeColor: new Color(color.red, color.green, color.blue),
-    strokeWidth: 5
-  })
+    )
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 5
+
   return shape
 }
 
@@ -126,7 +154,7 @@ function drawRectangleShape(oneKeypoint, secondKeypoint) {
 function drawEllipseShape(oneKeypoint, secondKeypoint) {
   let color = getColor()
 
-  const shape = new Shape.Ellipse({
+  const shape = new Path.Ellipse({
     center: [oneKeypoint.position.x, oneKeypoint.position.y],
     radius: [
       secondKeypoint.position.x - oneKeypoint.position.x,
@@ -135,6 +163,7 @@ function drawEllipseShape(oneKeypoint, secondKeypoint) {
     strokeColor: new Color(color.red, color.green, color.blue),
     strokeWidth: 5
   })
+
   return shape
 }
 
