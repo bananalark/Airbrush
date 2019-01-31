@@ -21,7 +21,8 @@ class Toolbar extends Component {
       drawModeOn,
       eraseModeOn,
       voiceModeOn,
-      getCommand
+      getCommand,
+      currentCommand
     } = this.props
 
     let isVoiceModeOn = voiceModeOn
@@ -29,8 +30,15 @@ class Toolbar extends Component {
     let isEraseModeOn = eraseModeOn
     await toggleVoice()
 
+    let currentState = {
+      currentCommand,
+      eraseModeOn,
+      voiceModeOn,
+      drawModeOn
+    }
+
     if (!isVoiceModeOn) {
-      testSpeech(!isVoiceModeOn, this.props.state)
+      testSpeech(!isVoiceModeOn, currentState)
     }
   }
 

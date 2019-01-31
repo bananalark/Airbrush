@@ -1,4 +1,4 @@
-import store from '../../store'
+import store, {toggleDraw, toggleErase} from '../../store'
 import {getCommand} from '../../store/speech'
 
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
@@ -9,9 +9,8 @@ var SpeechRecognitionEvent =
 /*eslint-disable*/
 export const evaluateCommand = (command, state) => {
   try {
-    console.log('evaluating your command, which is---->', command)
-    console.log('this is your state---->', state)
-    if (state.voiceModeOn === true) {
+    if (state.voiceModeOn === false) {
+      //bc there's a delay on toggle
       if (command === 'start' && state.drawModeOn === false) {
         store.dispatch(toggleDraw())
       } else if (command === 'stop' && state.drawModeOn === true) {
