@@ -1,6 +1,5 @@
 import * as posenet from '@tensorflow-models/posenet'
 import {draw, drawLineBetweenPoints, createProject, drawLine} from './draw.js'
-import clearCanvas from './clearCanvas'
 import store from '../../store'
 
 //will be moved to UI
@@ -99,7 +98,7 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
-  console.log('in camera', ctx)
+
   createProject(window, canvas, ctx)
 
   async function poseDetectionFrame(prevPoses = [], innerPath = path) {

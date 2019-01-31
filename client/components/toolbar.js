@@ -10,7 +10,7 @@ import Clear from '@material-ui/icons/Clear'
 import Save from '@material-ui/icons/Save'
 import Button from '@material-ui/core/Button'
 
-import {saveCanvas, clearCanvas} from './utils'
+import {saveCanvas, clearCanvas} from './utils/draw'
 
 import {connect} from 'react-redux'
 

@@ -18,18 +18,20 @@ import * as posenet from '@tensorflow-models/posenet'
 import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
 const {Path} = paper
-import clearCanvas from './clearCanvas'
 import store from '../../store'
 
 export function createProject(window, cnv, ctx) {
-  console.log('in draw', ctx)
   paper.install(window)
   paper.setup(cnv)
-
-  clearCanvas(paper.project, ctx)
 }
 
-//this should be in its own utils folder but here now for easy access to project
+export function clearCanvas() {
+  const canvas = document.getElementById('output')
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, ctx.width, ctx.height)
+  paper.project.clear()
+}
+
 export function saveCanvas() {
   //the three layers
   const backgroundCanvas = document.getElementById('background')
