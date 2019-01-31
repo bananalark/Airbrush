@@ -36,6 +36,7 @@ class CameraComponent extends Component {
           </Grid>
         </Grid>
         <canvas id="saved-image" />
+        <canvas id="loaded-image" />
       </div>
     )
   }

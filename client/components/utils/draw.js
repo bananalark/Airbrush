@@ -20,36 +20,46 @@ const paper = require('paper')
 const {Path} = paper
 import clearCanvas from './clearCanvas'
 import store from '../../store'
-import canvg from 'canvg'
 
 export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)
+  paper.project.stroke = 'transparent'
+
   clearCanvas(paper.project)
 }
 
+//this should be in its own utils folder but here now for easy access to project
 export function saveCanvas() {
-  const canvas = document.getElementById('output')
-  const ctx = canvas.getContext('2d')
-
+  //the three layers
   const backgroundCanvas = document.getElementById('background')
-  const backgroundctx = backgroundCanvas.getContext('2d')
+  const projectViewStr = paper.view.element.toDataURL()
+  const canvas = document.getElementById('output')
 
-  const canvasString = ctx.canvas.toDataURL()
-  const backgroundString = backgroundctx.canvas.toDataURL()
-
-  const projectSvgEl = paper.project.exportSVG()
-  const txt = projectSvgEl.innerHTML
-
+  //a canvas for meshing all together: display-none
   const canvasForSave = document.getElementById('saved-image')
   const saveCtx = canvasForSave.getContext('2d')
-  canvasForSave.width = backgroundCanvas.width
-  canvasForSave.height = backgroundCanvas.height
 
-  //saveCtx.drawImage(backgroundCanvas, 0, 0)
+  canvasForSave.width = canvas.width
+  canvasForSave.height = canvas.height
 
-  canvg(canvasForSave, txt)
+  //draw video snapshot
+  saveCtx.drawImage(backgroundCanvas, 0, 0)
+
+  //draw paper project
+  var image = new Image()
+  image.onload = function() {
+    saveCtx.drawImage(image, 0, 0)
+  }
+  image.src = projectViewStr
+
+  //finally draw any erasures.
+  saveCtx.drawImage(canvas, 0, 0)
+
+  //save all as one string
+  const fullImageStr = saveCtx.canvas.toDataURL()
 }
+
 //smoother 'drawLineBetweenPoints' with paper.js project
 export function drawLine(oneKeypoint, path) {
   let color = store.getState().color.color
