@@ -26,7 +26,7 @@ export function createProject(window, canvas) {
   clearCanvas(paper.project)
 }
 
-//smoother 'drawLineBetweenPoints' with paper.js project
+//draw lines
 export function drawLine(oneKeypoint, path) {
   let color = store.getState().color.color
   const red = color.r / 255
@@ -34,16 +34,14 @@ export function drawLine(oneKeypoint, path) {
   const blue = color.b / 255
 
   const pathStyle = new Path({
-    segments: [oneKeypoint.position], //console.log
+    segments: [oneKeypoint.position],
     strokeColor: new Color(red, green, blue),
-    strokeWidth: 10,
+    strokeWidth: 5,
     strokeCap: 'round'
   })
-  //starting point of drawing
+
   if (!path) path = pathStyle
   path.add(oneKeypoint.position)
-  //if there are a certain number of points, implement smoothing function and reset to a fresh path
-  //this is another variable worth playing around with
   if (path.segments.length > 10) {
     // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
     path.smooth(10)
@@ -52,54 +50,62 @@ export function drawLine(oneKeypoint, path) {
   return path
 }
 
-//draw circle
-export function drawCircle(oneKeypoint, secondKeypoint, path) {
+//draw circle as line
+export function drawCircleLine(oneKeypoint) {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
   const blue = color.b / 255
 
-  // const pathStyle = new Path.Circle({
-  //   center: [oneKeypoint.position],
-  //   radius: [secondKeypoint.position],
-  //   strokeColor: new Color(red, green, blue),
-  //   strokeWidth: 10
-  // })
-  // if (!path) path = pathStyle
-  // path.add(oneKeypoint.position)
-  // path.add(secondKeypoint.position)
-  // return path
-
   const shape = new Shape.Circle({
     center: [oneKeypoint.position.x, oneKeypoint.position.y],
     radius: 30,
     strokeColor: new Color(red, green, blue),
-    strokeWidth: 10
+    strokeWidth: 3
   })
   return shape
 }
 
-//draw rectangle
-export function drawRectangle(oneKeypoint, secondKeypoint) {
+//draw circle as a shape
+export function drawCircleShape(oneKeypoint, secondKeypoint) {
+  let color = store.getState().color.color
+  const red = color.r / 255
+  const green = color.g / 255
+  const blue = color.b / 255
+  const r = Math.sqrt(
+    Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
+      Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
+  )
+  const shape = new Shape.Circle({
+    center: [oneKeypoint.position.x, oneKeypoint.position.y],
+    radius: r,
+    strokeColor: new Color(red, green, blue),
+    strokeWidth: 5
+  })
+  return shape
+}
+
+//draw rectangle as a shape
+export function drawRectangleShape(oneKeypoint, secondKeypoint) {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
   const blue = color.b / 255
 
   const shape = new Shape.Rectangle({
-    point: [oneKeypoint.position.x, oneKeypoint.position.y],
+    point: [oneKeypoint.position.x, oneKeypoint.position.y], //rightWrist
     size: [
-      secondKeypoint.position.x - oneKeypoint.position.x,
+      secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
       secondKeypoint.position.y - oneKeypoint.position.y
     ],
     strokeColor: new Color(red, green, blue),
-    strokeWidth: 10
+    strokeWidth: 5
   })
   return shape
 }
 
-//draw ellipse
-export function drawEllipse(oneKeypoint, secondKeypoint) {
+//draw ellipse as a shape
+export function drawEllipseShape(oneKeypoint, secondKeypoint) {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
@@ -112,12 +118,13 @@ export function drawEllipse(oneKeypoint, secondKeypoint) {
       secondKeypoint.position.y - oneKeypoint.position.y
     ],
     strokeColor: new Color(red, green, blue),
-    strokeWidth: 10
+    strokeWidth: 5
   })
   return shape
 }
-//draw triangle
-export function drawTriangle(oneKeypoint) {
+
+//draw triangle as a line
+export function drawTriangleLine(oneKeypoint) {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
@@ -127,6 +134,27 @@ export function drawTriangle(oneKeypoint) {
     new Point(oneKeypoint.position.x, oneKeypoint.position.y),
     3,
     30
+  )
+  triangle.strokeColor = new Color(red, green, blue)
+
+  return triangle
+}
+
+//draw triangle as a shape
+export function drawTriangleShape(oneKeypoint, secondKeypoint) {
+  let color = store.getState().color.color
+  const red = color.r / 255
+  const green = color.g / 255
+  const blue = color.b / 255
+  //still need to work on it
+  let side = Math.sqrt(
+    Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
+      Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
+  )
+  const triangle = new Path.RegularPolygon(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    3,
+    side
   )
   triangle.strokeColor = new Color(red, green, blue)
 
