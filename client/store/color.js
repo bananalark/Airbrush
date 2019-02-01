@@ -3,7 +3,6 @@ const colorReducer = (state = {color: {r: 255, g: 255, b: 255}}, action) => {
     case 'GET_COLOR':
       return {
         ...state,
-        displayColorPicker: false,
         color: action.color
       }
     default:

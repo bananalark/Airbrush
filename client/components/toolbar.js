@@ -9,12 +9,19 @@ import Eraser from 'mdi-material-ui/Eraser'
 import Hand from 'mdi-material-ui/Hand'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
-import Button from '@material-ui/core/Button'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogContentText
+} from '@material-ui/core/'
 import Save from '@material-ui/icons/Save'
 import Drawer from '@material-ui/core/Drawer'
 
-import {saveCanvas, clearCanvas} from '../utils/draw'
-import voiceRecognition from '../utils/speechUtil'
+import ButtonsNonChrome from './buttonsNonChrome'
+import ButtonsChrome from './buttonsChrome'
+
+import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
@@ -23,150 +30,9 @@ import ColorPicker from './colorPicker'
 import BodyPartOptions from './bodyPartOptions'
 
 class Toolbar extends Component {
-  constructor() {
-    super()
-    this.state = {
-      brushOpen: false,
-      bodyPartOpen: false
-    }
-    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
-    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
-  }
-
-  async handleSpeak() {
-    let {
-      drawModeOn,
-      eraseModeOn,
-      voiceModeOn,
-      currentCommand,
-      toggleVoice
-    } = this.props
-
-    await toggleVoice()
-
-    if (store.getState().paintTools.voiceModeOn === true) {
-      voiceRecognition(store.getState().paintTools)
-      setInterval(() => {
-        if (store.getState().paintTools.voiceModeOn === true) {
-          voiceRecognition(store.getState().paintTools)
-        }
-      }, 5000)
-    }
-  }
-
-  toggleBrushOpen() {
-    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
-  }
-
-  toggleBodyPartOpen() {
-    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  }
-
   render() {
-    let {
-      eraseModeOn,
-      drawModeOn,
-      voiceModeOn,
-      toggleErase,
-      toggleDraw
-    } = this.props
-
-    return (
-      <div id="navbar">
-        <Button id="voice-button" onClick={() => this.handleSpeak()}>
-          {voiceModeOn ? (
-            <div>
-              <RecordVoiceOver />
-              Voice Currently ON
-            </div>
-          ) : (
-            <div>
-              <VoiceOverOff />
-              Voice Currently OFF
-            </div>
-          )}
-        </Button>
-        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
-          <Hand />
-          currently drawing with {this.props.chosenBodyPart}
-          <Drawer anchor="left" open={this.state.bodyPartOpen}>
-            <BodyPartOptions />
-          </Drawer>
-        </Button>
-        <Button
-          id="draw-button"
-          value={drawModeOn}
-          onClick={() => toggleDraw()}
-        >
-          {drawModeOn ? (
-            <div>
-              <Pencil />
-              Draw Mode ON
-            </div>
-          ) : (
-            <div>
-              <PencilOff />
-              Draw Mode OFF
-            </div>
-          )}
-        </Button>
-        <Button id="brush-button" onClick={this.toggleBrushOpen}>
-          <Brush />
-          Brush option
-          <Drawer anchor="left" open={this.state.brushOpen}>
-            <BrushOptions />
-          </Drawer>
-        </Button>
-        <Button
-          id="erase-button"
-          value={eraseModeOn}
-          onClick={() => toggleErase()}
-        >
-          {eraseModeOn ? (
-            <div>
-              <Eraser />
-              Eraser Mode ON
-            </div>
-          ) : (
-            <div>
-              <Eraser />
-              Eraser Mode OFF
-            </div>
-          )}
-        </Button>{' '}
-        <ColorPicker />
-        <Button
-          id="clear-button"
-          value="Clear Canvas"
-          onClick={() => clearCanvas()}
-        >
-          <Clear />Clear Canvas
-        </Button>
-        <Button
-          id="save-canvas"
-          value="Save Canvas"
-          onClick={() => saveCanvas()}
-        >
-          <Save />Save Canvas
-        </Button>
-      </div>
-    )
+    return <div>{isChrome ? <ButtonsChrome /> : <ButtonsNonChrome />}</div>
   }
 }
 
-const mapStateToProps = state => ({
-  currentCommand: state.paintTools.currentCommand,
-  eraseModeOn: state.paintTools.eraseModeOn,
-  voiceModeOn: state.paintTools.voiceModeOn,
-  drawModeOn: state.paintTools.drawModeOn,
-  chosenBrush: state.paintTools.chosenBrush,
-  chosenBodyPart: state.paintTools.chosenBodyPart
-})
-const mapDispatchToProps = dispatch => ({
-  getCommand: command => dispatch(getCommand(command)),
-  toggleErase: () => dispatch(toggleErase()),
-  toggleVoice: () => dispatch(toggleVoice()),
-  toggleDraw: () => dispatch(toggleDraw())
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(Toolbar)
+export default Toolbar
