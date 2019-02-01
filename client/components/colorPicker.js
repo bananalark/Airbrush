@@ -78,7 +78,6 @@ class ColorPicker extends React.Component {
 }
 
 const mapStateToProps = function(state) {
-  console.log('mapStateToProps:', state)
   return {
     selectedColor: state.color
   }

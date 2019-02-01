@@ -31,6 +31,13 @@ export function clearCanvas() {
   paper.project.clear()
 }
 
+export function eraseTool() {
+  const canvas = document.getElementById('output')
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, ctx.width, ctx.height)
+  paper.project.clear()
+}
+
 export function saveCanvas() {
   //the three layers
   const backgroundCanvas = document.getElementById('background')
@@ -102,8 +109,12 @@ function drawLine(oneKeypoint, path) {
     strokeWidth: 5,
     strokeCap: 'round'
   })
-
   if (!path) path = pathStyle
+  // console.log('ERASE MODE IS OFF...?')
+  // console.log(
+  //   'IS STATE CHANGING---->',
+  //   store.getState().paintTools.eraseModeOn === false
+  // )
 
   path.add(oneKeypoint.position)
 

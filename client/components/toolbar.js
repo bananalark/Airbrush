@@ -83,11 +83,7 @@ class Toolbar extends Component {
       toggleDraw
     } = this.props
 
-    return (
-      <div id="navbar">
-        {isChrome ? <ButtonsChrome /> : <ButtonsNonChrome />}
-      </div>
-    )
+    return <div>{isChrome ? <ButtonsChrome /> : <ButtonsNonChrome />}</div>
   }
 }
 

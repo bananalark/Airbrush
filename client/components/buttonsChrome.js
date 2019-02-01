@@ -80,7 +80,7 @@ class ButtonsChrome extends Component {
       toggleDraw
     } = this.props
     return (
-      <div>
+      <div id="navbar">
         <Button id="voice-button" onClick={() => this.handleSpeak()}>
           {voiceModeOn ? (
             <div>

@@ -6,6 +6,7 @@ import {
   drawLine,
   drawAnything
 } from './draw.js'
+import {CSSTransition} from 'react-transition-group'
 
 //will be moved to UI
 let minPartConfidence = 0.75
@@ -164,6 +165,28 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
+            let toolbarAreaTopLeft = {x: 100, y: 250}
+            let toolbarAreaTopRight = {x: 200, y: 250}
+            let toolbarAreaBottomLeft = {x: 100, y: 660}
+            let toolbarAreaBottomRight = {x: 200, y: 6060}
+            // videoHeight
+
+            // console.log('score', keypoints[10].score)
+            if (keypoints[10].score > 0.6) {
+              console.log(
+                `x: ${keypoints[10].position.x} || y: ${
+                  keypoints[10].position.y
+                }`
+              )
+            }
+
+            // if (keypoints[9].position.x < 200) {
+            //   console.log(`you're on the LEFT-hand side of the screen!`)
+            // } else if (keypoints[9].position.x > 600) {
+            //   console.log(`you're on the RIGHT-hand side of the screen!`)
+            // } else {
+            //   console.log(`you're in the middle of the screen!`)
+            // }
             //here we define "hand" using wrist and elbow position
             const yDiff = leftWrist.position.y - leftElbow.position.y
             const handY = yDiff / 2 + leftWrist.position.y
@@ -188,8 +211,9 @@ function detectPoseInRealTime(video, net) {
 
                 path = thisPath
               } else {
-                ctx.globalCompositeOperation = 'destination-out'
-
+                // ctx.globalCompositeOperation = 'destination-out'
+                // ctx.arc(handX, handY, 2, 0, Math.PI * 2, false)
+                // ctx.fill()
                 //needs refactor for using nose - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
                 // if (prevPoses[0].keypoints[17]) {
