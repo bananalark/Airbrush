@@ -55,11 +55,12 @@ export function saveCanvas() {
   }
   image.src = projectViewStr
 
-  //finally draw any erasures.
+  //finally draw any erasures. ** TEMPORARY **
   saveCtx.drawImage(canvas, 0, 0)
 
   //save all as one string
   fullImageStr = saveCtx.canvas.toDataURL('image/png')
+  return fullImageStr
 }
 
 export function download() {

@@ -10,7 +10,7 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
-import Save from '@material-ui/icons/Save'
+import Camera from '@material-ui/icons/Camera'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 
 import voiceRecognition from '../utils/speechUtil'
@@ -21,8 +21,8 @@ import BrushOptions from './brushOptions'
 import {Drawer} from '@material-ui/core'
 
 class Toolbar extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       open: false
     }
@@ -56,6 +56,7 @@ class Toolbar extends Component {
 
   render() {
     let {
+      openLightbox,
       eraseModeOn,
       drawModeOn,
       voiceModeOn,
@@ -120,19 +121,17 @@ class Toolbar extends Component {
           )}
         </Button>{' '}
         <ColorPicker />
-        <Button
-          id="clear-button"
-          value="Clear Canvas"
-          onClick={() => clearCanvas()}
-        >
+        <Button id="clear-button" value="Clear Canvas" onClick={clearCanvas}>
           <Clear />Clear Canvas
         </Button>
         <Button
-          id="save-canvas"
-          value="Save Canvas"
-          onClick={() => saveCanvas()}
+          id="take-snapshot"
+          value="Take Snapshot"
+          onClick={() => {
+            openLightbox(saveCanvas())
+          }}
         >
-          <Save />Save Canvas
+          <Camera />Take Snapshot
         </Button>
       </div>
     )
