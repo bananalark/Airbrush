@@ -18,57 +18,44 @@ const paper = require('paper')
 // const {Path} = paper
 import store from '../store'
 import {Size, Path} from 'paper'
+
 let fullImageStr
 
-export function createProject(window, cnv, ctx) {
+export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)
 }
 
 export function clearCanvas() {
-  const canvas = document.getElementById('output')
-  const ctx = canvas.getContext('2d')
-  ctx.clearRect(0, 0, ctx.width, ctx.height)
   paper.project.clear()
 }
 
 export function saveCanvas() {
-  //the three layers
   const backgroundCanvas = document.getElementById('background')
-  const projectViewStr = paper.view.element.toDataURL()
+  const bgCtx = backgroundCanvas.getContext('2d')
   const canvas = document.getElementById('output')
+  bgCtx.drawImage(canvas, 0, 0)
 
-  //a canvas for meshing all together: display-none
-  const canvasForSave = document.getElementById('saved-image')
-  const saveCtx = canvasForSave.getContext('2d')
+  // const projectViewStr = paper.view.element.toDataURL()
 
-  canvasForSave.width = canvas.width
-  canvasForSave.height = canvas.height
-
-  //draw video snapshot
-  saveCtx.drawImage(backgroundCanvas, 0, 0)
-
-  //draw paper project
-  var image = new Image()
-  image.onload = function() {
-    saveCtx.drawImage(image, 0, 0)
-  }
-  image.src = projectViewStr
-
-  //finally draw any erasures. ** TEMPORARY **
-  saveCtx.drawImage(canvas, 0, 0)
+  // //draw paper project
+  // var image = new Image()
+  // image.onload = function() {
+  //   bgCtx.drawImage(image, 0, 0)
+  // }
+  // image.src = projectViewStr
 
   //save all as one string
-  fullImageStr = saveCtx.canvas.toDataURL('image/png')
+  fullImageStr = bgCtx.canvas.toDataURL('image/png')
   return fullImageStr
 }
 
 export function download() {
-  let newStr = fullImageStr.replace(
+  let downloadRef = fullImageStr.replace(
     /^data:image\/[^;]*/,
     'data:application/octet-stream'
   )
-  parent.location.href = newStr
+  parent.location.href = downloadRef
 }
 
 function getColor() {
