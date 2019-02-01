@@ -192,14 +192,14 @@ function detectPoseInRealTime(video, net) {
 
                 //needs refactor for using nose - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
-                if (prevPoses[0].keypoints[17]) {
-                  drawLineBetweenPoints(
-                    [hand, prevPoses[0].keypoints[17]],
-                    ctx,
-                    1,
-                    15
-                  )
-                }
+                // if (prevPoses[0].keypoints[17]) {
+                //   drawLineBetweenPoints(
+                //     [hand, prevPoses[0].keypoints[17]],
+                //     ctx,
+                //     1,
+                //     15
+                //   )
+                // }
               }
             }
           }
