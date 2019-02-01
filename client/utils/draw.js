@@ -16,7 +16,7 @@
  */
 const paper = require('paper')
 // const {Path} = paper
-import store from '../../store'
+import store from '../store'
 import {Size, Path} from 'paper'
 
 export function createProject(window, cnv, ctx) {
@@ -115,7 +115,6 @@ export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
 //draw lines
 function drawLine(oneKeypoint, path) {
   let color = getColor()
-  console.log('path', typeof path)
 
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
