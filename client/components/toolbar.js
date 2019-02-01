@@ -9,11 +9,16 @@ import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
-import Button from '@material-ui/core/Button'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogContentText
+} from '@material-ui/core/'
 import Save from '@material-ui/icons/Save'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 
-import voiceRecognition from '../utils/speechUtil'
+import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
@@ -27,6 +32,9 @@ class Toolbar extends Component {
       open: false
     }
     this.toggleOpen = this.toggleOpen.bind(this)
+    this.handleSpeak = this.handleSpeak.bind(this)
+    this.handleNonChrome = this.handleNonChrome.bind(this)
+    this.handleDialogClose = this.handleDialogClose.bind(this)
   }
 
   async handleSpeak() {
@@ -50,6 +58,14 @@ class Toolbar extends Component {
     }
   }
 
+  handleNonChrome() {
+    this.setState({open: true})
+  }
+
+  handleDialogClose() {
+    this.setState({open: false})
+  }
+
   toggleOpen() {
     this.setState(prevState => ({open: !prevState.open}))
   }
@@ -65,19 +81,43 @@ class Toolbar extends Component {
 
     return (
       <div id="navbar">
-        <Button id="voice-button" onClick={() => this.handleSpeak()}>
-          {voiceModeOn ? (
-            <div>
-              <RecordVoiceOver />
-              Voice Currently ON
-            </div>
-          ) : (
-            <div>
-              <VoiceOverOff />
-              Voice Currently OFF
-            </div>
-          )}
-        </Button>
+        {isChrome ? (
+          <Button id="voice-button" onClick={() => this.handleSpeak()}>
+            {voiceModeOn ? (
+              <div>
+                <RecordVoiceOver />
+                Voice Currently ON
+              </div>
+            ) : (
+              <div>
+                <VoiceOverOff />
+                Voice Currently OFF
+              </div>
+            )}
+          </Button>
+        ) : (
+          <div>
+            <Button onClick={() => this.handleNonChrome()}>
+              <div>
+                <VoiceOverOff />
+                Voice Disabled
+              </div>
+            </Button>
+            <Dialog
+              maxWidth="sm"
+              open={this.state.open}
+              onClose={this.handleClose}
+              aria-labelledby="max-width-dialog-title"
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Voice Mode is not compatible with this browser. Please use
+                  Chrome for the best experience!
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
         <Button
           id="draw-button"
           value={drawModeOn}

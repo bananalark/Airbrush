@@ -1,10 +1,19 @@
 import store, {toggleDraw, toggleErase} from '../store'
 import {getCommand} from '../store/paintTools'
 
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-var SpeechRecognitionEvent =
-  SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+export var isChrome =
+  !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime)
+
+var SpeechRecognition
+var SpeechGrammarList
+var SpeechRecognitionEvent
+
+if (isChrome) {
+  SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+  SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+  SpeechRecognitionEvent =
+    SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+}
 
 /*eslint-disable*/
 export const evaluateCommand = (command, state) => {
