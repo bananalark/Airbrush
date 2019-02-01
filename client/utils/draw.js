@@ -15,7 +15,6 @@
  * =============================================================================
  */
 const paper = require('paper')
-// const {Path} = paper
 import store from '../store'
 import {Size, Path} from 'paper'
 
@@ -34,28 +33,19 @@ export function saveCanvas() {
   const backgroundCanvas = document.getElementById('background')
   const bgCtx = backgroundCanvas.getContext('2d')
   const canvas = document.getElementById('output')
+
   bgCtx.drawImage(canvas, 0, 0)
-
-  // const projectViewStr = paper.view.element.toDataURL()
-
-  // //draw paper project
-  // var image = new Image()
-  // image.onload = function() {
-  //   bgCtx.drawImage(image, 0, 0)
-  // }
-  // image.src = projectViewStr
-
-  //save all as one string
   fullImageStr = bgCtx.canvas.toDataURL('image/png')
+
   return fullImageStr
 }
 
 export function download() {
-  let downloadRef = fullImageStr.replace(
-    /^data:image\/[^;]*/,
-    'data:application/octet-stream'
-  )
-  parent.location.href = downloadRef
+  let element = document.createElement('a')
+  const file = new Blob([fullImageStr], {type: 'image/png'})
+  element.href = URL.createObjectURL(file)
+  element.download = 'airbrush.png'
+  element.click()
 }
 
 function getColor() {
