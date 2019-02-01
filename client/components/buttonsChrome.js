@@ -1,13 +1,13 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import ColorPicker from './colorPicker'
 import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
 import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
+import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
 import {
   Button,
@@ -24,16 +24,21 @@ import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
+import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
+import BodyPartOptions from './bodyPartOptions'
 
 class ButtonsChrome extends Component {
   constructor() {
     super()
     this.state = {
-      open: false,
+      brushOpen: false,
+      bodyPartOpen: false,
       voiceDialogOpen: false
     }
-    this.toggleOpen = this.toggleOpen.bind(this)
+    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
+    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
+
     this.handleSpeak = this.handleSpeak.bind(this)
     this.handleNonChrome = this.handleNonChrome.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
@@ -60,16 +65,20 @@ class ButtonsChrome extends Component {
     }
   }
 
+  toggleBrushOpen() {
+    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
+  }
+
+  toggleBodyPartOpen() {
+    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
+  }
+
   handleNonChrome() {
     this.setState({voiceDialogOpen: true})
   }
 
   handleDialogClose() {
     this.setState({voiceDialogOpen: false})
-  }
-
-  toggleOpen() {
-    this.setState(prevState => ({open: !prevState.open}))
   }
 
   render() {
@@ -82,7 +91,7 @@ class ButtonsChrome extends Component {
       toggleDraw
     } = this.props
     return (
-      <div>
+      <div id="navbar">
         <Button id="voice-button" onClick={() => this.handleSpeak()}>
           {voiceModeOn ? (
             <div>
@@ -95,6 +104,13 @@ class ButtonsChrome extends Component {
               Voice Currently OFF
             </div>
           )}
+        </Button>
+        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
+          <Hand />
+          currently drawing with {this.props.chosenBodyPart}
+          <Drawer anchor="left" open={this.state.bodyPartOpen}>
+            <BodyPartOptions />
+          </Drawer>
         </Button>
         <Button
           id="draw-button"
@@ -113,10 +129,10 @@ class ButtonsChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="brush-button" onClick={this.toggleOpen}>
+        <Button id="brush-button" onClick={this.toggleBrushOpen}>
           <Brush />
           Brush option
-          <Drawer anchor="left" open={this.state.open}>
+          <Drawer anchor="left" open={this.state.brushOpen}>
             <BrushOptions />
           </Drawer>
         </Button>
@@ -163,7 +179,9 @@ const mapStateToProps = state => ({
   currentCommand: state.paintTools.currentCommand,
   eraseModeOn: state.paintTools.eraseModeOn,
   voiceModeOn: state.paintTools.voiceModeOn,
-  drawModeOn: state.paintTools.drawModeOn
+  drawModeOn: state.paintTools.drawModeOn,
+  chosenBrush: state.paintTools.chosenBrush,
+  chosenBodyPart: state.paintTools.chosenBodyPart
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
