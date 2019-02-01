@@ -3,7 +3,7 @@ import ColorPicker from './colorPicker'
 import {connect} from 'react-redux'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
-import {download} from './utils/draw'
+import {download} from '../utils/draw'
 
 class CameraComponent extends Component {
   componentDidMount() {
