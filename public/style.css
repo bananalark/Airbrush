@@ -72,11 +72,9 @@ canvas {
 }
 
 #output {
-  /* margin-top: -350px; */
   z-index: 4;
 }
 
 #background {
-  /* margin-top: -350px; */
   z-index: 3;
 }
