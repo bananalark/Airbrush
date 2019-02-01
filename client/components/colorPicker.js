@@ -24,16 +24,18 @@ class ColorPicker extends React.Component {
   }
 
   render() {
-    console.log('this.props.selectedColor:', this.props.selectedColor)
+    //console.log('this.props.selectedColor:', this.props.selectedColor)
     const styles = reactCSS({
       default: {
         color: {
           width: '80px',
           height: '16px',
           borderRadius: '1px',
-          background: `rgba(${this.props.selectedColor.r}, ${
-            this.props.selectedColor.g
-          }, ${this.props.selectedColor.b}, ${this.props.selectedColor.a})`
+          background: `rgba(${this.props.selectedColor.color.r}, ${
+            this.props.selectedColor.color.g
+          }, ${this.props.selectedColor.color.b}, ${
+            this.props.selectedColor.color.a
+          })`
         },
         swatch: {
           padding: '5px',
@@ -76,6 +78,7 @@ class ColorPicker extends React.Component {
 }
 
 const mapStateToProps = function(state) {
+  console.log('mapStateToProps:', state)
   return {
     selectedColor: state.color
   }
