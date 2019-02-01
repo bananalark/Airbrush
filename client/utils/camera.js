@@ -3,7 +3,6 @@ import {
   draw,
   drawLineBetweenPoints,
   createProject,
-  drawLine,
   drawAnything
 } from './draw.js'
 import {CSSTransition} from 'react-transition-group'
@@ -14,8 +13,8 @@ let minPartConfidence = 0.75
 /*
 Setup video size
 */
-let videoHeight = 723
-let videoWidth = 964
+export let videoHeight = 723
+export let videoWidth = 964
 
 // if (3 * parent.innerWidth / 4 > parent.innerHeight) {
 //   videoHeight = parent.innerHeight
@@ -86,7 +85,8 @@ const guiState = {
  * happens. This function loops with a requestAnimationFrame method.
  */
 
-let hand
+let handRight
+let handLeft
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -165,49 +165,50 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
-            let toolbarAreaTopLeft = {x: 100, y: 250}
+            //here we define "hand" on the right arm using wrist and elbow position
+            const yDiffRight = leftWrist.position.y - leftElbow.position.y
+            const handYRight = yDiffRight / 2 + leftWrist.position.y
+            const xDiffRight = leftWrist.position.x - leftElbow.position.x
+            const handXRight = xDiffRight / 2 + leftWrist.position.x
+            handRight = {
+              score: leftWrist.score,
+              position: {y: handYRight, x: handXRight}
+            }
+            keypoints[17] = handRight
+
+            //here we define "hand" on the left arm using wrist and elbow position
+            const yDiffLeft = rightWrist.position.y - rightElbow.position.y
+            const handYLeft = yDiffLeft / 2 + rightWrist.position.y
+            const xDiffLeft = rightWrist.position.x - rightElbow.position.x
+            const handXLeft = xDiffLeft / 2 + rightWrist.position.x
+            handLeft = {
+              score: rightWrist.score,
+              position: {y: handYLeft, x: handXLeft}
+            }
+            keypoints[18] = handLeft
+
+            let toolbarAreaTopLeft = {x: 50, y: 250}
             let toolbarAreaTopRight = {x: 200, y: 250}
             let toolbarAreaBottomLeft = {x: 100, y: 660}
             let toolbarAreaBottomRight = {x: 200, y: 660}
             // videoHeight
 
-            if (
-              keypoints[10].position.x > 50 &&
-              keypoints[10].position.x < 300
-            ) {
-              // if (keypoints[10].y > 200 && keypoints[10].x < 300) {
-              console.log(`you're near the top!`)
-              // }
+            let selectorX = handLeft.position.x
+            let selectorY = handLeft.position.y
+            const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
+            if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
+              // console.log('here are your y-coords---->', selectorY)
+              if (selectorY > voiceZone[0].y && selectorY < voiceZone[1]) {
+                console.log('you may be in the VOICE zone')
+              }
             }
-
-            // if (keypoints[9].position.x < 200) {
-            //   console.log(`you're on the LEFT-hand side of the screen!`)
-            // } else if (keypoints[9].position.x > 600) {
-            //   console.log(`you're on the RIGHT-hand side of the screen!`)
-            // } else {
-            //   console.log(`you're in the middle of the screen!`)
-            // }
-            //here we define "hand" using wrist and elbow position
-            const yDiff = leftWrist.position.y - leftElbow.position.y
-            const handY = yDiff / 2 + leftWrist.position.y
-            const xDiff = leftWrist.position.x - leftElbow.position.x
-            const handX = xDiff / 2 + leftWrist.position.x
-            hand = {score: leftWrist.score, position: {y: handY, x: handX}}
-            keypoints[17] = hand
 
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                //const thisPath = drawLine(nose, path)
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
-                const thisPath = drawAnything(
-                  nose,
-                  leftWrist,
-                  rightWrist,
-                  hand,
-                  path
-                )
+                const thisPath = drawAnything(nose, handLeft, handRight, path)
 
                 path = thisPath
               } else {
@@ -218,7 +219,7 @@ function detectPoseInRealTime(video, net) {
                 //keypoints[9] == leftWrist (but literally your right wrist)
                 // if (prevPoses[0].keypoints[17]) {
                 //   drawLineBetweenPoints(
-                //     [hand, prevPoses[0].keypoints[17]],
+                //     [handRight, prevPoses[0].keypoints[17]],
                 //     ctx,
                 //     1,
                 //     15
