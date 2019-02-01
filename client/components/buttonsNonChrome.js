@@ -82,7 +82,7 @@ class ButtonsNonChrome extends Component {
       toggleDraw
     } = this.props
     return (
-      <div>
+      <div id="navbar">
         <Button onClick={() => this.handleNonChrome()}>
           <div>
             <VoiceOverOff />
