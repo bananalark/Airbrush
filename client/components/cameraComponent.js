@@ -3,6 +3,7 @@ import ColorPicker from './colorPicker'
 import {connect} from 'react-redux'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
+import {download} from './utils/draw'
 
 class CameraComponent extends Component {
   componentDidMount() {
@@ -33,7 +34,11 @@ class CameraComponent extends Component {
             </div>
           </Grid>
         </Grid>
+        {/* //this will be wrapped in a lightbox */}
         <canvas id="saved-image" display="none" />
+        <button id="download" onClick={download}>
+          download
+        </button>
       </div>
     )
   }

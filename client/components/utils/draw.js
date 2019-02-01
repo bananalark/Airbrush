@@ -58,7 +58,27 @@ export function saveCanvas() {
   saveCtx.drawImage(canvas, 0, 0)
 
   //save all as one string
-  const fullImageStr = saveCtx.canvas.toDataURL()
+  const fullImageStr = saveCtx.canvas.toDataURL('image/png')
+  console.log(fullImageStr)
+  let newStr = fullImageStr.replace(
+    /^data:image\/[^;]*/,
+    'data:application/octet-stream'
+  )
+  newStr = newStr.replace(
+    /^data:application\/octet-stream/,
+    'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png'
+  )
+  console.log(
+    'this',
+    this,
+    'parent',
+    parent,
+    'location',
+    parent.location,
+    'href',
+    parent.location.href
+  )
+  parent.location.href = newStr
 }
 
 function getColor() {
