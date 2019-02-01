@@ -16,11 +16,9 @@ import {
   DialogContentText
 } from '@material-ui/core/'
 import Save from '@material-ui/icons/Save'
+import Camera from '@material-ui/icons/Camera'
 import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
-
-import ButtonsNonChrome from './buttonsNonChrome'
-import ButtonsChrome from './buttonsChrome'
 
 import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
@@ -28,9 +26,9 @@ import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 import BrushOptions from './brushOptions'
 
-class Toolbar extends Component {
-  constructor(props) {
-    super(props)
+class ButtonsNonChrome extends Component {
+  constructor() {
+    super()
     this.state = {
       open: false,
       voiceDialogOpen: false
@@ -83,14 +81,92 @@ class Toolbar extends Component {
       toggleErase,
       toggleDraw
     } = this.props
-
     return (
-      <div id="navbar">
-        {isChrome ? (
-          <ButtonsChrome openLightbox={openLightbox} />
-        ) : (
-          <ButtonsNonChrome openLightbox={openLightbox} />
-        )}
+      <div>
+        <Button onClick={() => this.handleNonChrome()}>
+          <div>
+            <VoiceOverOff />
+            Voice Disabled
+          </div>
+        </Button>
+        <Dialog
+          maxWidth="xs"
+          open={this.state.voiceDialogOpen}
+          onClose={this.handleDialogClose}
+          aria-labelledby="max-width-dialog-title"
+        >
+          <DialogContent>
+            <DialogContentText align="center">
+              Voice Mode is not compatible with this browser. Please use Chrome
+              for the best experience!
+            </DialogContentText>
+          </DialogContent>
+        </Dialog>
+        <Button
+          id="draw-button"
+          value={drawModeOn}
+          onClick={() => toggleDraw()}
+        >
+          {drawModeOn ? (
+            <div>
+              <Pencil />
+              Draw Mode ON
+            </div>
+          ) : (
+            <div>
+              <PencilOff />
+              Draw Mode OFF
+            </div>
+          )}
+        </Button>
+        <Button id="brush-button" onClick={this.toggleOpen}>
+          <Brush />
+          Brush option
+          <Drawer anchor="left" open={this.state.open}>
+            <BrushOptions />
+          </Drawer>
+        </Button>
+        <Button
+          id="erase-button"
+          value={eraseModeOn}
+          onClick={() => toggleErase()}
+        >
+          {eraseModeOn ? (
+            <div>
+              <Eraser />
+              Eraser Mode ON
+            </div>
+          ) : (
+            <div>
+              <Eraser />
+              Eraser Mode OFF
+            </div>
+          )}
+        </Button>{' '}
+        <ColorPicker />
+        <Button
+          id="clear-button"
+          value="Clear Canvas"
+          onClick={() => clearCanvas()}
+        >
+          <Clear />Clear Canvas
+        </Button>
+        <Button
+          id="save-canvas"
+          value="Save Canvas"
+          onClick={() => saveCanvas()}
+        >
+          <Save />Save Canvas
+        </Button>
+        <Button
+          id="take-snapshot"
+          value="Take Snapshot"
+          onClick={() => {
+            openLightbox(saveCanvas())
+          }}
+        >
+          <Camera />Take Snapshot
+        </Button>
       </div>
     )
   }
@@ -109,4 +185,4 @@ const mapDispatchToProps = dispatch => ({
   toggleDraw: () => dispatch(toggleDraw())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Toolbar)
+export default connect(mapStateToProps, mapDispatchToProps)(ButtonsNonChrome)
