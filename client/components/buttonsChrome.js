@@ -18,6 +18,7 @@ import {
 import Save from '@material-ui/icons/Save'
 import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
+import Camera from '@material-ui/icons/Camera'
 
 import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
@@ -73,6 +74,7 @@ class ButtonsChrome extends Component {
 
   render() {
     let {
+      openLightbox,
       eraseModeOn,
       drawModeOn,
       voiceModeOn,
@@ -80,7 +82,7 @@ class ButtonsChrome extends Component {
       toggleDraw
     } = this.props
     return (
-      <div id="navbar">
+      <div>
         <Button id="voice-button" onClick={() => this.handleSpeak()}>
           {voiceModeOn ? (
             <div>
@@ -144,11 +146,13 @@ class ButtonsChrome extends Component {
           <Clear />Clear Canvas
         </Button>
         <Button
-          id="save-canvas"
-          value="Save Canvas"
-          onClick={() => saveCanvas()}
+          id="take-snapshot"
+          value="Take Snapshot"
+          onClick={() => {
+            openLightbox(saveCanvas())
+          }}
         >
-          <Save />Save Canvas
+          <Camera />Take Snapshot
         </Button>
       </div>
     )

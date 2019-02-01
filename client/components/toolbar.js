@@ -29,8 +29,8 @@ import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 import BrushOptions from './brushOptions'
 
 class Toolbar extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       open: false,
       voiceDialogOpen: false
@@ -76,6 +76,7 @@ class Toolbar extends Component {
 
   render() {
     let {
+      openLightbox,
       eraseModeOn,
       drawModeOn,
       voiceModeOn,
@@ -83,7 +84,15 @@ class Toolbar extends Component {
       toggleDraw
     } = this.props
 
-    return <div>{isChrome ? <ButtonsChrome /> : <ButtonsNonChrome />}</div>
+    return (
+      <div id="navbar">
+        {isChrome ? (
+          <ButtonsChrome openLightbox={openLightbox} />
+        ) : (
+          <ButtonsNonChrome openLightbox={openLightbox} />
+        )}
+      </div>
+    )
   }
 }
 
