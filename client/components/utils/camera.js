@@ -1,11 +1,9 @@
 import * as posenet from '@tensorflow-models/posenet'
-import {
-  draw,
-  drawLineBetweenPoints,
-  createProject,
-  drawAnything
-} from './utils/draw.js'
-import clearCanvas from './utils/clearCanvas'
+import {draw, drawLineBetweenPoints, createProject, drawLine} from './draw.js'
+import store from '../../store'
+
+//will be moved to UI
+let minPartConfidence = 0.75
 
 /*
 Setup video size
@@ -70,7 +68,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.75 //it was set to 0.5 by default
+    minPartConfidence //moved to top for ease of change
   },
   output: {
     showVideo: true,
@@ -102,7 +100,8 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
-  createProject(window, canvas)
+
+  createProject(window, canvas, ctx)
 
   async function poseDetectionFrame(prevPoses = [], path) {
     // Scale an image down to a certain factor. Too large of an image will slow
@@ -170,7 +169,7 @@ function detectPoseInRealTime(video, net) {
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
 
-            if (nose.score > minPartConfidence) {
+            if (hand.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
                 //const thisPath = drawLine(nose, path)
@@ -242,7 +241,6 @@ export async function bindPage() {
     throw e
   }
 
-  clearCanvas()
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 
