@@ -17,7 +17,8 @@ describe('paintTools reducer', () => {
       currentCommand: '',
       eraseModeOn: false,
       voiceModeOn: false,
-      drawModeOn: false
+      drawModeOn: false,
+      chosenBrush: 'defaultLine'
     })
   })
 
@@ -41,7 +42,8 @@ describe('action creators', () => {
     currentCommand: '',
     eraseModeOn: false,
     voiceModeOn: false,
-    drawModeOn: false
+    drawModeOn: false,
+    chosenBrush: 'defaultLine'
   }
 
   beforeEach(() => {
