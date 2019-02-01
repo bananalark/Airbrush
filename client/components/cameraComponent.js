@@ -6,7 +6,7 @@ import Toolbar from './toolbar'
 
 class CameraComponent extends Component {
   componentDidMount() {
-    require('./utils/camera')
+    require('../utils/camera')
   }
 
   render() {

@@ -6,7 +6,7 @@ import {
   drawLine,
   drawAnything
 } from './draw.js'
-import store from '../../store'
+import store from '../store'
 
 //will be moved to UI
 let minPartConfidence = 0.75
