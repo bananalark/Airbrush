@@ -31,7 +31,17 @@ import BodyPartOptions from './bodyPartOptions'
 
 class Toolbar extends Component {
   render() {
-    return <div>{isChrome ? <ButtonsChrome /> : <ButtonsNonChrome />}</div>
+    let {openLightbox} = this.props
+
+    return (
+      <div id="navbar">
+        {isChrome ? (
+          <ButtonsChrome openLightbox={openLightbox} />
+        ) : (
+          <ButtonsNonChrome openLightbox={openLightbox} />
+        )}
+      </div>
+    )
   }
 }
 
