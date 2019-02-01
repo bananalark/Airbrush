@@ -14,11 +14,10 @@
  * limitations under the License.
  * =============================================================================
  */
-import * as posenet from '@tensorflow-models/posenet'
-import * as tf from '@tensorflow/tfjs'
 const paper = require('paper')
-const {Path} = paper
+// const {Path} = paper
 import store from '../../store'
+import {Size, Path} from 'paper'
 
 export function createProject(window, cnv, ctx) {
   paper.install(window)
@@ -62,17 +61,46 @@ export function saveCanvas() {
   const fullImageStr = saveCtx.canvas.toDataURL()
 }
 
-//smoother 'drawLineBetweenPoints' with paper.js project
-export function drawLine(oneKeypoint, path) {
+function getColor() {
   let color = store.getState().color.color
   const red = color.r / 255
   const green = color.g / 255
   const blue = color.b / 255
+  return {red: red, green: green, blue: blue}
+}
+
+export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
+  let chosenBrush = store.getState().paintTools.chosenBrush
+
+  switch (chosenBrush) {
+    case 'defaultLine':
+      return drawLine(hand, path)
+    case 'circleLine':
+      return drawCircleLine(nose)
+    case 'circleShape':
+      return drawCircleShape(nose, leftWrist)
+    case 'rectangle':
+      return drawRectangleShape(leftWrist, rightWrist)
+    case 'ellipse':
+      return drawEllipseShape(nose, rightWrist)
+    case 'triangleLine':
+      return drawTriangleLine(nose)
+    case 'triangleShape':
+      return drawTriangleShape(nose, leftWrist)
+    default:
+      return drawLine(hand, path)
+  }
+}
+
+//draw lines
+function drawLine(oneKeypoint, path) {
+  let color = getColor()
+  console.log('path', typeof path)
 
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
-    strokeColor: new Color(red, green, blue),
-    strokeWidth: 10,
+    strokeColor: new Color(color.red, color.green, color.blue),
+    strokeWidth: 5,
     strokeCap: 'round'
   })
 
@@ -88,8 +116,105 @@ export function drawLine(oneKeypoint, path) {
 
     path = pathStyle
   }
-
   return path
+}
+
+//draw circle as line
+function drawCircleLine(oneKeypoint) {
+  let color = getColor()
+
+  const shape = new Path.Circle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    30
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 3
+
+  return shape
+}
+
+//draw circle as a shape
+function drawCircleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
+  const r = Math.sqrt(
+    Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
+      Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
+  )
+
+  const shape = new Path.Circle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    r
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 5
+
+  return shape
+}
+
+//draw rectangle as a shape
+function drawRectangleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
+
+  const shape = new Path.Rectangle(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    new Size(
+      secondKeypoint.position.x - oneKeypoint.position.x, //leftWrist - rightWrist
+      secondKeypoint.position.y - oneKeypoint.position.y
+    )
+  )
+  shape.strokeColor = new Color(color.red, color.green, color.blue)
+  shape.strokeWidth = 5
+
+  return shape
+}
+
+//draw ellipse as a shape
+function drawEllipseShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
+
+  const shape = new Path.Ellipse({
+    center: [oneKeypoint.position.x, oneKeypoint.position.y],
+    radius: [
+      secondKeypoint.position.x - oneKeypoint.position.x,
+      secondKeypoint.position.y - oneKeypoint.position.y
+    ],
+    strokeColor: new Color(color.red, color.green, color.blue),
+    strokeWidth: 5
+  })
+
+  return shape
+}
+
+//draw triangle as a line
+function drawTriangleLine(oneKeypoint) {
+  let color = getColor()
+
+  const triangle = new Path.RegularPolygon(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    3,
+    30
+  )
+  triangle.strokeColor = new Color(color.red, color.green, color.blue)
+
+  return triangle
+}
+
+//draw triangle as a shape
+function drawTriangleShape(oneKeypoint, secondKeypoint) {
+  let color = getColor()
+
+  let side = Math.sqrt(
+    Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
+      Math.pow(secondKeypoint.position.y - oneKeypoint.position.y, 2)
+  )
+  const triangle = new Path.RegularPolygon(
+    new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+    3,
+    side
+  )
+  triangle.strokeColor = new Color(color.red, color.green, color.blue)
+
+  return triangle
 }
 
 //on-off switch with gesture
@@ -99,34 +224,5 @@ export function draw(keypoints, minPartConfidence) {
     (keypoints[10].score >= minPartConfidence &&
       Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
     drawMode === 'true'
-  )
-}
-
-function toTuple({y, x}) {
-  return [y, x]
-}
-
-//this will go away by replacing paper.js functionality
-let lineWidth
-export function drawSegment([ay, ax], [by, bx], scale, ctx) {
-  ctx.beginPath()
-  ctx.moveTo(ax * scale, ay * scale)
-  ctx.lineTo(bx * scale, by * scale)
-  ctx.lineWidth = lineWidth
-  ctx.stroke()
-}
-//this will go away by replacing paper.js functionality
-export function drawLineBetweenPoints(
-  adjacentKeyPoints,
-  ctx,
-  scale = 1,
-  newLineWidth
-) {
-  lineWidth = newLineWidth
-  drawSegment(
-    toTuple(adjacentKeyPoints[0].position),
-    toTuple(adjacentKeyPoints[1].position),
-    scale,
-    ctx
   )
 }
