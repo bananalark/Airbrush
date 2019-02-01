@@ -1,32 +1,36 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import ColorPicker from './colorPicker'
 import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
 import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
+import Hand from 'mdi-material-ui/Hand'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
 import Drawer from '@material-ui/core/Drawer'
-import {saveCanvas, clearCanvas} from '../utils/draw'
 
+import {saveCanvas, clearCanvas} from '../utils/draw'
 import voiceRecognition from '../utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 import BrushOptions from './brushOptions'
+import ColorPicker from './colorPicker'
+import BodyPartOptions from './bodyPartOptions'
 
 class Toolbar extends Component {
   constructor() {
     super()
     this.state = {
-      open: false
+      brushOpen: false,
+      bodyPartOpen: false
     }
-    this.toggleOpen = this.toggleOpen.bind(this)
+    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
+    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
   }
 
   async handleSpeak() {
@@ -50,8 +54,12 @@ class Toolbar extends Component {
     }
   }
 
-  toggleOpen() {
-    this.setState(prevState => ({open: !prevState.open}))
+  toggleBrushOpen() {
+    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
+  }
+
+  toggleBodyPartOpen() {
+    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
   }
 
   render() {
@@ -78,6 +86,13 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>
+        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
+          <Hand />
+          currently drawing with {this.props.chosenBodyPart}
+          <Drawer anchor="left" open={this.state.bodyPartOpen}>
+            <BodyPartOptions />
+          </Drawer>
+        </Button>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -95,10 +110,10 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>
-        <Button id="brush-button" onClick={this.toggleOpen}>
+        <Button id="brush-button" onClick={this.toggleBrushOpen}>
           <Brush />
           Brush option
-          <Drawer anchor="left" open={this.state.open}>
+          <Drawer anchor="left" open={this.state.brushOpen}>
             <BrushOptions />
           </Drawer>
         </Button>
@@ -143,7 +158,9 @@ const mapStateToProps = state => ({
   currentCommand: state.paintTools.currentCommand,
   eraseModeOn: state.paintTools.eraseModeOn,
   voiceModeOn: state.paintTools.voiceModeOn,
-  drawModeOn: state.paintTools.drawModeOn
+  drawModeOn: state.paintTools.drawModeOn,
+  chosenBrush: state.paintTools.chosenBrush,
+  chosenBodyPart: state.paintTools.chosenBodyPart
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),

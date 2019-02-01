@@ -69,26 +69,43 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
-export function drawAnything(nose, leftWrist, rightWrist, hand, path) {
-  let chosenBrush = store.getState().paintTools.chosenBrush
+export function drawAnything(nose, leftHand, rightHand, path) {
+  let {chosenBrush, chosenBodyPart} = store.getState().paintTools
+
+  let part
+
+  switch (chosenBodyPart) {
+    case 'nose':
+      part = nose
+      break
+    case 'leftHand':
+      part = leftHand
+      break
+    case 'rightHand':
+      part = rightHand
+      break
+    default:
+      part = rightHand
+      break
+  }
 
   switch (chosenBrush) {
     case 'defaultLine':
-      return drawLine(hand, path)
+      return drawLine(part, path)
     case 'circleLine':
-      return drawCircleLine(nose)
+      return drawCircleLine(part)
     case 'circleShape':
-      return drawCircleShape(nose, leftWrist)
+      return drawCircleShape(nose, rightHand)
     case 'rectangle':
-      return drawRectangleShape(leftWrist, rightWrist)
+      return drawRectangleShape(rightHand, leftHand)
     case 'ellipse':
-      return drawEllipseShape(nose, rightWrist)
+      return drawEllipseShape(nose, rightHand)
     case 'triangleLine':
-      return drawTriangleLine(nose)
+      return drawTriangleLine(part)
     case 'triangleShape':
-      return drawTriangleShape(nose, leftWrist)
+      return drawTriangleShape(nose, rightHand)
     default:
-      return drawLine(hand, path)
+      return drawLine(part, path)
   }
 }
 
