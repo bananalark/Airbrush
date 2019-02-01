@@ -24,12 +24,13 @@ class ColorPicker extends React.Component {
   }
 
   render() {
+    console.log('this.props.selectedColor:', this.props.selectedColor)
     const styles = reactCSS({
       default: {
         color: {
-          width: '36px',
-          height: '14px',
-          borderRadius: '2px',
+          width: '80px',
+          height: '16px',
+          borderRadius: '1px',
           background: `rgba(${this.props.selectedColor.r}, ${
             this.props.selectedColor.g
           }, ${this.props.selectedColor.b}, ${this.props.selectedColor.a})`
