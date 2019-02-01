@@ -85,7 +85,7 @@ class Toolbar extends Component {
     } = this.props
 
     return (
-      <div id="navbar">
+      <div>
         {isChrome ? (
           <ButtonsChrome openLightbox={openLightbox} />
         ) : (

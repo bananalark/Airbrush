@@ -168,16 +168,16 @@ function detectPoseInRealTime(video, net) {
             let toolbarAreaTopLeft = {x: 100, y: 250}
             let toolbarAreaTopRight = {x: 200, y: 250}
             let toolbarAreaBottomLeft = {x: 100, y: 660}
-            let toolbarAreaBottomRight = {x: 200, y: 6060}
+            let toolbarAreaBottomRight = {x: 200, y: 660}
             // videoHeight
 
-            // console.log('score', keypoints[10].score)
-            if (keypoints[10].score > 0.6) {
-              console.log(
-                `x: ${keypoints[10].position.x} || y: ${
-                  keypoints[10].position.y
-                }`
-              )
+            if (
+              keypoints[10].position.x > 50 &&
+              keypoints[10].position.x < 300
+            ) {
+              // if (keypoints[10].y > 200 && keypoints[10].x < 300) {
+              console.log(`you're near the top!`)
+              // }
             }
 
             // if (keypoints[9].position.x < 200) {
