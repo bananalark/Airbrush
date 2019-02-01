@@ -16,6 +16,7 @@ import {
   DialogContentText
 } from '@material-ui/core/'
 import Save from '@material-ui/icons/Save'
+import Camera from '@material-ui/icons/Camera'
 import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 
@@ -73,6 +74,7 @@ class ButtonsNonChrome extends Component {
 
   render() {
     let {
+      openLightbox,
       eraseModeOn,
       drawModeOn,
       voiceModeOn,
@@ -155,6 +157,15 @@ class ButtonsNonChrome extends Component {
           onClick={() => saveCanvas()}
         >
           <Save />Save Canvas
+        </Button>
+        <Button
+          id="take-snapshot"
+          value="Take Snapshot"
+          onClick={() => {
+            openLightbox(saveCanvas())
+          }}
+        >
+          <Camera />Take Snapshot
         </Button>
       </div>
     )

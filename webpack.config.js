@@ -24,6 +24,10 @@ module.exports = {
       {
         test: /\.paper.js$/,
         use: ['paper-loader']
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   }
