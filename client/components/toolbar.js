@@ -9,6 +9,8 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
+import Save from '@material-ui/icons/Save'
+import {saveCanvas, clearCanvas} from './utils/draw'
 
 import voiceRecognition from './utils/speechUtil'
 
@@ -81,8 +83,19 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>{' '}
-        <Button id="clear-button" value="Clear Canvas">
+        <Button
+          id="clear-button"
+          value="Clear Canvas"
+          onClick={() => clearCanvas()}
+        >
           <Clear />Clear Canvas
+        </Button>
+        <Button
+          id="save-sanvas"
+          value="Save Canvas"
+          onClick={() => saveCanvas()}
+        >
+          <Save />Save Canvas
         </Button>
         <Button id="voice-button" onClick={() => this.handleSpeak()}>
           {voiceModeOn ? (
