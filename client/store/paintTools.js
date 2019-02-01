@@ -9,6 +9,7 @@ const TOGGLE_ERASE = 'TOGGLE_ERASE'
 const TOGGLE_VOICE = 'TOGGLE_VOICE'
 const TOGGLE_DRAW = 'TOGGLE_DRAW'
 const CHOOSE_BRUSH = 'CHOOSE_BRUSH'
+const CHOOSE_BODY_PART = 'CHOOSE_BODY_PART'
 
 /**
  * INITIAL STATE
@@ -18,7 +19,8 @@ const initialState = {
   eraseModeOn: false,
   voiceModeOn: false,
   drawModeOn: false,
-  chosenBrush: 'defaultLine'
+  chosenBrush: 'defaultLine',
+  chosenBodyPart: 'rightHand'
 }
 
 /**
@@ -28,7 +30,8 @@ export const getCommand = command => ({type: GET_COMMAND, command})
 export const toggleErase = () => ({type: TOGGLE_ERASE})
 export const toggleVoice = () => ({type: TOGGLE_VOICE})
 export const toggleDraw = () => ({type: TOGGLE_DRAW})
-export const chooseBrush = brush => ({type: CHOOSE_BRUSH, brush: brush})
+export const chooseBrush = brush => ({type: CHOOSE_BRUSH, brush})
+export const chooseBodyPart = part => ({type: CHOOSE_BODY_PART, part})
 
 /**
  * REDUCER
@@ -41,7 +44,6 @@ const paintTools = (state = initialState, action) => {
       return newState
     case TOGGLE_VOICE:
       newState.voiceModeOn = !state.voiceModeOn
-
       return newState
     case TOGGLE_ERASE:
       newState.eraseModeOn = !state.eraseModeOn
@@ -51,6 +53,9 @@ const paintTools = (state = initialState, action) => {
       return newState
     case CHOOSE_BRUSH:
       newState.chosenBrush = action.brush
+      return newState
+    case CHOOSE_BODY_PART:
+      newState.chosenBodyPart = action.part
       return newState
     default:
       return state
