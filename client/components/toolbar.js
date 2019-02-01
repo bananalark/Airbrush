@@ -16,6 +16,7 @@ import {
   DialogContentText
 } from '@material-ui/core/'
 import Save from '@material-ui/icons/Save'
+import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 
 import voiceRecognition, {isChrome} from '../utils/speechUtil'
@@ -23,7 +24,6 @@ import voiceRecognition, {isChrome} from '../utils/speechUtil'
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 import BrushOptions from './brushOptions'
-import {Drawer} from '@material-ui/core'
 
 class Toolbar extends Component {
   constructor() {

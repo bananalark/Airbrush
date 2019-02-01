@@ -22,9 +22,7 @@ class CameraComponent extends Component {
         >
           <Grid container direction="column">
             <div id="display">
-              <Grid item>
-                <video id="video" plays-inline="true" />
-              </Grid>
+              <video id="video" plays-inline="true" style={{display: 'none'}} />
               <Toolbar />
               <div style={{position: 'relative'}}>
                 <canvas id="background" />
