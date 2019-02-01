@@ -1,5 +1,11 @@
 import * as posenet from '@tensorflow-models/posenet'
-import {draw, drawLineBetweenPoints, createProject, drawLine} from './draw.js'
+import {
+  draw,
+  drawLineBetweenPoints,
+  createProject,
+  drawLine,
+  drawAnything
+} from './draw.js'
 import store from '../../store'
 
 //will be moved to UI
@@ -169,7 +175,7 @@ function detectPoseInRealTime(video, net) {
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
 
-            if (hand.score >= minPartConfidence) {
+            if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
                 //const thisPath = drawLine(nose, path)

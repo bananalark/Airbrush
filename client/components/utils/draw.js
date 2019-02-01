@@ -16,7 +16,6 @@
  */
 const paper = require('paper')
 // const {Path} = paper
-import clearCanvas from './clearCanvas'
 import store from '../../store'
 import {Size, Path} from 'paper'
 
