@@ -12,8 +12,8 @@ let minPartConfidence = 0.75
 /*
 Setup video size
 */
-let videoHeight = 723
-let videoWidth = 964
+export let videoHeight = 723
+export let videoWidth = 964
 
 // if (3 * parent.innerWidth / 4 > parent.innerHeight) {
 //   videoHeight = parent.innerHeight
@@ -189,7 +189,6 @@ function detectPoseInRealTime(video, net) {
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                //const thisPath = drawLine(nose, path)
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)

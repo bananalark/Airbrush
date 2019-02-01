@@ -18,6 +18,7 @@ const paper = require('paper')
 // const {Path} = paper
 import store from '../store'
 import {Size, Path} from 'paper'
+import {videoHeight, videoWidth} from './camera'
 
 export function createProject(window, cnv, ctx) {
   paper.install(window)
@@ -69,24 +70,47 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
-export function drawAnything(nose, leftHand, rightHand, path) {
-  let {chosenBrush, chosenBodyPart} = store.getState().paintTools
+const prevStateDifferent = (function() {
+  let prevBodyPart = store.getState().chosenBodyPart
+  return function(bodyPart) {
+    if (prevBodyPart !== bodyPart) {
+      prevBodyPart = bodyPart
+      return true
+    }
+    return false
+  }
+})()
 
-  let part
-
+function determineBodyPart(chosenBodyPart, nose, leftHand, rightHand) {
   switch (chosenBodyPart) {
     case 'nose':
-      part = nose
-      break
+      return nose
     case 'leftHand':
-      part = leftHand
-      break
+      return leftHand
     case 'rightHand':
-      part = rightHand
-      break
+      return rightHand
     default:
-      part = rightHand
-      break
+      return rightHand
+  }
+}
+
+export function drawAnything(nose, leftHand, rightHand, path) {
+  const {chosenBrush, chosenBodyPart} = store.getState().paintTools
+
+  //this prevents any lines from being drawn between previous drawing body part and current drawing body part
+  if (prevStateDifferent(chosenBodyPart) === true) {
+    return null
+  }
+
+  const part = determineBodyPart(chosenBodyPart, nose, leftHand, rightHand)
+
+  if (
+    part.position.x < 0 ||
+    part.position.y < 0 ||
+    part.position.x > videoWidth ||
+    part.position.y > videoHeight
+  ) {
+    return null
   }
 
   switch (chosenBrush) {
@@ -94,16 +118,28 @@ export function drawAnything(nose, leftHand, rightHand, path) {
       return drawLine(part, path)
     case 'circleLine':
       return drawCircleLine(part)
-    case 'circleShape':
-      return drawCircleShape(nose, rightHand)
-    case 'rectangle':
-      return drawRectangleShape(rightHand, leftHand)
-    case 'ellipse':
-      return drawEllipseShape(nose, rightHand)
     case 'triangleLine':
       return drawTriangleLine(part)
+    case 'rectangle':
+      return drawRectangleShape(rightHand, leftHand)
+    case 'circleShape':
+      if (part === rightHand || part === leftHand) {
+        return drawCircleShape(nose, part)
+      } else {
+        return drawCircleShape(nose, rightHand)
+      }
+    case 'ellipse':
+      if (part === rightHand || part === leftHand) {
+        return drawEllipseShape(nose, part)
+      } else {
+        return drawEllipseShape(nose, rightHand)
+      }
     case 'triangleShape':
-      return drawTriangleShape(nose, rightHand)
+      if (part === rightHand || part === leftHand) {
+        return drawTriangleShape(nose, part)
+      } else {
+        return drawTriangleShape(nose, rightHand)
+      }
     default:
       return drawLine(part, path)
   }
