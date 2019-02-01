@@ -1,5 +1,5 @@
-import store, {toggleDraw, toggleErase} from '../../store'
-import {getCommand} from '../../store/paintTools'
+import store, {toggleDraw, toggleErase} from '../store'
+import {getCommand} from '../store/paintTools'
 
 var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList

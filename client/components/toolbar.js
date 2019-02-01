@@ -11,9 +11,9 @@ import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
-import {saveCanvas, clearCanvas} from './utils/draw'
+import {saveCanvas, clearCanvas} from '../utils/draw'
 
-import voiceRecognition from './utils/speechUtil'
+import voiceRecognition from '../utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
