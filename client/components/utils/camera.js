@@ -3,10 +3,17 @@ import {
   draw,
   drawLineBetweenPoints,
   createProject,
-  drawLine
-} from './utils/draw.js'
-import clearCanvas from './utils/clearCanvas'
+  drawLine,
+  drawAnything
+} from './draw.js'
+import store from '../../store'
 
+//will be moved to UI
+let minPartConfidence = 0.75
+
+/*
+Setup video size
+*/
 let videoHeight
 let videoWidth
 
@@ -24,9 +31,10 @@ if (videoHeight > 723 || videoWidth > 964) {
   videoWidth = 964
 }
 
-/**
- * Loads a the camera to be used in the demo
- *
+const getCurrentCommand = () => store.getState().speech.currentCommand
+
+/*
+ Loads a the camera to be used on canvas
  */
 async function setupCamera() {
   const video = document.getElementById('video')
@@ -66,7 +74,7 @@ const guiState = {
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
-    minPartConfidence: 0.75
+    minPartConfidence //moved to top for ease of change
   },
   output: {
     showVideo: true,
@@ -79,7 +87,7 @@ const guiState = {
  * Feeds an image to posenet to estimate poses - this is where the magic
  * happens. This function loops with a requestAnimationFrame method.
  */
-let path
+
 let hand
 
 function detectPoseInRealTime(video, net) {
@@ -98,17 +106,16 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
-  createProject(window, canvas)
 
-  async function poseDetectionFrame(prevPoses = [], innerPath = path) {
+  createProject(window, canvas, ctx)
+
+  async function poseDetectionFrame(prevPoses = [], path) {
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
     const outputStride = +guiState.input.outputStride
 
     let poses = []
-    let prevKeypoints
-    let prevScore
     let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
@@ -136,7 +143,6 @@ function detectPoseInRealTime(video, net) {
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        //i.e. 'if we want to start drawing now'
         if (draw(keypoints, minPartConfidence)) {
           if (prevPoses.length) {
             let eraseMode = document.getElementById('erase-button')
@@ -161,23 +167,34 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
-            //beginning to map out hand. will implement after finish integrating paper.js
+            //here we define "hand" using wrist and elbow position
             const yDiff = leftWrist.position.y - leftElbow.position.y
             const handY = yDiff / 2 + leftWrist.position.y
             const xDiff = leftWrist.position.x - leftElbow.position.x
             const handX = xDiff / 2 + leftWrist.position.x
             hand = {score: leftWrist.score, position: {y: handY, x: handX}}
             keypoints[17] = hand
-            if (hand.score > minPartConfidence) {
+
+            if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                const thisPath = drawLine(hand, path)
+                //const thisPath = drawLine(nose, path)
+
+                //this calls a utility function in draw.js that chooses which brush tool to use based on our store
+                const thisPath = drawAnything(
+                  nose,
+                  leftWrist,
+                  rightWrist,
+                  hand,
+                  path
+                )
 
                 path = thisPath
               } else {
-                if (eraseModeValue === 'true') {
-                  ctx.globalCompositeOperation = 'destination-out'
-                }
+                ctx.globalCompositeOperation = 'destination-out'
+
+                //needs refactor for using nose - having trouble passing into loop
+                //keypoints[9] == leftWrist (but literally your right wrist)
                 if (prevPoses[0].keypoints[17]) {
                   drawLineBetweenPoints(
                     [hand, prevPoses[0].keypoints[17]],
@@ -186,21 +203,18 @@ function detectPoseInRealTime(video, net) {
                     15
                   )
                 }
-
-                //needs refactor for using hand - having trouble passing into loop
-                //keypoints[9] == leftWrist (but literally your right wrist)
               }
             }
           }
-        } else if (
-          keypoints[10].score >= minPartConfidence &&
-          Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
-        ) {
-          path = null
         }
       }
-      prevKeypoints = keypoints
-      prevScore = score
+
+      // } else if (
+      //   keypoints[10].score >= minPartConfidence &&
+      //   Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
+      // ) {
+      //   path = null
+      // }
     })
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }
@@ -233,7 +247,6 @@ export async function bindPage() {
     throw e
   }
 
-  clearCanvas()
   setTimeout(() => detectPoseInRealTime(video, net), 1000)
 }
 

@@ -4,17 +4,31 @@ import {connect} from 'react-redux'
 import ColorPicker from './colorPicker'
 import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
+import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
 import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
+import Save from '@material-ui/icons/Save'
+import {saveCanvas, clearCanvas} from './utils/draw'
 
 import voiceRecognition from './utils/speechUtil'
 
 import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
+import BrushOptions from './brushOptions'
+import {Drawer} from '@material-ui/core'
+
 class Toolbar extends Component {
+  constructor() {
+    super()
+    this.state = {
+      open: false
+    }
+    this.toggleOpen = this.toggleOpen.bind(this)
+  }
+
   async handleSpeak() {
     let {
       drawModeOn,
@@ -36,6 +50,10 @@ class Toolbar extends Component {
     }
   }
 
+  toggleOpen() {
+    this.setState(prevState => ({open: !prevState.open}))
+  }
+
   render() {
     let {
       eraseModeOn,
@@ -47,6 +65,19 @@ class Toolbar extends Component {
 
     return (
       <div id="navbar">
+        <Button id="voice-button" onClick={() => this.handleSpeak()}>
+          {voiceModeOn ? (
+            <div>
+              <RecordVoiceOver />
+              Voice Currently ON
+            </div>
+          ) : (
+            <div>
+              <VoiceOverOff />
+              Voice Currently OFF
+            </div>
+          )}
+        </Button>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -63,6 +94,13 @@ class Toolbar extends Component {
               Draw Mode OFF
             </div>
           )}
+        </Button>
+        <Button id="brush-button" onClick={this.toggleOpen}>
+          <Brush />
+          Brush option
+          <Drawer anchor="left" open={this.state.open}>
+            <BrushOptions />
+          </Drawer>
         </Button>
         <Button
           id="erase-button"
@@ -81,23 +119,21 @@ class Toolbar extends Component {
             </div>
           )}
         </Button>{' '}
-        <Button id="clear-button" value="Clear Canvas">
+        <ColorPicker />
+        <Button
+          id="clear-button"
+          value="Clear Canvas"
+          onClick={() => clearCanvas()}
+        >
           <Clear />Clear Canvas
         </Button>
-        <Button id="voice-button" onClick={() => this.handleSpeak()}>
-          {voiceModeOn ? (
-            <div>
-              <RecordVoiceOver />
-              Voice Currently ON
-            </div>
-          ) : (
-            <div>
-              <VoiceOverOff />
-              Voice Currently OFF
-            </div>
-          )}
+        <Button
+          id="save-canvas"
+          value="Save Canvas"
+          onClick={() => saveCanvas()}
+        >
+          <Save />Save Canvas
         </Button>
-        <ColorPicker />
       </div>
     )
   }
