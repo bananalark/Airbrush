@@ -47,6 +47,7 @@
     "connect-session-sequelize": "^4.1.0",
     "express": "^4.16.3",
     "express-session": "^1.15.1",
+    "fabric": "^2.6.0",
     "history": "^4.6.3",
     "json-loader": "^0.5.7",
     "mdi-material-ui": "^5.8.0",
