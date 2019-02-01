@@ -34,7 +34,7 @@ class Toolbar extends Component {
     let {openLightbox} = this.props
 
     return (
-      <div id="navbar">
+      <div>
         {isChrome ? (
           <ButtonsChrome openLightbox={openLightbox} />
         ) : (
