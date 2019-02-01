@@ -29,7 +29,8 @@ class Toolbar extends Component {
   constructor() {
     super()
     this.state = {
-      open: false
+      open: false,
+      voiceDialogOpen: false
     }
     this.toggleOpen = this.toggleOpen.bind(this)
     this.handleSpeak = this.handleSpeak.bind(this)
@@ -59,11 +60,11 @@ class Toolbar extends Component {
   }
 
   handleNonChrome() {
-    this.setState({open: true})
+    this.setState({voiceDialogOpen: true})
   }
 
   handleDialogClose() {
-    this.setState({open: false})
+    this.setState({voiceDialogOpen: false})
   }
 
   toggleOpen() {
@@ -82,20 +83,79 @@ class Toolbar extends Component {
     return (
       <div id="navbar">
         {isChrome ? (
-          <Button id="voice-button" onClick={() => this.handleSpeak()}>
-            {voiceModeOn ? (
-              <div>
-                <RecordVoiceOver />
-                Voice Currently ON
-              </div>
-            ) : (
-              <div>
-                <VoiceOverOff />
-                Voice Currently OFF
-              </div>
-            )}
-          </Button>
+          <div>
+            <Button id="voice-button" onClick={() => this.handleSpeak()}>
+              {voiceModeOn ? (
+                <div>
+                  <RecordVoiceOver />
+                  Voice Currently ON
+                </div>
+              ) : (
+                <div>
+                  <VoiceOverOff />
+                  Voice Currently OFF
+                </div>
+              )}
+            </Button>
+            <Button
+              id="draw-button"
+              value={drawModeOn}
+              onClick={() => toggleDraw()}
+            >
+              {drawModeOn ? (
+                <div>
+                  <Pencil />
+                  Draw Mode ON
+                </div>
+              ) : (
+                <div>
+                  <PencilOff />
+                  Draw Mode OFF
+                </div>
+              )}
+            </Button>
+            <Button id="brush-button" onClick={this.toggleOpen}>
+              <Brush />
+              Brush option
+              <Drawer anchor="left" open={this.state.open}>
+                <BrushOptions />
+              </Drawer>
+            </Button>
+            <Button
+              id="erase-button"
+              value={eraseModeOn}
+              onClick={() => toggleErase()}
+            >
+              {eraseModeOn ? (
+                <div>
+                  <Eraser />
+                  Eraser Mode ON
+                </div>
+              ) : (
+                <div>
+                  <Eraser />
+                  Eraser Mode OFF
+                </div>
+              )}
+            </Button>{' '}
+            <ColorPicker />
+            <Button
+              id="clear-button"
+              value="Clear Canvas"
+              onClick={() => clearCanvas()}
+            >
+              <Clear />Clear Canvas
+            </Button>
+            <Button
+              id="save-canvas"
+              value="Save Canvas"
+              onClick={() => saveCanvas()}
+            >
+              <Save />Save Canvas
+            </Button>
+          </div>
         ) : (
+          /*vvvv NON-CHROME BROWSERS vvvv*/
           <div>
             <Button onClick={() => this.handleNonChrome()}>
               <div>
@@ -105,8 +165,8 @@ class Toolbar extends Component {
             </Button>
             <Dialog
               maxWidth="sm"
-              open={this.state.open}
-              onClose={this.handleClose}
+              open={this.state.voiceDialogOpen}
+              onClose={this.handleDialogClose}
               aria-labelledby="max-width-dialog-title"
             >
               <DialogContent>
@@ -116,64 +176,64 @@ class Toolbar extends Component {
                 </DialogContentText>
               </DialogContent>
             </Dialog>
+            <Button
+              id="draw-button"
+              value={drawModeOn}
+              onClick={() => toggleDraw()}
+            >
+              {drawModeOn ? (
+                <div>
+                  <Pencil />
+                  Draw Mode ON
+                </div>
+              ) : (
+                <div>
+                  <PencilOff />
+                  Draw Mode OFF
+                </div>
+              )}
+            </Button>
+            <Button id="brush-button" onClick={this.toggleOpen}>
+              <Brush />
+              Brush option
+              <Drawer anchor="left" open={this.state.open}>
+                <BrushOptions />
+              </Drawer>
+            </Button>
+            <Button
+              id="erase-button"
+              value={eraseModeOn}
+              onClick={() => toggleErase()}
+            >
+              {eraseModeOn ? (
+                <div>
+                  <Eraser />
+                  Eraser Mode ON
+                </div>
+              ) : (
+                <div>
+                  <Eraser />
+                  Eraser Mode OFF
+                </div>
+              )}
+            </Button>{' '}
+            <ColorPicker />
+            <Button
+              id="clear-button"
+              value="Clear Canvas"
+              onClick={() => clearCanvas()}
+            >
+              <Clear />Clear Canvas
+            </Button>
+            <Button
+              id="save-canvas"
+              value="Save Canvas"
+              onClick={() => saveCanvas()}
+            >
+              <Save />Save Canvas
+            </Button>
           </div>
         )}
-        <Button
-          id="draw-button"
-          value={drawModeOn}
-          onClick={() => toggleDraw()}
-        >
-          {drawModeOn ? (
-            <div>
-              <Pencil />
-              Draw Mode ON
-            </div>
-          ) : (
-            <div>
-              <PencilOff />
-              Draw Mode OFF
-            </div>
-          )}
-        </Button>
-        <Button id="brush-button" onClick={this.toggleOpen}>
-          <Brush />
-          Brush option
-          <Drawer anchor="left" open={this.state.open}>
-            <BrushOptions />
-          </Drawer>
-        </Button>
-        <Button
-          id="erase-button"
-          value={eraseModeOn}
-          onClick={() => toggleErase()}
-        >
-          {eraseModeOn ? (
-            <div>
-              <Eraser />
-              Eraser Mode ON
-            </div>
-          ) : (
-            <div>
-              <Eraser />
-              Eraser Mode OFF
-            </div>
-          )}
-        </Button>{' '}
-        <ColorPicker />
-        <Button
-          id="clear-button"
-          value="Clear Canvas"
-          onClick={() => clearCanvas()}
-        >
-          <Clear />Clear Canvas
-        </Button>
-        <Button
-          id="save-canvas"
-          value="Save Canvas"
-          onClick={() => saveCanvas()}
-        >
-          <Save />Save Canvas
-        </Button>
       </div>
     )
   }
