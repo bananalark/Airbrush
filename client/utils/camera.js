@@ -3,8 +3,10 @@ import {
   draw,
   drawLineBetweenPoints,
   createProject,
-  drawAnything
+  drawAnything,
+  clearCanvas
 } from './draw.js'
+import trackHand from './trackHand'
 
 //will be moved to UI
 let minPartConfidence = 0.75
@@ -86,6 +88,7 @@ const guiState = {
 
 let handRight
 let handLeft
+let rightHandBox
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -175,6 +178,8 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[17] = handRight
 
+            trackHand()
+
             //here we define "hand" on the left arm using wrist and elbow position
             const yDiffLeft = rightWrist.position.y - rightElbow.position.y
             const handYLeft = yDiffLeft / 2 + rightWrist.position.y
@@ -192,6 +197,7 @@ function detectPoseInRealTime(video, net) {
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)
+                console.log(handLeft.position.x, handRight.position.x + 50)
 
                 path = thisPath
               } else {
