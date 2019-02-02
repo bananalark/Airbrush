@@ -13,23 +13,22 @@ let minPartConfidence = 0.75
 /*
 Setup video size
 */
-export let videoHeight = 723
-export let videoWidth = 964
+export let videoHeight
+export let videoWidth
 
-// if (3 * parent.innerWidth / 4 > parent.innerHeight) {
-//   videoHeight = parent.innerHeight
-//   videoWidth = Math.ceil(4 * parent.innerHeight / 3)
-// } else {
-//   videoWidth = parent.innerWidth
-//   videoHeight = Math.ceil(3 * parent.innerWidth / 4)
-// }
+if (3 * parent.innerWidth / 4 > parent.innerHeight) {
+  videoHeight = parent.innerHeight
+  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
+} else {
+  videoWidth = parent.innerWidth
+  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
+}
 
-// //this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
-// if (videoHeight > 723 || videoWidth > 964) {
-//   videoHeight = 723
-//   videoWidth = 964
-// }
-let timeInZone = 0
+//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+if (videoHeight > 723 || videoWidth > 964) {
+  videoHeight = 723
+  videoWidth = 964
+}
 
 /*
  Loads a the camera to be used on canvas
