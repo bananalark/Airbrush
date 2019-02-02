@@ -22,9 +22,42 @@ import {videoHeight, videoWidth} from './camera'
 
 let fullImageStr
 
-export const buttonHandHover = drawingHand => {
-  let selectorX = drawingHand.position.x
-  let selectorY = drawingHand.position.y
+// export const buttonHandHover = drawingHand => {
+//   let selectorX = drawingHand.position.x
+//   let selectorY = drawingHand.position.y
+
+//   const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
+//   if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
+//     // console.log('here are your y-coords---->', selectorY)
+//     console.log('you may be in the VOICE zone')
+//     // if (selectorY > voiceZone[0].y && selectorY < voiceZone[1].y) {
+//     // }
+//   }
+// }
+
+export const painterTracker = (part, vidWidth, vidHeight) => {
+  console.log('PART INSIDE PAINTERTRACKER FUNC', part)
+  const paintingPointerCanvas = document.getElementById('painting-pointer')
+  paintingPointerCanvas.width = vidWidth
+  paintingPointerCanvas.height = vidHeight
+  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
+  paintingPointerCtx.globalCompositeOperation = 'destination-over'
+  if (part.position) {
+    paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
+    paintingPointerCtx.beginPath()
+    paintingPointerCtx.arc(
+      part.position.x,
+      part.position.y,
+      30,
+      0,
+      2 * Math.PI,
+      true
+    )
+    paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
+    paintingPointerCtx.fill()
+
+    requestAnimationFrame(painterTracker)
+  }
 }
 
 export function createProject(window, cnv) {
@@ -103,6 +136,7 @@ function determineBodyPart(chosenBodyPart, nose, leftHand, rightHand) {
   }
 }
 
+/*eslint-disable*/
 export function drawAnything(nose, leftHand, rightHand, path) {
   const {chosenBrush, chosenBodyPart} = store.getState().paintTools
 
@@ -153,6 +187,7 @@ export function drawAnything(nose, leftHand, rightHand, path) {
       return drawLine(part, path)
   }
 }
+/*eslint-enable*/
 
 //draw lines
 function drawLine(oneKeypoint, path) {
@@ -185,7 +220,7 @@ function drawLine(oneKeypoint, path) {
 }
 
 //draw circle as line
-function drawCircleLine(oneKeypoint) {
+export function drawCircleLine(oneKeypoint) {
   let color = getColor()
 
   const shape = new Path.Circle(
@@ -199,7 +234,7 @@ function drawCircleLine(oneKeypoint) {
 }
 
 //draw circle as a shape
-function drawCircleShape(oneKeypoint, secondKeypoint) {
+export function drawCircleShape(oneKeypoint, secondKeypoint) {
   let color = getColor()
   const r = Math.sqrt(
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +

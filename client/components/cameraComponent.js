@@ -69,6 +69,7 @@ class CameraComponent extends Component {
               <div style={{position: 'relative'}}>
                 <canvas id="background" />
                 <canvas id="output" />
+                <canvas id="painting-pointer" />
               </div>
             </div>
           </Grid>

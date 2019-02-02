@@ -5,8 +5,8 @@ import {
   createProject,
   drawAnything
 } from './draw.js'
-import {CSSTransition} from 'react-transition-group'
 
+import store from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
@@ -94,6 +94,12 @@ function detectPoseInRealTime(video, net) {
 
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
+
+  const paintingPointerCanvas = document.getElementById('painting-pointer')
+  paintingPointerCanvas.width = videoWidth
+  paintingPointerCanvas.height = videoHeight
+  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
+  paintingPointerCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
@@ -187,20 +193,88 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
-            let toolbarAreaTopLeft = {x: 50, y: 250}
-            let toolbarAreaTopRight = {x: 200, y: 250}
-            let toolbarAreaBottomLeft = {x: 100, y: 660}
-            let toolbarAreaBottomRight = {x: 200, y: 660}
-            // videoHeight
+            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+            const painterTracker = (part, vidWidth, vidHeight) => {
+              console.log('PART INSIDE PAINTERTRACKER FUNC', part)
+              paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
+              paintingPointerCtx.beginPath()
+              paintingPointerCtx.arc(
+                part.position.x,
+                part.position.y,
+                30,
+                0,
+                2 * Math.PI,
+                true
+              )
+              paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
+              paintingPointerCtx.fill()
 
+              requestAnimationFrame(painterTracker)
+            }
+            if (currentBodyPart === 'nose') {
+              painterTracker(nose, videoWidth, videoHeight)
+            } else if (currentBodyPart === 'rightHand') {
+              painterTracker(handRight, videoWidth, videoHeight)
+            } else if (currentBodyPart === 'leftHand') {
+              painterTracker(handLeft, videoWidth, videoHeight)
+            }
+
+            //BUTTON-HOVER SELECTION HERE
             let selectorX = handLeft.position.x
             let selectorY = handLeft.position.y
+
             const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
-            if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
+            if (selectorX > 0 && selectorX < 200) {
               // console.log('here are your y-coords---->', selectorY)
-              if (selectorY > voiceZone[0].y && selectorY < voiceZone[1]) {
+              // console.log('here are your x-coords---->', selectorX)
+              if (selectorY > 0 && selectorY < 100) {
                 console.log('you may be in the VOICE zone')
               }
+              // if (selectorY > 50 && selectorY < 150) {
+              //   console.log('you may be in the HAND SELECT zone')
+              // }
+              // if (selectorY > 100 && selectorY < 150) {
+              //   console.log('you may be in the DRAW MODE zone')
+              // }
+              // if (selectorY > 150 && selectorY < 200) {
+              //   console.log('you may be in the BRUSH OPTION zone')
+              // }
+              // if (selectorY > 200 && selectorY < 250) {
+              //   console.log('you may be in the ERASER MODE zone')
+              // }
+              // if (selectorY > 250 && selectorY < 300) {
+              //   console.log('you may be in the COLOR PICKER zone')
+              // }
+              // if (selectorY > 300 && selectorY < 350) {
+              //   console.log('you may be in the CLEAR CANVAS zone')
+              // }
+              // if (selectorY > 350 && selectorY < 500) {
+              //   console.log('you may be in the SNAPSHOT zone')
+              // }
+              // if (selectorY > 50 && selectorY < 100) {
+              //   console.log('you may be in the VOICE zone')
+              // }
+              // if (selectorY > 100 && selectorY < 150) {
+              //   console.log('you may be in the HAND SELECT zone')
+              // }
+              // if (selectorY > 150 && selectorY < 200) {
+              //   console.log('you may be in the DRAW MODE zone')
+              // }
+              // if (selectorY > 250 && selectorY < 300) {
+              //   console.log('you may be in the BRUSH OPTION zone')
+              // }
+              // if (selectorY > 300 && selectorY < 350) {
+              //   console.log('you may be in the ERASER MODE zone')
+              // }
+              // if (selectorY > 350 && selectorY < 400) {
+              //   console.log('you may be in the COLOR PICKER zone')
+              // }
+              // if (selectorY > 400 && selectorY < 450) {
+              //   console.log('you may be in the CLEAR CANVAS zone')
+              // }
+              // if (selectorY > 450 && selectorY < 500) {
+              //   console.log('you may be in the SNAPSHOT zone')
+              // }
             }
 
             if (nose.score >= minPartConfidence) {
