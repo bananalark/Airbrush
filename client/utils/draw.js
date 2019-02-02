@@ -35,31 +35,6 @@ let fullImageStr
 //   }
 // }
 
-export const painterTracker = (part, vidWidth, vidHeight) => {
-  console.log('PART INSIDE PAINTERTRACKER FUNC', part)
-  const paintingPointerCanvas = document.getElementById('painting-pointer')
-  paintingPointerCanvas.width = vidWidth
-  paintingPointerCanvas.height = vidHeight
-  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
-  paintingPointerCtx.globalCompositeOperation = 'destination-over'
-  if (part.position) {
-    paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
-    paintingPointerCtx.beginPath()
-    paintingPointerCtx.arc(
-      part.position.x,
-      part.position.y,
-      30,
-      0,
-      2 * Math.PI,
-      true
-    )
-    paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
-    paintingPointerCtx.fill()
-
-    requestAnimationFrame(painterTracker)
-  }
-}
-
 export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)

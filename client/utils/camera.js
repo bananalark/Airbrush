@@ -29,6 +29,7 @@ export let videoWidth = 964
 //   videoHeight = 723
 //   videoWidth = 964
 // }
+let timeInZone = 0
 
 /*
  Loads a the camera to be used on canvas
@@ -193,24 +194,26 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
+            /*here we construct a small green circle to follow the painting hand or nose*/
             let currentBodyPart = store.getState().paintTools.chosenBodyPart
             const painterTracker = (part, vidWidth, vidHeight) => {
-              console.log('PART INSIDE PAINTERTRACKER FUNC', part)
               paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
               paintingPointerCtx.beginPath()
-              paintingPointerCtx.arc(
-                part.position.x,
-                part.position.y,
-                30,
-                0,
-                2 * Math.PI,
-                true
-              )
+              if (part.position) {
+                paintingPointerCtx.arc(
+                  part.position.x,
+                  part.position.y,
+                  30,
+                  0,
+                  2 * Math.PI,
+                  true
+                )
+              }
               paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
               paintingPointerCtx.fill()
-
               requestAnimationFrame(painterTracker)
             }
+
             if (currentBodyPart === 'nose') {
               painterTracker(nose, videoWidth, videoHeight)
             } else if (currentBodyPart === 'rightHand') {
@@ -219,16 +222,27 @@ function detectPoseInRealTime(video, net) {
               painterTracker(handLeft, videoWidth, videoHeight)
             }
 
-            //BUTTON-HOVER SELECTION HERE
-            let selectorX = handLeft.position.x
-            let selectorY = handLeft.position.y
+            //here we handle the user hovering over the toolbar buttons to select them
+            let hoverTool
+            if (currentBodyPart === 'nose') {
+              hoverTool = nose
+            } else if (currentBodyPart === 'rightHand') {
+              hoverTool = handLeft
+            } else if (currentBodyPart === 'leftHand') {
+              hoverTool = handRight
+            }
 
-            const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
-            if (selectorX > 0 && selectorX < 200) {
-              // console.log('here are your y-coords---->', selectorY)
-              // console.log('here are your x-coords---->', selectorX)
-              if (selectorY > 0 && selectorY < 100) {
-                console.log('you may be in the VOICE zone')
+            let hoverToolX = hoverTool.position.x
+            let hoverToolY = hoverTool.position.y
+
+            if (hoverToolX > 0 && hoverToolX < 200) {
+              if (hoverToolY > 0 && hoverToolY < 100) {
+                timeInZone += 1
+                console.log(timeInZone)
+                if (timeInZone === 50) {
+                  console.log('You selected Voice Mode!')
+                  timeInZone = 0
+                }
               }
               // if (selectorY > 50 && selectorY < 150) {
               //   console.log('you may be in the HAND SELECT zone')
