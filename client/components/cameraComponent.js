@@ -7,7 +7,6 @@ import 'lightbox-react/style.css'
 import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
 import {createMuiTheme} from '@material-ui/core/styles'
-import {VALID_FAN_MODE_VALUES} from '@tensorflow/tfjs-layers/dist/initializers'
 
 class CameraComponent extends Component {
   constructor(props) {

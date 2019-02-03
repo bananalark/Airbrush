@@ -3,7 +3,9 @@ import {
   draw,
   drawLineBetweenPoints,
   createProject,
-  drawAnything
+  drawAnything,
+  hoverToChooseTool,
+  smoothTrackingCircle
 } from './draw.js'
 
 import store from '../store'
@@ -13,6 +15,9 @@ let minPartConfidence = 0.75
 /*
 Setup video size
 */
+// vv Amber's hardcoded data until resolution fix
+// export let videoHeight = 723
+// export let videoWidth = 964
 export let videoHeight
 export let videoWidth
 
@@ -113,6 +118,17 @@ function detectPoseInRealTime(video, net) {
 
   createProject(window, canvas, ctx)
 
+  // ***** SELECTION CIRCLE SMOOTHING TECH *****
+  /*The following is used for smoothing the tracking circle
+  An average is collected of the last five frames. Assigned
+  'framesAveraged' to a const, so that we can easily change this
+  later, as needed.*/
+  let currentPoseNum = 0
+  const framesAveraged = 5
+  let lastFewXCoords = Array(framesAveraged)
+  let lastFewYCoords = Array(framesAveraged)
+  /*End of smoothing tech*/
+
   async function poseDetectionFrame(prevPoses = [], path) {
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
@@ -193,33 +209,70 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
-            /*here we construct a small green circle to follow the painting hand or nose*/
+            //***** TRACKING CIRCLE *****
+            //Here we construct a small green circle to follow the hand or nose
             let currentBodyPart = store.getState().paintTools.chosenBodyPart
-            const painterTracker = (part, vidWidth, vidHeight) => {
+
+            function painterTracker(xCoord, yCoord, vidWidth, vidHeight) {
               paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
               paintingPointerCtx.beginPath()
-              if (part.position) {
-                paintingPointerCtx.arc(
-                  part.position.x,
-                  part.position.y,
-                  30,
-                  0,
-                  2 * Math.PI,
-                  true
-                )
+
+              paintingPointerCtx.arc(xCoord, yCoord, 30, 0, 2 * Math.PI, true)
+              if (xCoord > 0 && xCoord < 200) {
+                //pointer changes to white in the toolbar
+                paintingPointerCtx.fillStyle = 'rgba(255, 255, 255, 0.88)'
+              } else {
+                paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
               }
-              paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
               paintingPointerCtx.fill()
               requestAnimationFrame(painterTracker)
             }
 
+            let keypointToTrack
             if (currentBodyPart === 'nose') {
-              painterTracker(nose, videoWidth, videoHeight)
-            } else if (currentBodyPart === 'rightHand') {
-              painterTracker(handRight, videoWidth, videoHeight)
+              keypointToTrack = nose
             } else if (currentBodyPart === 'leftHand') {
-              painterTracker(handLeft, videoWidth, videoHeight)
+              keypointToTrack = handLeft
+            } else {
+              keypointToTrack = handRight
             }
+
+            let {xCoordAverage, yCoordAverage} = smoothTrackingCircle(
+              lastFewXCoords,
+              lastFewYCoords,
+              currentPoseNum,
+              framesAveraged,
+              keypointToTrack
+            )
+
+            if (xCoordAverage && yCoordAverage) {
+              painterTracker(
+                xCoordAverage,
+                yCoordAverage,
+                videoWidth,
+                videoHeight
+              )
+            }
+            currentPoseNum += 1
+
+            //***** HOVER BUTTON SELECTION *****
+            //Here we handle button clicks if the user hovers the toolbar
+            let hoverTool
+            if (currentBodyPart === 'nose') {
+              hoverTool = nose
+            } else if (currentBodyPart === 'rightHand') {
+              hoverTool = handLeft
+            } else if (currentBodyPart === 'leftHand') {
+              hoverTool = handRight
+            } else {
+              hoverTool = handLeft
+            }
+
+            let hoverToolX = hoverTool.position.x
+            let hoverToolY = hoverTool.position.y
+
+            //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+            hoverToChooseTool(hoverToolX, hoverToolY)
 
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
@@ -230,6 +283,7 @@ function detectPoseInRealTime(video, net) {
 
                 path = thisPath
               } else {
+                // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
                 // ctx.globalCompositeOperation = 'destination-out'
                 // ctx.arc(handX, handY, 2, 0, Math.PI * 2, false)
                 // ctx.fill()
@@ -248,13 +302,6 @@ function detectPoseInRealTime(video, net) {
           }
         }
       }
-
-      // } else if (
-      //   keypoints[10].score >= minPartConfidence &&
-      //   Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
-      // ) {
-      //   path = null
-      // }
     })
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }

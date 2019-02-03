@@ -20,9 +20,9 @@ import Camera from '@material-ui/icons/Camera'
 import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 
-import voiceRecognition, {isChrome} from '../utils/speechUtil'
+import {voiceModeStartStop} from '../utils/speechUtil'
 
-import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
+import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
@@ -45,24 +45,11 @@ class ButtonsNonChrome extends Component {
   }
 
   async handleSpeak() {
-    let {
-      drawModeOn,
-      eraseModeOn,
-      voiceModeOn,
-      currentCommand,
-      toggleVoice
-    } = this.props
+    let {toggleVoice} = this.props
 
     await toggleVoice()
 
-    if (store.getState().paintTools.voiceModeOn === true) {
-      voiceRecognition(store.getState().paintTools)
-      setInterval(() => {
-        if (store.getState().paintTools.voiceModeOn === true) {
-          voiceRecognition(store.getState().paintTools)
-        }
-      }, 5000)
-    }
+    voiceModeStartStop()
   }
 
   toggleBrushOpen() {
@@ -90,7 +77,6 @@ class ButtonsNonChrome extends Component {
       openLightbox,
       eraseModeOn,
       drawModeOn,
-      voiceModeOn,
       toggleErase,
       toggleDraw
     } = this.props

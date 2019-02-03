@@ -9,20 +9,14 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogContentText
-} from '@material-ui/core/'
-import Save from '@material-ui/icons/Save'
+import {Button} from '@material-ui/core/'
 import Drawer from '@material-ui/core/Drawer'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import Camera from '@material-ui/icons/Camera'
 
-import voiceRecognition, {isChrome} from '../utils/speechUtil'
+import {voiceModeStartStop} from '../utils/speechUtil'
 
-import store, {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
+import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
@@ -33,36 +27,18 @@ class ButtonsChrome extends Component {
     super()
     this.state = {
       brushOpen: false,
-      bodyPartOpen: false,
-      voiceDialogOpen: false
+      bodyPartOpen: false
     }
     this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
     this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
 
     this.handleSpeak = this.handleSpeak.bind(this)
-    this.handleNonChrome = this.handleNonChrome.bind(this)
-    this.handleDialogClose = this.handleDialogClose.bind(this)
   }
 
   async handleSpeak() {
-    let {
-      drawModeOn,
-      eraseModeOn,
-      voiceModeOn,
-      currentCommand,
-      toggleVoice
-    } = this.props
-
+    let {toggleVoice} = this.props
     await toggleVoice()
-
-    if (store.getState().paintTools.voiceModeOn === true) {
-      voiceRecognition(store.getState().paintTools)
-      setInterval(() => {
-        if (store.getState().paintTools.voiceModeOn === true) {
-          voiceRecognition(store.getState().paintTools)
-        }
-      }, 5000)
-    }
+    voiceModeStartStop()
   }
 
   toggleBrushOpen() {
@@ -71,14 +47,6 @@ class ButtonsChrome extends Component {
 
   toggleBodyPartOpen() {
     this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  }
-
-  handleNonChrome() {
-    this.setState({voiceDialogOpen: true})
-  }
-
-  handleDialogClose() {
-    this.setState({voiceDialogOpen: false})
   }
 
   render() {
@@ -90,13 +58,14 @@ class ButtonsChrome extends Component {
       toggleErase,
       toggleDraw
     } = this.props
+
     return (
       <div id="navbar">
         <Button id="voice-button" onClick={() => this.handleSpeak()}>
           {voiceModeOn ? (
             <div>
               <RecordVoiceOver />
-              Voice Currently ON
+              Voice Currently On
             </div>
           ) : (
             <div>
