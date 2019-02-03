@@ -1,4 +1,4 @@
-import store, {toggleDraw, toggleErase} from '../store'
+import store, {toggleDraw, toggleErase, toggleVoice} from '../store'
 import {getCommand} from '../store/paintTools'
 
 export var isChrome =
@@ -97,5 +97,16 @@ export default function voiceRecognition(state) {
     }
   } else {
     console.log('Voice mode is currently OFF')
+  }
+}
+
+export const voiceModeStartStop = () => {
+  if (store.getState().paintTools.voiceModeOn === true) {
+    voiceRecognition(store.getState().paintTools)
+    setInterval(() => {
+      if (store.getState().paintTools.voiceModeOn === true) {
+        voiceRecognition(store.getState().paintTools)
+      }
+    }, 5000)
   }
 }
