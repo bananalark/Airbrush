@@ -78,3 +78,7 @@ canvas {
 #background {
   z-index: 3;
 }
+
+#painting-pointer {
+  z-index: 4;
+}

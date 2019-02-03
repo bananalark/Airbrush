@@ -6,28 +6,29 @@ import {
   drawAnything
 } from './draw.js'
 
+import store from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
 /*
 Setup video size
 */
-export let videoHeight = 723
-export let videoWidth = 964
+export let videoHeight
+export let videoWidth
 
-// if (3 * parent.innerWidth / 4 > parent.innerHeight) {
-//   videoHeight = parent.innerHeight
-//   videoWidth = Math.ceil(4 * parent.innerHeight / 3)
-// } else {
-//   videoWidth = parent.innerWidth
-//   videoHeight = Math.ceil(3 * parent.innerWidth / 4)
-// }
+if (3 * parent.innerWidth / 4 > parent.innerHeight) {
+  videoHeight = parent.innerHeight
+  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
+} else {
+  videoWidth = parent.innerWidth
+  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
+}
 
-// //this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
-// if (videoHeight > 723 || videoWidth > 964) {
-//   videoHeight = 723
-//   videoWidth = 964
-// }
+//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+if (videoHeight > 723 || videoWidth > 964) {
+  videoHeight = 723
+  videoWidth = 964
+}
 
 /*
  Loads a the camera to be used on canvas
@@ -93,6 +94,12 @@ function detectPoseInRealTime(video, net) {
 
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
+
+  const paintingPointerCanvas = document.getElementById('painting-pointer')
+  paintingPointerCanvas.width = videoWidth
+  paintingPointerCanvas.height = videoHeight
+  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
+  paintingPointerCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
@@ -186,6 +193,34 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
+            /*here we construct a small green circle to follow the painting hand or nose*/
+            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+            const painterTracker = (part, vidWidth, vidHeight) => {
+              paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
+              paintingPointerCtx.beginPath()
+              if (part.position) {
+                paintingPointerCtx.arc(
+                  part.position.x,
+                  part.position.y,
+                  30,
+                  0,
+                  2 * Math.PI,
+                  true
+                )
+              }
+              paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
+              paintingPointerCtx.fill()
+              requestAnimationFrame(painterTracker)
+            }
+
+            if (currentBodyPart === 'nose') {
+              painterTracker(nose, videoWidth, videoHeight)
+            } else if (currentBodyPart === 'rightHand') {
+              painterTracker(handRight, videoWidth, videoHeight)
+            } else if (currentBodyPart === 'leftHand') {
+              painterTracker(handLeft, videoWidth, videoHeight)
+            }
+
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
@@ -195,8 +230,9 @@ function detectPoseInRealTime(video, net) {
 
                 path = thisPath
               } else {
-                ctx.globalCompositeOperation = 'destination-out'
-
+                // ctx.globalCompositeOperation = 'destination-out'
+                // ctx.arc(handX, handY, 2, 0, Math.PI * 2, false)
+                // ctx.fill()
                 //needs refactor for using nose - having trouble passing into loop
                 //keypoints[9] == leftWrist (but literally your right wrist)
                 // if (prevPoses[0].keypoints[17]) {
