@@ -3,6 +3,8 @@ import reactCSS from 'reactcss'
 import {SwatchesPicker} from 'react-color'
 import {connect} from 'react-redux'
 
+import FormatPaint from '@material-ui/icons/FormatPaint'
+
 class ColorPicker extends React.Component {
   constructor(props) {
     super(props)
@@ -59,6 +61,8 @@ class ColorPicker extends React.Component {
     })
     return (
       <div id="color-picker">
+        <FormatPaint />
+        {`    `}
         <div style={styles.swatch} onClick={this.handleClick}>
           <div style={styles.color} />
         </div>
