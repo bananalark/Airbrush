@@ -1,31 +1,21 @@
-const trackHand = (lsx, rsx, hx, hy) => {
+function trackHand(span, hx, hy) {
   //make mini canvas rightHandBox
-  //params: left shoulder x, right shoulder x, hand x, hand y
 
-  //approx hand size from shoulder distance
-  const canvasSize = Math.abs(lsx - rsx)
-
-  //upper left corner of mini canvas
-  const left = hx - canvasSize / 2
-  const top = hy - canvasSize / 2
+  //upper left corner of mini canvas:
+  //starting with half the hand-span length
+  console.log(span, hx, hy)
+  const halfSpan = span / 2
+  const left = hx - halfSpan
+  const top = hy - halfSpan
 
   let handCanvas = document.getElementById('hand')
-  handCanvas.width = canvasSize
-  handCanvas.height = canvasSize
+  handCanvas.width = span
+  handCanvas.height = span
   const handCtx = handCanvas.getContext('2d')
 
   const bgCanvas = document.getElementById('background')
-
-  let handImage = bgCanvas.toDataURL('image/svg', {
-    left,
-    top,
-    width: canvasSize,
-    height: canvasSize
-  })
-
-  handImage = new Blob([handImage], {type: 'image/svg'})
-
-  handCtx.drawImage(handImage, 0, 0)
+  console.log('span', span)
+  handCtx.drawImage(bgCanvas, left, top, span, span, 0, 0, span, span)
 }
 
 export default trackHand

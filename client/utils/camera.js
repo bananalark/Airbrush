@@ -88,7 +88,7 @@ const guiState = {
 
 let handRight
 let handLeft
-let rightHandBox
+let handSpan
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -178,7 +178,14 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[17] = handRight
 
-            trackHand()
+            if (!handSpan) {
+              //pretty wonky attempt at general size of hand-extended-toward-camera
+              handSpan = Math.floor(
+                Math.abs(leftShoulder.position.x - rightShoulder.position.x)
+              )
+            }
+
+            trackHand(handSpan, handXRight, handYRight)
 
             //here we define "hand" on the left arm using wrist and elbow position
             const yDiffLeft = rightWrist.position.y - rightElbow.position.y

@@ -73,7 +73,12 @@ class CameraComponent extends Component {
             </div>
           </Grid>
         </Grid>
-        <canvas id="hand" />
+        <div id="hand-div">
+          <canvas
+            id="hand"
+            style={{position: 'absolute', top: '700px', zIndex: 2000}}
+          />
+        </div>
       </div>
     )
   }
