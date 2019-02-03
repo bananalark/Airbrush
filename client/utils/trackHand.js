@@ -1,3 +1,5 @@
+import * as tf from '@tensorflow/tfjs'
+
 function trackHand(span, hx, hy) {
   //make mini canvas rightHandBox
 
@@ -17,5 +19,11 @@ function trackHand(span, hx, hy) {
   console.log('span', span)
   handCtx.drawImage(bgCanvas, left, top, span, span, 0, 0, span, span)
 }
+
+const loadModel = async () => {
+  const model = await tf.loadModel('http://localhost:8080/mymodel.json')
+  console.log('model', model)
+}
+loadModel()
 
 export default trackHand
