@@ -242,25 +242,15 @@ function detectPoseInRealTime(video, net) {
 
               if (lastFewXCoords[4] !== null) {
                 keypoint = smooth(lastFewXCoords, lastFewYCoords)
-                console.log('smoothed here', keypoint)
               }
+
               drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-              //}
 
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
 
-                //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(keypoint, path)
-
                 path = thisPath
-
-                // const thisPath = smoothAndDraw('line', lastFewXCoords,
-                //   lastFewYCoords, videoWidth,
-                //   videoHeight, null, path = 0)
-                // console.log('spits out', thisPath)
-
-                // path = thisPath
               } else {
                 // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
               }
@@ -271,6 +261,7 @@ function detectPoseInRealTime(video, net) {
     })
     //increment/reset frame count
     currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
+
     if (store.getState().paintTools.drawModeOn === false) {
       path = null
       paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)

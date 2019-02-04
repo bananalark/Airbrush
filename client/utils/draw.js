@@ -116,7 +116,6 @@ function setSize(size) {
 /*eslint-disable*/
 export function drawAnything(part, path) {
   const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
-  console.log(path)
   const pixelWidth = setSize(size)
 
   //this prevents any lines from being drawn between previous drawing body part and current drawing body part
@@ -131,7 +130,7 @@ export function drawAnything(part, path) {
   if (x < 0 || y < 0 || x > videoWidth || y > videoHeight) {
     return null
   }
-  console.log('here?', chosenBrush, path)
+
   switch (chosenBrush) {
     case 'defaultLine':
       return drawLine(part, path, pixelWidth)
@@ -178,12 +177,11 @@ function drawLine(oneKeypoint, path, pixelWidth) {
   if (!path) {
     path = pathStyle
   }
+  path.add(oneKeypoint.position)
   if (path.segments.length > 5) {
     path.smooth({type: 'continuous'})
     path = pathStyle
   }
-
-  path.add(oneKeypoint.position)
 
   return path
 }
