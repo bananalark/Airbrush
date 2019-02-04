@@ -38,6 +38,30 @@ form div {
   justify-content: space-between;
 }
 
+.custom-pop-up {
+  position: absolute;
+  left: 0;
+  margin-left: 180px;
+  top: 0;
+  height: 300px;
+  width: 160px;
+  z-index: 5;
+  background: rgba(133, 156, 154, 0.7);
+  border-radius: 6px;
+}
+
+#closed {
+  display: none;
+}
+
+.open {
+  display: block;
+}
+
+.closed {
+  display: none;
+}
+
 #color-picker {
   text-align: center;
 }

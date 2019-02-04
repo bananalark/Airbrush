@@ -9,13 +9,20 @@ class BodyPartOptions extends Component {
     this.state = {
       parts: ['rightHand', 'leftHand', 'nose']
     }
+    this.handleClick = this.handleClick.bind(this)
+  }
+
+  handleClick(part) {
+    let bodyPartOptionsPopUp = document.getElementById('bodypart-options')
+    bodyPartOptionsPopUp.className = 'closed'
+    this.props.chooseBodyPart(part)
   }
 
   render() {
     return (
       <>
         {this.state.parts.map(part => (
-          <Button onClick={() => this.props.chooseBodyPart(part)} key={part}>
+          <Button onClick={() => this.handleClick(part)} key={part}>
             {part}
           </Button>
         ))}

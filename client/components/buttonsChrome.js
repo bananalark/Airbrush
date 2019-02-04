@@ -21,6 +21,7 @@ import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
+import CustomPopUp from './customPopUp'
 
 class ButtonsChrome extends Component {
   constructor() {
@@ -41,13 +42,15 @@ class ButtonsChrome extends Component {
     voiceModeStartStop()
   }
 
-  toggleBrushOpen() {
-    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
-  }
+  // toggleBrushOpen() {
+  //   let brushOptionsPopUp = document.getElementById("brush-options")
+  //   brushOptionsPopUp.className = 'open';
+  // }
 
-  toggleBodyPartOpen() {
-    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  }
+  // toggleBodyPartOpen() {
+  //   let bodyPartOptionsPopUp = document.getElementById('bodypart-options')
+  //   bodyPartOptionsPopUp.className = 'open';
+  // }
 
   render() {
     let {
@@ -77,9 +80,11 @@ class ButtonsChrome extends Component {
         <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
           <Hand />
           currently drawing with {this.props.chosenBodyPart}
-          <Drawer anchor="left" open={this.state.bodyPartOpen}>
+          {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+          <CustomPopUp id="bodypart-options" className="open">
             <BodyPartOptions />
-          </Drawer>
+          </CustomPopUp>
+          {/* </Drawer> */}
         </Button>
         <Button
           id="draw-button"
@@ -101,9 +106,11 @@ class ButtonsChrome extends Component {
         <Button id="brush-button" onClick={this.toggleBrushOpen}>
           <Brush />
           Brush option
-          <Drawer anchor="left" open={this.state.brushOpen}>
+          {/* <Drawer anchor="left" open={this.state.brushOpen}> */}
+          <CustomPopUp id="brush-options">
             <BrushOptions />
-          </Drawer>
+          </CustomPopUp>
+          {/* </Drawer> */}
         </Button>
         <Button
           id="erase-button"

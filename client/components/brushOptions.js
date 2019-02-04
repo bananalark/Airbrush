@@ -17,6 +17,13 @@ class BrushOptions extends Component {
         'triangleShape'
       ]
     }
+    this.clickHandler = this.clickHandler.bind(this)
+  }
+
+  clickHandler(brush) {
+    let brushOptionsPopUp = document.getElementById('brush-options')
+    brushOptionsPopUp.className = 'closed'
+    this.props.chooseBrush(brush)
   }
 
   render() {
@@ -24,7 +31,7 @@ class BrushOptions extends Component {
       <>
         {this.state.brushes.map(brush => {
           return (
-            <Button onClick={() => this.props.chooseBrush(brush)} key={brush}>
+            <Button onClick={() => this.clickHandler(brush)} key={brush}>
               {brush}
             </Button>
           )
