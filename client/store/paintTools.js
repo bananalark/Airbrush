@@ -10,6 +10,7 @@ const TOGGLE_VOICE = 'TOGGLE_VOICE'
 const TOGGLE_DRAW = 'TOGGLE_DRAW'
 const CHOOSE_BRUSH = 'CHOOSE_BRUSH'
 const CHOOSE_BODY_PART = 'CHOOSE_BODY_PART'
+const CHOOSE_SIZE = 'CHOOSE_SIZE'
 
 /**
  * INITIAL STATE
@@ -20,7 +21,8 @@ const initialState = {
   voiceModeOn: false,
   drawModeOn: false,
   chosenBrush: 'defaultLine',
-  chosenBodyPart: 'rightHand'
+  chosenBodyPart: 'rightHand',
+  size: 'small'
 }
 
 /**
@@ -32,6 +34,7 @@ export const toggleVoice = () => ({type: TOGGLE_VOICE})
 export const toggleDraw = () => ({type: TOGGLE_DRAW})
 export const chooseBrush = brush => ({type: CHOOSE_BRUSH, brush})
 export const chooseBodyPart = part => ({type: CHOOSE_BODY_PART, part})
+export const chooseSize = size => ({type: CHOOSE_SIZE, size})
 
 /**
  * REDUCER
@@ -56,6 +59,9 @@ const paintTools = (state = initialState, action) => {
       return newState
     case CHOOSE_BODY_PART:
       newState.chosenBodyPart = action.part
+      return newState
+    case CHOOSE_SIZE:
+      newState.size = action.size
       return newState
     default:
       return state
