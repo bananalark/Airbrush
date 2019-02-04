@@ -72,10 +72,11 @@ export function saveCanvas() {
   return fullImageStr
 }
 
+//create a DOM element to hold download ref
 export function download() {
   let element = document.createElement('a')
-  const file = new Blob([fullImageStr], {type: 'image/png'})
-  element.href = URL.createObjectURL(file)
+  const file = fullImageStr.replace('image/png', 'image/octet-stream')
+  element.href = file
   element.download = 'airbrush.png'
   element.click()
 }
