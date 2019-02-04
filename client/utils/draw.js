@@ -288,13 +288,9 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
 }
 
 //on-off switch with gesture
-export function draw(keypoints, minPartConfidence) {
+export function draw() {
   let drawMode = document.getElementById('draw-button').value
-  return (
-    (keypoints[10].score >= minPartConfidence &&
-      Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
-    drawMode === 'true'
-  )
+  return drawMode === 'true'
 }
 
 let voiceZoneHoverStart = 0

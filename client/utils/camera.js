@@ -9,6 +9,8 @@ import {
   smooth
 } from './draw.js'
 
+import {trackHand, predict} from './trackHand'
+
 import store from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
@@ -101,6 +103,10 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
 
+  const handCanvas = document.getElementById('hand')
+  handCanvas.height = 224
+  handCanvas.width = 224
+
   const paintingPointerCanvas = document.getElementById('painting-pointer')
   paintingPointerCanvas.width = videoWidth
   paintingPointerCanvas.height = videoHeight
@@ -164,61 +170,93 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (draw(keypoints, minPartConfidence)) {
-          if (prevPoses.length) {
-            let eraseMode = document.getElementById('erase-button')
-            let eraseModeValue = eraseMode.attributes.value.nodeValue
-            const [
-              nose,
-              leftEye,
-              rightEye,
-              leftEar,
-              rightEar,
-              leftShoulder,
-              rightShoulder,
-              leftElbow,
-              rightElbow,
-              leftWrist,
-              rightWrist,
-              leftHip,
-              rightHip,
-              leftKnee,
-              rightKnee,
-              leftAnkle,
-              rightAnkle
-            ] = keypoints
+        if (prevPoses.length) {
+          let eraseMode = document.getElementById('erase-button')
+          let eraseModeValue = eraseMode.attributes.value.nodeValue
+          const [
+            nose,
+            leftEye,
+            rightEye,
+            leftEar,
+            rightEar,
+            leftShoulder,
+            rightShoulder,
+            leftElbow,
+            rightElbow,
+            leftWrist,
+            rightWrist,
+            leftHip,
+            rightHip,
+            leftKnee,
+            rightKnee,
+            leftAnkle,
+            rightAnkle
+          ] = keypoints
 
-            //hand "keypoint" defintion: manual definition for each smooths rendering
+          //hand "keypoint" defintion: manual definition for each smooths rendering
 
-            //define "hand" on the right arm using wrist and elbow position
-            const yDiffRight = leftWrist.position.y - leftElbow.position.y
-            const handYRight = yDiffRight / 2 + leftWrist.position.y
-            const xDiffRight = leftWrist.position.x - leftElbow.position.x
-            const handXRight = xDiffRight / 2 + leftWrist.position.x
-            handRight = {
-              score: leftWrist.score,
-              position: {y: handYRight, x: handXRight}
+          //define "hand" on the right arm using wrist and elbow position
+          const yDiffRight = leftWrist.position.y - leftElbow.position.y
+          const handYRight = yDiffRight / 2 + leftWrist.position.y
+          const xDiffRight = leftWrist.position.x - leftElbow.position.x
+          const handXRight = xDiffRight / 2 + leftWrist.position.x
+          handRight = {
+            score: leftWrist.score,
+            position: {y: handYRight, x: handXRight}
+          }
+          keypoints[17] = handRight
+
+          // if (!handSpan) {
+          //   //pretty wonky attempt at general size of hand-extended-toward-camera
+          //   handSpan = Math.floor(
+          //     Math.abs(leftShoulder.position.x - rightShoulder.position.x)
+          //   )
+          // }
+
+          //here we define "hand" on the left arm using wrist and elbow position
+          const yDiffLeft = rightWrist.position.y - rightElbow.position.y
+          const handYLeft = yDiffLeft / 2 + rightWrist.position.y
+          const xDiffLeft = rightWrist.position.x - rightElbow.position.x
+          const handXLeft = xDiffLeft / 2 + rightWrist.position.x
+          handLeft = {
+            score: rightWrist.score,
+            position: {y: handYLeft, x: handXLeft}
+          }
+          keypoints[18] = handLeft
+
+          //****DRAWING ACTION ****/
+
+          let currentBodyPart = store.getState().paintTools.chosenBodyPart
+
+          //if somebody is there, calculate drawing needs
+          if (nose.score >= minPartConfidence) {
+            //determine current drawing tool and its coordinates
+            let keypoint =
+              currentBodyPart === 'nose'
+                ? nose
+                : currentBodyPart === 'leftHand' ? handLeft : handRight
+
+            //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+
+            let {x, y} = keypoint.position
+
+            if (x > 0 && y < 200) {
+              hoverToChooseTool(x, y)
             }
-            keypoints[17] = handRight
 
-            // if (!handSpan) {
-            //   //pretty wonky attempt at general size of hand-extended-toward-camera
-            //   handSpan = Math.floor(
-            //     Math.abs(leftShoulder.position.x - rightShoulder.position.x)
-            //   )
-            // }
+            //to smooth points
+            //add to arrays for averaging over frames
+            lastFewXCoords[currentPoseNum] = x
+            lastFewYCoords[currentPoseNum] = y
 
-            //here we define "hand" on the left arm using wrist and elbow position
-            const yDiffLeft = rightWrist.position.y - rightElbow.position.y
-            const handYLeft = yDiffLeft / 2 + rightWrist.position.y
-            const xDiffLeft = rightWrist.position.x - rightElbow.position.x
-            const handXLeft = xDiffLeft / 2 + rightWrist.position.x
-            handLeft = {
-              score: rightWrist.score,
-              position: {y: handYLeft, x: handXLeft}
+            if (!lastFewXCoords.includes('null')) {
+              keypoint = smooth(lastFewXCoords, lastFewYCoords)
             }
-            keypoints[18] = handLeft
 
+            //draw dot
+            drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
+            //track gesture
             trackHand(
               handSpan,
               handXRight,
@@ -227,47 +265,15 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
               backgroundCanvas
             )
 
-            //****DRAWING ACTION ****/
+            if (eraseModeValue === 'false') {
+              ctx.globalCompositeOperation = 'source-over'
 
-            let currentBodyPart = store.getState().paintTools.chosenBodyPart
-
-            //if somebody is there, calculate drawing needs
-            if (nose.score >= minPartConfidence) {
-              //determine current drawing tool and its coordinates
-              let keypoint =
-                currentBodyPart === 'nose'
-                  ? nose
-                  : currentBodyPart === 'leftHand' ? handLeft : handRight
-
-              //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
-
-              let {x, y} = keypoint.position
-
-              if (x > 0 && y < 200) {
-                hoverToChooseTool(x, y)
-              }
-
-              //to smooth tracking circle:
-              //add to arrays for averaging over frames
-              lastFewXCoords[currentPoseNum] = x
-              lastFewYCoords[currentPoseNum] = y
-              console.log(lastFewXCoords)
-
-              if (!lastFewXCoords.includes('null')) {
-                console.log('firing?')
-                keypoint = smooth(lastFewXCoords, lastFewYCoords)
-              }
-
-              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-
-              if (eraseModeValue === 'false') {
-                ctx.globalCompositeOperation = 'source-over'
-
+              if (draw()) {
                 const thisPath = drawAnything(keypoint, path)
                 path = thisPath
-              } else {
-                // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
               }
+            } else {
+              // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
             }
           }
         }

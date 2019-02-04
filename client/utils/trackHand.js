@@ -7,7 +7,7 @@ import store from '../store'
 
 export function trackHand(span, hx, hy, hCanvas, bgCanvas) {
   //make mini canvas rightHandBox
-
+  console.log('trackHand firing')
   span = 224 //hardcoded to keep data in line with dataset model was trained on
   console.log('imported from camera', hCanvas, bgCanvas)
   const halfSpan = span / 2
