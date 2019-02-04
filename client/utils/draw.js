@@ -28,19 +28,6 @@ import {voiceModeStartStop, isChrome} from './speechUtil'
 
 let fullImageStr
 
-// export const buttonHandHover = drawingHand => {
-//   let selectorX = drawingHand.position.x
-//   let selectorY = drawingHand.position.y
-
-//   const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
-//   if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
-//     // console.log('here are your y-coords---->', selectorY)
-//     console.log('you may be in the VOICE zone')
-//     // if (selectorY > voiceZone[0].y && selectorY < voiceZone[1].y) {
-//     // }
-//   }
-// }
-
 export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)
@@ -50,12 +37,17 @@ export function clearCanvas() {
   paper.project.clear()
 }
 
-export function eraseTool() {
-  const canvas = document.getElementById('output')
-  const ctx = canvas.getContext('2d')
-  ctx.clearRect(0, 0, ctx.width, ctx.height)
-  paper.project.clear()
-}
+// export function eraseTool(path) {
+//   console.log('you should be erasing')
+//   // myPath = new Path()
+//   path.removeSegment(0)
+//   // if (store.getState().paintTools.eraseModeOn === false) {
+//   // }
+//   // const canvas = document.getElementById('output')
+//   // const ctx = canvas.getContext('2d')
+//   // ctx.clearRect(0, 0, ctx.width, ctx.height)
+//   // paper.project.clear()
+// }
 
 export function saveCanvas() {
   const backgroundCanvas = document.getElementById('background')
@@ -162,6 +154,7 @@ export function drawAnything(nose, leftHand, rightHand, path) {
 /*eslint-enable*/
 
 //draw lines
+
 function drawLine(oneKeypoint, path) {
   let color = getColor()
 
@@ -171,23 +164,12 @@ function drawLine(oneKeypoint, path) {
     strokeWidth: 5,
     strokeCap: 'round'
   })
+
   if (!path) path = pathStyle
-  // console.log('ERASE MODE IS OFF...?')
-  // console.log(
-  //   'IS STATE CHANGING---->',
-  //   store.getState().paintTools.eraseModeOn === false
-  // )
-
-  path.add(oneKeypoint.position)
-
-  //if there are a certain number of points, implement smoothing function and reset to a fresh path
-  //this is another variable worth playing around with
-  if (path.segments.length > 5) {
-    // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
-    path.smooth({type: 'continuous'})
-
-    path = pathStyle
+  if (store.getState().paintTools.eraseModeOn === false) {
+    path.add(oneKeypoint.position)
   }
+
   return path
 }
 

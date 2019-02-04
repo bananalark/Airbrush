@@ -92,6 +92,7 @@ const guiState = {
 
 let handRight
 let handLeft
+let beginPath
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -275,28 +276,24 @@ function detectPoseInRealTime(video, net) {
             hoverToChooseTool(hoverToolX, hoverToolY)
 
             if (nose.score >= minPartConfidence) {
-              if (eraseModeValue === 'false') {
+              if (store.getState().paintTools.eraseModeOn === false) {
                 ctx.globalCompositeOperation = 'source-over'
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)
+                beginPath = thisPath
+                // console.log('beginpath---->', beginPath)
 
                 path = thisPath
               } else {
-                // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
-                // ctx.globalCompositeOperation = 'destination-out'
-                // ctx.arc(handX, handY, 2, 0, Math.PI * 2, false)
-                // ctx.fill()
-                //needs refactor for using nose - having trouble passing into loop
-                //keypoints[9] == leftWrist (but literally your right wrist)
-                // if (prevPoses[0].keypoints[17]) {
-                //   drawLineBetweenPoints(
-                //     [handRight, prevPoses[0].keypoints[17]],
-                //     ctx,
-                //     1,
-                //     15
-                //   )
-                // }
+                console.log(path.segments.length - 1)
+
+                path.removeSegment(path.segments.length - 1)
+                // console.log('should be removing!')
+                // path.removeSegment(0)
+                //   // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
+                //   // eraseTool(path)
+                //   eraseTool(path)
               }
             }
           }
