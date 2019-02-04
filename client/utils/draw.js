@@ -166,7 +166,8 @@ export function drawAnything(nose, leftHand, rightHand, path) {
   }
 }
 /*eslint-enable*/
-
+let oldColor = store.getState().color.color
+let compare = oldColor
 //draw lines
 function drawLine(oneKeypoint, path, pixelWidth) {
   let color = getColor()
@@ -178,10 +179,16 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     strokeCap: 'round'
   })
 
-  if (!path) path = pathStyle
-  if (store.getState().paintTools.eraseModeOn === false) {
-    path.add(oneKeypoint.position)
+  if (store.getState().color.color !== compare) {
+    path = null
+    compare = store.getState().color.color
   }
+  if (!path) path = pathStyle
+
+  // path = pathStyle
+  // if (store.getState().paintTools.eraseModeOn === false) {
+  // }
+  path.add(oneKeypoint.position)
 
   return path
 }

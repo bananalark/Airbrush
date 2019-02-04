@@ -8,7 +8,9 @@ import {
   smoothTrackingCircle
 } from './draw.js'
 
-import store from '../store'
+import {Path} from 'paper'
+
+import store, {toggleErase, toggleDraw} from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
@@ -92,7 +94,7 @@ const guiState = {
 
 let handRight
 let handLeft
-let beginPath
+let eraseSwitchedOff = false
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -281,17 +283,40 @@ function detectPoseInRealTime(video, net) {
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)
-                beginPath = thisPath
-
                 path = thisPath
               } else {
                 path.removeSegment(path.segments.length - 1)
+
+                //this turns off both erase and draw mode once there are no more segments to remove
+                if (path.segments.length === 0) {
+                  path = null
+                  store.dispatch(toggleErase())
+                  if (store.getState().paintTools.drawModeOn === true) {
+                    store.dispatch(toggleDraw())
+                  }
+                }
+                // eraseSwitchedOn = true
               }
             }
           }
         }
       }
     })
+
+    //increment/reset frame count
+
+    // currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
+
+    if (store.getState().paintTools.drawModeOn === false) {
+      path = null
+
+      paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
+
+      lastFewXCoords = Array(framesAveraged).fill('null')
+
+      lastFewYCoords = Array(framesAveraged).fill('null')
+    }
+
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }
 
