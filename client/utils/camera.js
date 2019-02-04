@@ -1,11 +1,11 @@
 import * as posenet from '@tensorflow-models/posenet'
 import {
   draw,
-  drawLineBetweenPoints,
   createProject,
   drawAnything,
+  drawTracker,
   hoverToChooseTool,
-  smoothTrackingCircle
+  smooth
 } from './draw.js'
 
 import {Path} from 'paper'
@@ -37,6 +37,9 @@ if (videoHeight > 723 || videoWidth > 964) {
   videoWidth = 964
 }
 
+//FOR DEBUG PURPOSES
+videoHeight = 723
+videoWidth = 964
 /*
  Loads a the camera to be used on canvas
  */
@@ -116,7 +119,6 @@ function detectPoseInRealTime(video, net) {
 
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
-
   //begin the paper.js project, located in utils/draw.js
 
   createProject(window, canvas, ctx)
@@ -127,12 +129,14 @@ function detectPoseInRealTime(video, net) {
   'framesAveraged' to a const, so that we can easily change this
   later, as needed.*/
   let currentPoseNum = 0
-  const framesAveraged = 5
-  let lastFewXCoords = Array(framesAveraged)
-  let lastFewYCoords = Array(framesAveraged)
+  const frames = 5
+  let lastFewXCoords = Array(frames).fill('null')
+  let lastFewYCoords = Array(frames).fill('null')
   /*End of smoothing tech*/
 
   async function poseDetectionFrame(prevPoses = [], path) {
+    //start our frame counter, reset if reached 5
+
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -190,7 +194,9 @@ function detectPoseInRealTime(video, net) {
               rightAnkle
             ] = keypoints
 
-            //here we define "hand" on the right arm using wrist and elbow position
+            //hand "keypoint" defintion: manual definition for each smooths rendering
+
+            //define "hand" on the right arm using wrist and elbow position
             const yDiffRight = leftWrist.position.y - leftElbow.position.y
             const handYRight = yDiffRight / 2 + leftWrist.position.y
             const xDiffRight = leftWrist.position.x - leftElbow.position.x
@@ -201,7 +207,7 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[17] = handRight
 
-            //here we define "hand" on the left arm using wrist and elbow position
+            //left arm
             const yDiffLeft = rightWrist.position.y - rightElbow.position.y
             const handYLeft = yDiffLeft / 2 + rightWrist.position.y
             const xDiffLeft = rightWrist.position.x - rightElbow.position.x
@@ -212,77 +218,42 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
-            //***** TRACKING CIRCLE *****
-            //Here we construct a small green circle to follow the hand or nose
+            //****DRAWING ACTION ****/
+
             let currentBodyPart = store.getState().paintTools.chosenBodyPart
 
-            function painterTracker(xCoord, yCoord, vidWidth, vidHeight) {
-              paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
-              paintingPointerCtx.beginPath()
-
-              paintingPointerCtx.arc(xCoord, yCoord, 30, 0, 2 * Math.PI, true)
-              if (xCoord > 0 && xCoord < 200) {
-                //pointer changes to white in the toolbar
-                paintingPointerCtx.fillStyle = 'rgba(255, 255, 255, 0.88)'
-              } else {
-                paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
-              }
-              paintingPointerCtx.fill()
-              requestAnimationFrame(painterTracker)
-            }
-
-            let keypointToTrack
-            if (currentBodyPart === 'nose') {
-              keypointToTrack = nose
-            } else if (currentBodyPart === 'leftHand') {
-              keypointToTrack = handLeft
-            } else {
-              keypointToTrack = handRight
-            }
-
-            let {xCoordAverage, yCoordAverage} = smoothTrackingCircle(
-              lastFewXCoords,
-              lastFewYCoords,
-              currentPoseNum,
-              framesAveraged,
-              keypointToTrack
-            )
-
-            if (xCoordAverage && yCoordAverage) {
-              painterTracker(
-                xCoordAverage,
-                yCoordAverage,
-                videoWidth,
-                videoHeight
-              )
-            }
-            currentPoseNum += 1
-
-            //***** HOVER BUTTON SELECTION *****
-            //Here we handle button clicks if the user hovers the toolbar
-            let hoverTool
-            if (currentBodyPart === 'nose') {
-              hoverTool = nose
-            } else if (currentBodyPart === 'rightHand') {
-              hoverTool = handLeft
-            } else if (currentBodyPart === 'leftHand') {
-              hoverTool = handRight
-            } else {
-              hoverTool = handLeft
-            }
-
-            let hoverToolX = hoverTool.position.x
-            let hoverToolY = hoverTool.position.y
-
-            //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
-            hoverToChooseTool(hoverToolX, hoverToolY)
-
+            //if somebody is there, calculate drawing needs
             if (nose.score >= minPartConfidence) {
-              if (store.getState().paintTools.eraseModeOn === false) {
+              //determine current drawing tool and its coordinates
+              let keypoint =
+                currentBodyPart === 'nose'
+                  ? nose
+                  : currentBodyPart === 'leftHand' ? handLeft : handRight
+
+              //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+
+              let {x, y} = keypoint.position
+
+              if (x > 0 && y < 200) {
+                hoverToChooseTool(x, y)
+              }
+
+              //to smooth tracking circle:
+              //add to arrays for averaging over frames
+              lastFewXCoords[currentPoseNum] = x
+              lastFewYCoords[currentPoseNum] = y
+              console.log(lastFewXCoords)
+
+              if (!lastFewXCoords.includes('null')) {
+                keypoint = smooth(lastFewXCoords, lastFewYCoords)
+              }
+
+              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
+              if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
 
-                //this calls a utility function in draw.js that chooses which brush tool to use based on our store
-                const thisPath = drawAnything(nose, handLeft, handRight, path)
+                const thisPath = drawAnything(keypoint, path)
                 path = thisPath
               } else {
                 path.removeSegment(path.segments.length - 1)
@@ -295,7 +266,6 @@ function detectPoseInRealTime(video, net) {
                     store.dispatch(toggleDraw())
                   }
                 }
-                // eraseSwitchedOn = true
               }
             }
           }
@@ -304,17 +274,13 @@ function detectPoseInRealTime(video, net) {
     })
 
     //increment/reset frame count
-
-    // currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
+    currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
 
     if (store.getState().paintTools.drawModeOn === false) {
       path = null
-
       paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
-
-      lastFewXCoords = Array(framesAveraged).fill('null')
-
-      lastFewYCoords = Array(framesAveraged).fill('null')
+      lastFewXCoords = Array(frames).fill('null')
+      lastFewYCoords = Array(frames).fill('null')
     }
 
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
