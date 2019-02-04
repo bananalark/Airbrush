@@ -1,12 +1,7 @@
+import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
-import {
-  draw,
-  drawLineBetweenPoints,
-  createProject,
-  drawAnything,
-  clearCanvas
-} from './draw.js'
-import trackHand from './trackHand'
+import {draw, createProject, drawAnything} from './draw.js'
+import {trackHand, predict} from './trackHand'
 
 //will be moved to UI
 let minPartConfidence = 0.75
@@ -16,20 +11,6 @@ Setup video size
 */
 export let videoHeight = 723
 export let videoWidth = 964
-
-// if (3 * parent.innerWidth / 4 > parent.innerHeight) {
-//   videoHeight = parent.innerHeight
-//   videoWidth = Math.ceil(4 * parent.innerHeight / 3)
-// } else {
-//   videoWidth = parent.innerWidth
-//   videoHeight = Math.ceil(3 * parent.innerWidth / 4)
-// }
-
-// //this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
-// if (videoHeight > 723 || videoWidth > 964) {
-//   videoHeight = 723
-//   videoWidth = 964
-// }
 
 /*
  Loads a the camera to be used on canvas
@@ -81,21 +62,22 @@ const guiState = {
   net: null
 }
 
-/**
- * Feeds an image to posenet to estimate poses - this is where the magic
- * happens. This function loops with a requestAnimationFrame method.
- */
-
 let handRight
 let handLeft
 let handSpan
 
-function detectPoseInRealTime(video, net) {
+//this function loops through each frame, feeding an image to posenet for pose estimation
+function detectPoseInRealTime(video, net, model, mobileNet) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
 
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
+
+  //for observing hand gesture capture
+  const handCanvas = document.getElementById('hand')
+  handCanvas.width = 224
+  handCanvas.height = 224
 
   const flipHorizontal = true
 
@@ -106,7 +88,6 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.height = videoHeight
 
   //begin the paper.js project, located in utils/draw.js
-
   createProject(window, canvas, ctx)
 
   async function poseDetectionFrame(prevPoses = [], path) {
@@ -185,8 +166,6 @@ function detectPoseInRealTime(video, net) {
               )
             }
 
-            trackHand(handSpan, handXRight, handYRight)
-
             //here we define "hand" on the left arm using wrist and elbow position
             const yDiffLeft = rightWrist.position.y - rightElbow.position.y
             const handYLeft = yDiffLeft / 2 + rightWrist.position.y
@@ -198,41 +177,38 @@ function detectPoseInRealTime(video, net) {
             }
             keypoints[18] = handLeft
 
+            trackHand(
+              handSpan,
+              handXRight,
+              handYRight,
+              handCanvas,
+              backgroundCanvas
+            )
+
             if (nose.score >= minPartConfidence) {
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)
-                console.log(handLeft.position.x, handRight.position.x + 50)
 
                 path = thisPath
               } else {
                 ctx.globalCompositeOperation = 'destination-out'
 
-                //needs refactor for using nose - having trouble passing into loop
-                //keypoints[9] == leftWrist (but literally your right wrist)
-                // if (prevPoses[0].keypoints[17]) {
-                //   drawLineBetweenPoints(
-                //     [handRight, prevPoses[0].keypoints[17]],
-                //     ctx,
-                //     1,
-                //     15
-                //   )
-                // }
+                //erase needs refactor
               }
             }
           }
         }
       }
-
-      // } else if (
-      //   keypoints[10].score >= minPartConfidence &&
-      //   Math.abs(keypoints[10].position.y - keypoints[6].position.y) > 150
-      // ) {
-      //   path = null
-      // }
+      //clear needs refactor
     })
+
+    //implement hand recognition from trackHand.js
+    console.log('model and mobileNet?', model, mobileNet)
+    predict(handCanvas, model, mobileNet)
+
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }
 
@@ -240,13 +216,29 @@ function detectPoseInRealTime(video, net) {
 }
 /*eslint-enable*/
 
-/**
- * Kicks off the demo by loading the posenet model, finding and loading
- * available camera devices, and setting off the detectPoseInRealTime function.
- */
+// model to our pretrained version
+async function loadModel() {
+  let ml = await tf.loadModel('http://localhost:8080/mymodel.json')
+  return ml
+}
+
+//also highly-trained model it was built on
+async function loadTruncatedMobileNet() {
+  const mobilenet = await tf.loadModel(
+    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json'
+  )
+
+  const layer = mobilenet.getLayer('conv_pw_13_relu')
+  let tmn = tf.model({inputs: mobilenet.inputs, outputs: layer.output})
+  return tmn
+}
+
+//load models, find camera, set off detectPose
 export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
+  const model = await loadModel()
+  const mobileNet = await loadTruncatedMobileNet()
 
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
@@ -264,7 +256,7 @@ export async function bindPage() {
     throw e
   }
 
-  setTimeout(() => detectPoseInRealTime(video, net), 1000)
+  setTimeout(() => detectPoseInRealTime(video, net, model, mobileNet), 1000)
 }
 
 // kick off the demo
