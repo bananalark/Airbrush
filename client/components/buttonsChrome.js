@@ -9,11 +9,11 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
-import {Button} from '@material-ui/core/'
+import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
-import {saveCanvas, clearCanvas} from '../utils/draw'
 import Camera from '@material-ui/icons/Camera'
 
+import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
 
 import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
@@ -21,6 +21,7 @@ import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
+import LineThickness from './LineThickness'
 
 class ButtonsChrome extends Component {
   constructor() {
@@ -103,6 +104,7 @@ class ButtonsChrome extends Component {
           Brush option
           <Drawer anchor="left" open={this.state.brushOpen}>
             <BrushOptions />
+            <LineThickness />
           </Drawer>
         </Button>
         <Button
