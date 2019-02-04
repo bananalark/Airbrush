@@ -15,12 +15,31 @@
  * =============================================================================
  */
 const paper = require('paper')
-// const {Path} = paper
-import store from '../store'
+import store, {
+  toggleVoice,
+  chooseBodyPart,
+  toggleDraw,
+  chooseBrush,
+  toggleErase
+} from '../store'
 import {Size, Path} from 'paper'
 import {videoHeight, videoWidth} from './camera'
+import {voiceModeStartStop, isChrome} from './speechUtil'
 
 let fullImageStr
+
+// export const buttonHandHover = drawingHand => {
+//   let selectorX = drawingHand.position.x
+//   let selectorY = drawingHand.position.y
+
+//   const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
+//   if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
+//     // console.log('here are your y-coords---->', selectorY)
+//     console.log('you may be in the VOICE zone')
+//     // if (selectorY > voiceZone[0].y && selectorY < voiceZone[1].y) {
+//     // }
+//   }
+// }
 
 export function createProject(window, cnv) {
   paper.install(window)
@@ -31,32 +50,30 @@ export function clearCanvas() {
   paper.project.clear()
 }
 
+export function eraseTool() {
+  const canvas = document.getElementById('output')
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, ctx.width, ctx.height)
+  paper.project.clear()
+}
+
 export function saveCanvas() {
   const backgroundCanvas = document.getElementById('background')
   const bgCtx = backgroundCanvas.getContext('2d')
   const canvas = document.getElementById('output')
+
   bgCtx.drawImage(canvas, 0, 0)
-
-  // const projectViewStr = paper.view.element.toDataURL()
-
-  // //draw paper project
-  // var image = new Image()
-  // image.onload = function() {
-  //   bgCtx.drawImage(image, 0, 0)
-  // }
-  // image.src = projectViewStr
-
-  //save all as one string
   fullImageStr = bgCtx.canvas.toDataURL('image/png')
+
   return fullImageStr
 }
 
 export function download() {
-  let downloadRef = fullImageStr.replace(
-    /^data:image\/[^;]*/,
-    'data:application/octet-stream'
-  )
-  parent.location.href = downloadRef
+  let element = document.createElement('a')
+  const file = new Blob([fullImageStr], {type: 'image/png'})
+  element.href = URL.createObjectURL(file)
+  element.download = 'airbrush.png'
+  element.click()
 }
 
 function getColor() {
@@ -91,6 +108,7 @@ function determineBodyPart(chosenBodyPart, nose, leftHand, rightHand) {
   }
 }
 
+/*eslint-disable*/
 export function drawAnything(nose, leftHand, rightHand, path) {
   const {chosenBrush, chosenBodyPart} = store.getState().paintTools
 
@@ -141,6 +159,7 @@ export function drawAnything(nose, leftHand, rightHand, path) {
       return drawLine(part, path)
   }
 }
+/*eslint-enable*/
 
 //draw lines
 function drawLine(oneKeypoint, path) {
@@ -152,8 +171,12 @@ function drawLine(oneKeypoint, path) {
     strokeWidth: 5,
     strokeCap: 'round'
   })
-
   if (!path) path = pathStyle
+  // console.log('ERASE MODE IS OFF...?')
+  // console.log(
+  //   'IS STATE CHANGING---->',
+  //   store.getState().paintTools.eraseModeOn === false
+  // )
 
   path.add(oneKeypoint.position)
 
@@ -169,7 +192,7 @@ function drawLine(oneKeypoint, path) {
 }
 
 //draw circle as line
-function drawCircleLine(oneKeypoint) {
+export function drawCircleLine(oneKeypoint) {
   let color = getColor()
 
   const shape = new Path.Circle(
@@ -183,7 +206,7 @@ function drawCircleLine(oneKeypoint) {
 }
 
 //draw circle as a shape
-function drawCircleShape(oneKeypoint, secondKeypoint) {
+export function drawCircleShape(oneKeypoint, secondKeypoint) {
   let color = getColor()
   const r = Math.sqrt(
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
@@ -274,4 +297,111 @@ export function draw(keypoints, minPartConfidence) {
       Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
     drawMode === 'true'
   )
+}
+
+let voiceZoneHoverStart = 0
+let drawingHandHoverStart = 0
+let drawModeHoverStart = 0
+let brushOptionHoverStart = 0
+let eraserModeHoverStart = 0
+let clearCanvasHoverStart = 0
+let snapshotHoverStart = 0
+
+/*eslint-disable*/
+export const hoverToChooseTool = async (xCoord, yCoord) => {
+  const paintingPointerCanvas = document.getElementById('painting-pointer')
+  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
+  const hoverTimer = 30
+
+  const confirmSelectionCircle = zone => {
+    paintingPointerCtx.beginPath()
+    paintingPointerCtx.arc(xCoord, yCoord, 50, 0, 2 * Math.PI, true)
+    paintingPointerCtx.fillStyle = 'rgba(197, 59, 38, 1)'
+    paintingPointerCtx.fill()
+    zone = 0
+  }
+
+  if (xCoord > 0 && xCoord < 200) {
+    if (yCoord >= 0 && yCoord < 100) {
+      voiceZoneHoverStart += 1
+      if (voiceZoneHoverStart === hoverTimer) {
+        confirmSelectionCircle(voiceZoneHoverStart)
+        await store.dispatch(toggleVoice())
+        voiceModeStartStop()
+        voiceZoneHoverStart = 0
+      }
+    }
+
+    /* TODO: We'll have to move the hand/nose-drawer open/close state to REDUX if we want touch functionality. -Amber*/
+    // if (yCoord >= 100 && yCoord < 175) {
+    //   drawingHandHoverStart += 1
+    //   if (drawingHandHoverStart === hoverTimer) {
+    //     confirmSelectionCircle(drawingHandHoverStart)
+    //     await store.dispatch(chooseBodyPart())
+    //     drawingHandHoverStart = 0
+    //   }
+    // }
+
+    if (yCoord >= 200 && yCoord < 275) {
+      drawModeHoverStart += 1
+      if (drawModeHoverStart === hoverTimer) {
+        confirmSelectionCircle(drawModeHoverStart)
+        await store.dispatch(toggleDraw())
+        drawModeHoverStart = 0
+      }
+    }
+
+    /* TODO: We'll have to move the brush-drawer open/close state to REDUX if we want touch functionality. -Amber*/
+    // if (yCoord >= 275 && yCoord < 350) {
+    //   // console.log('you may be in the brush select zone')
+    //   brushOptionHoverStart += 1
+    //   if (brushOptionHoverStart === hoverTimer) {
+    //     confirmSelectionCircle(brushOptionHoverStart)
+    //     await store.dispatch(chooseBrush())
+    //     brushOptionHoverStart = 0
+    //   }
+    // }
+
+    if (yCoord >= 390 && yCoord < 425) {
+      eraserModeHoverStart += 1
+      if (eraserModeHoverStart === hoverTimer) {
+        confirmSelectionCircle(eraserModeHoverStart)
+        await store.dispatch(toggleErase())
+        eraserModeHoverStart = 0
+      }
+    }
+    if (yCoord >= 475 && yCoord < 575) {
+      clearCanvasHoverStart += 1
+      if (clearCanvasHoverStart === hoverTimer) {
+        confirmSelectionCircle(clearCanvasHoverStart)
+        clearCanvas()
+        clearCanvasHoverStart = 0
+      }
+    }
+    if (yCoord >= 600) {
+      snapshotHoverStart += 1
+      if (snapshotHoverStart === hoverTimer) {
+        download()
+        snapshotHoverStart = 0
+      }
+    }
+  }
+}
+/*eslint-enable*/
+
+export const smoothTrackingCircle = (
+  collectedXCoords,
+  collectedYCoords,
+  poseNum,
+  avgFrames,
+  keypoint
+) => {
+  collectedXCoords[poseNum % avgFrames] = keypoint.position.x
+  collectedYCoords[poseNum % avgFrames] = keypoint.position.y
+
+  let xCoordAverage =
+    collectedXCoords.reduce((acc, curVal) => acc + curVal) / avgFrames
+  let yCoordAverage =
+    collectedYCoords.reduce((acc, curVal) => acc + curVal) / avgFrames
+  return {xCoordAverage, yCoordAverage}
 }
