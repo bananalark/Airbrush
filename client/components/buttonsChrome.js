@@ -9,30 +9,31 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
-import {Button} from '@material-ui/core/'
+import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
-import {saveCanvas, clearCanvas} from '../utils/draw'
 import Camera from '@material-ui/icons/Camera'
 
+import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
 
-import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
+import {
+  getCommand,
+  toggleDraw,
+  toggleErase,
+  toggleVoice,
+  toggleBrush,
+  toggleBodypart
+} from '../store'
 
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
 import CustomPopUp from './customPopUp'
+import LineThickness from './LineThickness'
 
 class ButtonsChrome extends Component {
   constructor() {
     super()
-    this.state = {
-      brushOpen: false,
-      bodyPartOpen: false
-    }
-    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
-    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
-
     this.handleSpeak = this.handleSpeak.bind(this)
   }
 
@@ -41,20 +42,6 @@ class ButtonsChrome extends Component {
     await toggleVoice()
     voiceModeStartStop()
   }
-
-  // toggleBrushOpen() {
-  //   let brushOptionsPopUp = document.getElementById("brush-options")
-  //   brushOptionsPopUp.className = 'open';
-  // }
-
-  toggleBrushOpen() {
-    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
-  }
-
-  // toggleBodyPartOpen() {
-  //   let bodyPartOptionsPopUp = document.getElementById('bodypart-options')
-  //   bodyPartOptionsPopUp.className = 'open';
-  // }
 
   toggleBodyPartOpen() {
     this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
@@ -67,7 +54,11 @@ class ButtonsChrome extends Component {
       drawModeOn,
       voiceModeOn,
       toggleErase,
-      toggleDraw
+      toggleDraw,
+      toggleBrush,
+      toggleBodyPart,
+      brushOpen,
+      bodyPartOpen
     } = this.props
 
     return (
@@ -85,15 +76,20 @@ class ButtonsChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
-          <Hand />
-          currently drawing with {this.props.chosenBodyPart}
-          {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
-          <CustomPopUp id="bodypart-options" className="open">
+        <div>
+          <Button id="body-part-option" onClick={toggleBodyPart}>
+            <Hand />
+            currently drawing with {this.props.chosenBodyPart}
+            {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+            {/* </Drawer> */}
+          </Button>
+          <CustomPopUp
+            id="bodypart-options"
+            className={bodyPartOpen ? 'open' : 'closed'}
+          >
             <BodyPartOptions />
           </CustomPopUp>
-          {/* </Drawer> */}
-        </Button>
+        </div>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -111,15 +107,19 @@ class ButtonsChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="brush-button" onClick={this.toggleBrushOpen}>
-          <Brush />
-          Brush option
-          {/* <Drawer anchor="left" open={this.state.brushOpen}> */}
-          <CustomPopUp id="brush-options" className="">
+        <div>
+          <Button id="brush-button" onClick={toggleBrush}>
+            <Brush />
+            Brush option
+          </Button>
+          <CustomPopUp
+            id="brush-options-popup"
+            className={brushOpen ? 'open' : 'closed'}
+          >
             <BrushOptions />
+            <LineThickness />
           </CustomPopUp>
-          {/* </Drawer> */}
-        </Button>
+        </div>
         <Button
           id="erase-button"
           value={eraseModeOn}
@@ -165,13 +165,17 @@ const mapStateToProps = state => ({
   voiceModeOn: state.paintTools.voiceModeOn,
   drawModeOn: state.paintTools.drawModeOn,
   chosenBrush: state.paintTools.chosenBrush,
-  chosenBodyPart: state.paintTools.chosenBodyPart
+  chosenBodyPart: state.paintTools.chosenBodyPart,
+  bodyPartOpen: state.expansionPanels.bodyPart,
+  brushOpen: state.expansionPanels.brush
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
   toggleErase: () => dispatch(toggleErase()),
   toggleVoice: () => dispatch(toggleVoice()),
-  toggleDraw: () => dispatch(toggleDraw())
+  toggleDraw: () => dispatch(toggleDraw()),
+  toggleBrush: () => dispatch(toggleBrush()),
+  toggleBodyPart: () => dispatch(toggleBodypart())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ButtonsChrome)

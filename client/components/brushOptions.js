@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import Button from '@material-ui/core/Button'
-import {chooseBrush} from '../store'
+import {chooseBrush, toggleBrush} from '../store'
 
 class BrushOptions extends Component {
   constructor() {
@@ -17,33 +17,34 @@ class BrushOptions extends Component {
         'triangleShape'
       ]
     }
-    this.clickHandler = this.clickHandler.bind(this)
+    this.handleClick = this.handleClick.bind(this)
   }
 
-  clickHandler(brush) {
-    let brushOptionsPopUp = document.getElementById('brush-options')
-    brushOptionsPopUp.className = 'closed'
+  handleClick(brush) {
     this.props.chooseBrush(brush)
+    this.props.toggleBrush()
   }
 
   render() {
     return (
-      <>
+      <div id="brush-options">
+        <p>Brush Options</p>
         {this.state.brushes.map(brush => {
           return (
-            <Button onClick={() => this.clickHandler(brush)} key={brush}>
+            <Button key={brush} onClick={() => this.handleClick(brush)}>
               {brush}
             </Button>
           )
         })}
-      </>
+      </div>
     )
   }
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    chooseBrush: brush => dispatch(chooseBrush(brush))
+    chooseBrush: brush => dispatch(chooseBrush(brush)),
+    toggleBrush: () => dispatch(toggleBrush())
   }
 }
 

@@ -28,6 +28,7 @@ import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
 import CustomPopUp from './customPopUp'
+import LineThickness from './LineThickness'
 
 class ButtonsNonChrome extends Component {
   constructor() {
@@ -132,6 +133,7 @@ class ButtonsNonChrome extends Component {
           Brush option
           <Drawer anchor="left" open={this.state.brushOpen}>
             <BrushOptions />
+            <LineThickness />
           </Drawer>
         </Button>
         <Button

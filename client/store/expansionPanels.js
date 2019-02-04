@@ -18,7 +18,10 @@ const initialState = {
  * ACTION CREATORS
  */
 export const toggleBodypart = () => ({type: TOGGLE_BODYPART})
-export const toggleBrush = () => ({type: TOGGLE_BRUSH})
+export const toggleBrush = () => {
+  console.log('in toggle TOGGLE_BRUSH')
+  return {type: TOGGLE_BRUSH}
+}
 
 /**
  * REDUCER
