@@ -25,6 +25,10 @@ import store, {
 import {Size, Path} from 'paper'
 import {videoHeight, videoWidth} from './camera'
 import {voiceModeStartStop, isChrome} from './speechUtil'
+import KalmanFilter from 'kalmanjs'
+
+const xFilter = new KalmanFilter()
+const yFilter = new KalmanFilter()
 
 let fullImageStr
 
@@ -118,6 +122,10 @@ export function drawAnything(nose, leftHand, rightHand, path) {
   }
 
   const part = determineBodyPart(chosenBodyPart, nose, leftHand, rightHand)
+
+  //apply Kalman filter for accuracy
+  part.position.x = xFilter.filter(part.position.x)
+  part.position.y = yFilter.filter(part.position.y)
 
   if (
     part.position.x < 0 ||
