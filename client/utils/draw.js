@@ -100,19 +100,6 @@ const prevStateDifferent = (function() {
   }
 })()
 
-function determineBodyPart(chosenBodyPart, nose, leftHand, rightHand) {
-  switch (chosenBodyPart) {
-    case 'nose':
-      return nose
-    case 'leftHand':
-      return leftHand
-    case 'rightHand':
-      return rightHand
-    default:
-      return rightHand
-  }
-}
-
 function setSize(size) {
   switch (size) {
     case 'small':
@@ -127,30 +114,24 @@ function setSize(size) {
 }
 
 /*eslint-disable*/
-export function drawAnything(nose, leftHand, rightHand, path) {
+export function drawAnything(part, path) {
   const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
-
+  console.log(path)
   const pixelWidth = setSize(size)
+
   //this prevents any lines from being drawn between previous drawing body part and current drawing body part
   if (prevStateDifferent(chosenBodyPart) === true) {
     return null
   }
 
-  const part = determineBodyPart(chosenBodyPart, nose, leftHand, rightHand)
-
   //apply Kalman filter for accuracy
-  part.position.x = xFilter.filter(part.position.x)
-  part.position.y = yFilter.filter(part.position.y)
+  let x = xFilter.filter(part.position.x)
+  let y = yFilter.filter(part.position.y)
 
-  if (
-    part.position.x < 0 ||
-    part.position.y < 0 ||
-    part.position.x > videoWidth ||
-    part.position.y > videoHeight
-  ) {
+  if (x < 0 || y < 0 || x > videoWidth || y > videoHeight) {
     return null
   }
-
+  console.log('here?', chosenBrush, path)
   switch (chosenBrush) {
     case 'defaultLine':
       return drawLine(part, path, pixelWidth)
@@ -194,23 +175,16 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     strokeWidth: pixelWidth,
     strokeCap: 'round'
   })
-  if (!path) path = pathStyle
-  // console.log('ERASE MODE IS OFF...?')
-  // console.log(
-  //   'IS STATE CHANGING---->',
-  //   store.getState().paintTools.eraseModeOn === false
-  // )
+  if (!path) {
+    path = pathStyle
+  }
+  if (path.segments.length > 5) {
+    path.smooth({type: 'continuous'})
+    path = pathStyle
+  }
 
   path.add(oneKeypoint.position)
 
-  //if there are a certain number of points, implement smoothing function and reset to a fresh path
-  //this is another variable worth playing around with
-  if (path.segments.length > 5) {
-    // below, path.simplify(num): from docs: This value is set to 2.5 by default. Setting it to a lower value, produces a more correct path but with more segment points. Setting it to a higher value leads to a smoother curve and less segment points, but the shape of the path will be more different than the original.
-    path.smooth({type: 'continuous'})
-
-    path = pathStyle
-  }
   return path
 }
 
@@ -415,13 +389,15 @@ export const hoverToChooseTool = async (xCoord, yCoord) => {
 //***** TRACKING CIRCLE *****
 //Here we construct a small green circle to follow the hand or nose
 
-function drawTracker(xCoord, yCoord, vidWidth, vidHeight, paintingPointerCtx) {
+export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
+  let x = keypoint.position.x
+  let y = keypoint.position.y
   paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
 
   paintingPointerCtx.beginPath()
 
-  paintingPointerCtx.arc(xCoord, yCoord, 30, 0, 2 * Math.PI, true)
-  if (xCoord > 0 && xCoord < 200) {
+  paintingPointerCtx.arc(x, y, 30, 0, 2 * Math.PI, true)
+  if (x > 0 && y < 200) {
     //pointer changes to white in the toolbar
     paintingPointerCtx.fillStyle = 'rgba(255, 255, 255, 0.88)'
   } else {
@@ -430,24 +406,13 @@ function drawTracker(xCoord, yCoord, vidWidth, vidHeight, paintingPointerCtx) {
   paintingPointerCtx.fill()
 }
 
-export function smoothAndDrawTrackingCircle(
-  collectedXCoords,
-  collectedYCoords,
-  frames,
-  videoWidth,
-  videoHeight,
-  paintingPointerCtx
-) {
+export function smooth(collectedXCoords, collectedYCoords) {
   let xCoordAverage =
-    collectedXCoords.reduce((acc, curVal) => acc + curVal) / frames
+    collectedXCoords.reduce((acc, curVal) => acc + curVal) /
+    collectedXCoords.length
   let yCoordAverage =
-    collectedYCoords.reduce((acc, curVal) => acc + curVal) / frames
+    collectedYCoords.reduce((acc, curVal) => acc + curVal) /
+    collectedYCoords.length
 
-  drawTracker(
-    xCoordAverage,
-    yCoordAverage,
-    videoWidth,
-    videoHeight,
-    paintingPointerCtx
-  )
+  return {position: {x: xCoordAverage, y: yCoordAverage}}
 }

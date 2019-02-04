@@ -3,8 +3,9 @@ import {
   draw,
   createProject,
   drawAnything,
+  drawTracker,
   hoverToChooseTool,
-  smoothAndDrawTrackingCircle
+  smooth
 } from './draw.js'
 
 import store from '../store'
@@ -115,7 +116,6 @@ function detectPoseInRealTime(video, net) {
 
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
-
   //begin the paper.js project, located in utils/draw.js
 
   createProject(window, canvas, ctx)
@@ -222,14 +222,15 @@ function detectPoseInRealTime(video, net) {
             //if somebody is there, calculate drawing needs
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
-              let keypointToTrack =
+              let keypoint =
                 currentBodyPart === 'nose'
                   ? nose
                   : currentBodyPart === 'leftHand' ? handLeft : handRight
 
-              let {x, y} = keypointToTrack.position
-
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+
+              let {x, y} = keypoint.position
+
               if (x > 0 && y < 200) {
                 hoverToChooseTool(x, y)
               }
@@ -240,24 +241,26 @@ function detectPoseInRealTime(video, net) {
               lastFewYCoords[currentPoseNum] = y
 
               if (lastFewXCoords[4] !== null) {
-                smoothAndDrawTrackingCircle(
-                  lastFewXCoords,
-                  lastFewYCoords,
-                  frames,
-                  videoWidth,
-                  videoHeight,
-                  paintingPointerCtx
-                )
+                keypoint = smooth(lastFewXCoords, lastFewYCoords)
+                console.log('smoothed here', keypoint)
               }
+              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+              //}
 
-              //actually draw if not in erase mode
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
 
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
+                const thisPath = drawAnything(keypoint, path)
 
-                const thisPath = drawAnything(nose, handLeft, handRight, path)
                 path = thisPath
+
+                // const thisPath = smoothAndDraw('line', lastFewXCoords,
+                //   lastFewYCoords, videoWidth,
+                //   videoHeight, null, path = 0)
+                // console.log('spits out', thisPath)
+
+                // path = thisPath
               } else {
                 // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
               }
