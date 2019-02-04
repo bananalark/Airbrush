@@ -22,6 +22,7 @@ class BrushOptions extends Component {
   render() {
     return (
       <>
+        <p>Brush Options</p>
         {this.state.brushes.map(brush => {
           return (
             <Button onClick={() => this.props.chooseBrush(brush)} key={brush}>

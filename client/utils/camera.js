@@ -1,17 +1,44 @@
 import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
-import {draw, createProject, drawAnything} from './draw.js'
-import {trackHand, predict} from './trackHand'
+import {
+  draw,
+  createProject,
+  drawAnything,
+  drawTracker,
+  hoverToChooseTool,
+  smooth
+} from './draw.js'
 
+import store from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
 /*
 Setup video size
 */
-export let videoHeight = 723
-export let videoWidth = 964
+// vv Amber's hardcoded data until resolution fix
+// export let videoHeight = 723
+// export let videoWidth = 964
+export let videoHeight
+export let videoWidth
 
+if (3 * parent.innerWidth / 4 > parent.innerHeight) {
+  videoHeight = parent.innerHeight
+  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
+} else {
+  videoWidth = parent.innerWidth
+  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
+}
+
+//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+if (videoHeight > 723 || videoWidth > 964) {
+  videoHeight = 723
+  videoWidth = 964
+}
+
+//FOR DEBUG PURPOSES
+videoHeight = 723
+videoWidth = 964
 /*
  Loads a the camera to be used on canvas
  */
@@ -74,10 +101,11 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
 
-  //for observing hand gesture capture
-  const handCanvas = document.getElementById('hand')
-  handCanvas.width = 224
-  handCanvas.height = 224
+  const paintingPointerCanvas = document.getElementById('painting-pointer')
+  paintingPointerCanvas.width = videoWidth
+  paintingPointerCanvas.height = videoHeight
+  const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
+  paintingPointerCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
@@ -86,11 +114,23 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
 
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
-
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas, ctx)
 
+  // ***** SELECTION CIRCLE SMOOTHING TECH *****
+  /*The following is used for smoothing the tracking circle
+  An average is collected of the last five frames. Assigned
+  'framesAveraged' to a const, so that we can easily change this
+  later, as needed.*/
+  let currentPoseNum = 0
+  const frames = 5
+  let lastFewXCoords = Array(frames).fill('null')
+  let lastFewYCoords = Array(frames).fill('null')
+  /*End of smoothing tech*/
+
   async function poseDetectionFrame(prevPoses = [], path) {
+    //start our frame counter, reset if reached 5
+
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -148,7 +188,9 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
               rightAnkle
             ] = keypoints
 
-            //here we define "hand" on the right arm using wrist and elbow position
+            //hand "keypoint" defintion: manual definition for each smooths rendering
+
+            //define "hand" on the right arm using wrist and elbow position
             const yDiffRight = leftWrist.position.y - leftElbow.position.y
             const handYRight = yDiffRight / 2 + leftWrist.position.y
             const xDiffRight = leftWrist.position.x - leftElbow.position.x
@@ -159,12 +201,12 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
             }
             keypoints[17] = handRight
 
-            if (!handSpan) {
-              //pretty wonky attempt at general size of hand-extended-toward-camera
-              handSpan = Math.floor(
-                Math.abs(leftShoulder.position.x - rightShoulder.position.x)
-              )
-            }
+            // if (!handSpan) {
+            //   //pretty wonky attempt at general size of hand-extended-toward-camera
+            //   handSpan = Math.floor(
+            //     Math.abs(leftShoulder.position.x - rightShoulder.position.x)
+            //   )
+            // }
 
             //here we define "hand" on the left arm using wrist and elbow position
             const yDiffLeft = rightWrist.position.y - rightElbow.position.y
@@ -185,29 +227,65 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
               backgroundCanvas
             )
 
+            //****DRAWING ACTION ****/
+
+            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+
+            //if somebody is there, calculate drawing needs
             if (nose.score >= minPartConfidence) {
+              //determine current drawing tool and its coordinates
+              let keypoint =
+                currentBodyPart === 'nose'
+                  ? nose
+                  : currentBodyPart === 'leftHand' ? handLeft : handRight
+
+              //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+
+              let {x, y} = keypoint.position
+
+              if (x > 0 && y < 200) {
+                hoverToChooseTool(x, y)
+              }
+
+              //to smooth tracking circle:
+              //add to arrays for averaging over frames
+              lastFewXCoords[currentPoseNum] = x
+              lastFewYCoords[currentPoseNum] = y
+              console.log(lastFewXCoords)
+
+              if (!lastFewXCoords.includes('null')) {
+                console.log('firing?')
+                keypoint = smooth(lastFewXCoords, lastFewYCoords)
+              }
+
+              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
 
-                //this calls a utility function in draw.js that chooses which brush tool to use based on our store
-                const thisPath = drawAnything(nose, handLeft, handRight, path)
-
+                const thisPath = drawAnything(keypoint, path)
                 path = thisPath
               } else {
-                ctx.globalCompositeOperation = 'destination-out'
-
-                //erase needs refactor
+                // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
               }
             }
           }
         }
       }
-      //clear needs refactor
     })
 
     //implement hand recognition from trackHand.js
-    console.log('model and mobileNet?', model, mobileNet)
     predict(handCanvas, model, mobileNet)
+
+    //increment/reset frame count
+    currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
+
+    if (store.getState().paintTools.drawModeOn === false) {
+      path = null
+      paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
+      lastFewXCoords = Array(frames).fill('null')
+      lastFewYCoords = Array(frames).fill('null')
+    }
 
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }

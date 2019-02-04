@@ -12,6 +12,7 @@ const CHOOSE_BRUSH = 'CHOOSE_BRUSH'
 const CHOOSE_BODY_PART = 'CHOOSE_BODY_PART'
 const DRAW_ON = 'DRAW_ON'
 const DRAW_OFF = 'DRAW_OFF'
+const CHOOSE_SIZE = 'CHOOSE_SIZE'
 
 /**
  * INITIAL STATE
@@ -22,7 +23,8 @@ const initialState = {
   voiceModeOn: false,
   drawModeOn: false,
   chosenBrush: 'defaultLine',
-  chosenBodyPart: 'rightHand'
+  chosenBodyPart: 'rightHand',
+  size: 'small'
 }
 
 /**
@@ -36,6 +38,7 @@ export const drawOn = () => ({type: DRAW_ON})
 export const drawOff = () => ({type: DRAW_OFF})
 export const chooseBrush = brush => ({type: CHOOSE_BRUSH, brush})
 export const chooseBodyPart = part => ({type: CHOOSE_BODY_PART, part})
+export const chooseSize = size => ({type: CHOOSE_SIZE, size})
 
 /**
  * REDUCER
@@ -64,6 +67,9 @@ const paintTools = (state = initialState, action) => {
       return newState
     case CHOOSE_BODY_PART:
       newState.chosenBodyPart = action.part
+      return newState
+    case CHOOSE_SIZE:
+      newState.size = action.size
       return newState
     default:
       return state
