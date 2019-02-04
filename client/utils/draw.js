@@ -330,87 +330,112 @@ export const hoverToChooseTool = async (xCoord, yCoord) => {
     zone = 0
   }
 
-  if (xCoord > 0 && xCoord < 200) {
-    if (yCoord >= 0 && yCoord < 100) {
-      voiceZoneHoverStart += 1
-      if (voiceZoneHoverStart === hoverTimer) {
-        confirmSelectionCircle(voiceZoneHoverStart)
-        await store.dispatch(toggleVoice())
-        voiceModeStartStop()
-        voiceZoneHoverStart = 0
-      }
+  if (yCoord >= 0 && yCoord < 100) {
+    voiceZoneHoverStart += 1
+    if (voiceZoneHoverStart === hoverTimer) {
+      confirmSelectionCircle(voiceZoneHoverStart)
+      await store.dispatch(toggleVoice())
+      voiceModeStartStop()
+      voiceZoneHoverStart = 0
     }
+  }
 
-    /* TODO: We'll have to move the hand/nose-drawer open/close state to REDUX if we want touch functionality. -Amber*/
-    // if (yCoord >= 100 && yCoord < 175) {
-    //   drawingHandHoverStart += 1
-    //   if (drawingHandHoverStart === hoverTimer) {
-    //     confirmSelectionCircle(drawingHandHoverStart)
-    //     await store.dispatch(chooseBodyPart())
-    //     drawingHandHoverStart = 0
-    //   }
-    // }
+  /* TODO: We'll have to move the hand/nose-drawer open/close state to REDUX if we want touch functionality. -Amber*/
+  // if (yCoord >= 100 && yCoord < 175) {
+  //   drawingHandHoverStart += 1
+  //   if (drawingHandHoverStart === hoverTimer) {
+  //     confirmSelectionCircle(drawingHandHoverStart)
+  //     await store.dispatch(chooseBodyPart())
+  //     drawingHandHoverStart = 0
+  //   }
+  // }
 
-    if (yCoord >= 200 && yCoord < 275) {
-      drawModeHoverStart += 1
-      if (drawModeHoverStart === hoverTimer) {
-        confirmSelectionCircle(drawModeHoverStart)
-        await store.dispatch(toggleDraw())
-        drawModeHoverStart = 0
-      }
+  if (yCoord >= 200 && yCoord < 275) {
+    drawModeHoverStart += 1
+    if (drawModeHoverStart === hoverTimer) {
+      confirmSelectionCircle(drawModeHoverStart)
+      await store.dispatch(toggleDraw())
+      drawModeHoverStart = 0
     }
+  }
 
-    /* TODO: We'll have to move the brush-drawer open/close state to REDUX if we want touch functionality. -Amber*/
-    // if (yCoord >= 275 && yCoord < 350) {
-    //   // console.log('you may be in the brush select zone')
-    //   brushOptionHoverStart += 1
-    //   if (brushOptionHoverStart === hoverTimer) {
-    //     confirmSelectionCircle(brushOptionHoverStart)
-    //     await store.dispatch(chooseBrush())
-    //     brushOptionHoverStart = 0
-    //   }
-    // }
+  /* TODO: We'll have to move the brush-drawer open/close state to REDUX if we want touch functionality. -Amber*/
+  // if (yCoord >= 275 && yCoord < 350) {
+  //   // console.log('you may be in the brush select zone')
+  //   brushOptionHoverStart += 1
+  //   if (brushOptionHoverStart === hoverTimer) {
+  //     confirmSelectionCircle(brushOptionHoverStart)
+  //     await store.dispatch(chooseBrush())
+  //     brushOptionHoverStart = 0
+  //   }
+  // }
 
-    if (yCoord >= 390 && yCoord < 425) {
-      eraserModeHoverStart += 1
-      if (eraserModeHoverStart === hoverTimer) {
-        confirmSelectionCircle(eraserModeHoverStart)
-        await store.dispatch(toggleErase())
-        eraserModeHoverStart = 0
-      }
+  if (yCoord >= 390 && yCoord < 425) {
+    eraserModeHoverStart += 1
+    if (eraserModeHoverStart === hoverTimer) {
+      confirmSelectionCircle(eraserModeHoverStart)
+      await store.dispatch(toggleErase())
+      eraserModeHoverStart = 0
     }
-    if (yCoord >= 475 && yCoord < 575) {
-      clearCanvasHoverStart += 1
-      if (clearCanvasHoverStart === hoverTimer) {
-        confirmSelectionCircle(clearCanvasHoverStart)
-        clearCanvas()
-        clearCanvasHoverStart = 0
-      }
+  }
+  if (yCoord >= 475 && yCoord < 575) {
+    clearCanvasHoverStart += 1
+    if (clearCanvasHoverStart === hoverTimer) {
+      confirmSelectionCircle(clearCanvasHoverStart)
+      clearCanvas()
+      clearCanvasHoverStart = 0
     }
-    if (yCoord >= 600) {
-      snapshotHoverStart += 1
-      if (snapshotHoverStart === hoverTimer) {
-        download()
-        snapshotHoverStart = 0
-      }
+  }
+  if (yCoord >= 600) {
+    snapshotHoverStart += 1
+    if (snapshotHoverStart === hoverTimer) {
+      download()
+      snapshotHoverStart = 0
     }
   }
 }
 /*eslint-enable*/
 
-export const smoothTrackingCircle = (
+//***** TRACKING CIRCLE *****
+//Here we construct a small green circle to follow the hand or nose
+
+function drawTracker(xCoord, yCoord, vidWidth, vidHeight, paintingPointerCtx) {
+  paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
+
+  paintingPointerCtx.beginPath()
+
+  paintingPointerCtx.arc(xCoord, yCoord, 30, 0, 2 * Math.PI, true)
+  if (xCoord > 0 && xCoord < 200) {
+    //pointer changes to white in the toolbar
+    paintingPointerCtx.fillStyle = 'rgba(255, 255, 255, 0.88)'
+  } else {
+    paintingPointerCtx.fillStyle = 'rgba(22, 208, 171, 0.58)'
+  }
+  paintingPointerCtx.fill()
+}
+
+export function smoothAndDrawTrackingCircle(
   collectedXCoords,
   collectedYCoords,
-  poseNum,
-  avgFrames,
-  keypoint
-) => {
-  collectedXCoords[poseNum % avgFrames] = keypoint.position.x
-  collectedYCoords[poseNum % avgFrames] = keypoint.position.y
-
+  frames,
+  videoWidth,
+  videoHeight,
+  paintingPointerCtx
+) {
   let xCoordAverage =
-    collectedXCoords.reduce((acc, curVal) => acc + curVal) / avgFrames
+    collectedXCoords.reduce((acc, curVal) => acc + curVal) / frames
   let yCoordAverage =
-    collectedYCoords.reduce((acc, curVal) => acc + curVal) / avgFrames
-  return {xCoordAverage, yCoordAverage}
+    collectedYCoords.reduce((acc, curVal) => acc + curVal) / frames
+
+  //reset arrays
+  collectedXCoords = Array(frames)
+  collectedYCoords = Array(frames)
+
+  drawTracker(
+    xCoordAverage,
+    yCoordAverage,
+    videoWidth,
+    videoHeight,
+    paintingPointerCtx
+  )
 }
