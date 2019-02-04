@@ -443,10 +443,6 @@ export function smoothAndDrawTrackingCircle(
   let yCoordAverage =
     collectedYCoords.reduce((acc, curVal) => acc + curVal) / frames
 
-  //reset arrays
-  collectedXCoords = Array(frames)
-  collectedYCoords = Array(frames)
-
   drawTracker(
     xCoordAverage,
     yCoordAverage,
