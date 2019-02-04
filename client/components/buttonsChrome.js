@@ -47,10 +47,18 @@ class ButtonsChrome extends Component {
   //   brushOptionsPopUp.className = 'open';
   // }
 
+  toggleBrushOpen() {
+    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
+  }
+
   // toggleBodyPartOpen() {
   //   let bodyPartOptionsPopUp = document.getElementById('bodypart-options')
   //   bodyPartOptionsPopUp.className = 'open';
   // }
+
+  toggleBodyPartOpen() {
+    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
+  }
 
   render() {
     let {
@@ -107,7 +115,7 @@ class ButtonsChrome extends Component {
           <Brush />
           Brush option
           {/* <Drawer anchor="left" open={this.state.brushOpen}> */}
-          <CustomPopUp id="brush-options">
+          <CustomPopUp id="brush-options" className="">
             <BrushOptions />
           </CustomPopUp>
           {/* </Drawer> */}
