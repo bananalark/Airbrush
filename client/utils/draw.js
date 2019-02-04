@@ -100,10 +100,24 @@ function determineBodyPart(chosenBodyPart, nose, leftHand, rightHand) {
   }
 }
 
+function setSize(size) {
+  switch (size) {
+    case 'small':
+      return 3
+    case 'medium':
+      return 8
+    case 'large':
+      return 15
+    default:
+      return 3
+  }
+}
+
 /*eslint-disable*/
 export function drawAnything(nose, leftHand, rightHand, path) {
-  const {chosenBrush, chosenBodyPart} = store.getState().paintTools
+  const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
 
+  const pixelWidth = setSize(size)
   //this prevents any lines from being drawn between previous drawing body part and current drawing body part
   if (prevStateDifferent(chosenBodyPart) === true) {
     return null
@@ -122,46 +136,45 @@ export function drawAnything(nose, leftHand, rightHand, path) {
 
   switch (chosenBrush) {
     case 'defaultLine':
-      return drawLine(part, path)
+      return drawLine(part, path, pixelWidth)
     case 'circleLine':
-      return drawCircleLine(part)
+      return drawCircleLine(part, pixelWidth)
     case 'triangleLine':
-      return drawTriangleLine(part)
+      return drawTriangleLine(part, pixelWidth)
     case 'rectangle':
-      return drawRectangleShape(rightHand, leftHand)
+      return drawRectangleShape(rightHand, leftHand, pixelWidth)
     case 'circleShape':
       if (part === rightHand || part === leftHand) {
-        return drawCircleShape(nose, part)
+        return drawCircleShape(nose, part, pixelWidth)
       } else {
-        return drawCircleShape(nose, rightHand)
+        return drawCircleShape(nose, rightHand, pixelWidth)
       }
     case 'ellipse':
       if (part === rightHand || part === leftHand) {
-        return drawEllipseShape(nose, part)
+        return drawEllipseShape(nose, part, pixelWidth)
       } else {
-        return drawEllipseShape(nose, rightHand)
+        return drawEllipseShape(nose, rightHand, pixelWidth)
       }
     case 'triangleShape':
       if (part === rightHand || part === leftHand) {
-        return drawTriangleShape(nose, part)
+        return drawTriangleShape(nose, part, pixelWidth)
       } else {
-        return drawTriangleShape(nose, rightHand)
+        return drawTriangleShape(nose, rightHand, pixelWidth)
       }
     default:
-      return drawLine(part, path)
+      return drawLine(part, path, pixelWidth)
   }
 }
 /*eslint-enable*/
 
 //draw lines
-
-function drawLine(oneKeypoint, path) {
+function drawLine(oneKeypoint, path, pixelWidth) {
   let color = getColor()
 
   const pathStyle = new Path({
     segments: [oneKeypoint.position],
     strokeColor: new Color(color.red, color.green, color.blue),
-    strokeWidth: 5,
+    strokeWidth: pixelWidth,
     strokeCap: 'round'
   })
 
@@ -174,7 +187,7 @@ function drawLine(oneKeypoint, path) {
 }
 
 //draw circle as line
-export function drawCircleLine(oneKeypoint) {
+export function drawCircleLine(oneKeypoint, pixelWidth) {
   let color = getColor()
 
   const shape = new Path.Circle(
@@ -182,13 +195,13 @@ export function drawCircleLine(oneKeypoint) {
     30
   )
   shape.strokeColor = new Color(color.red, color.green, color.blue)
-  shape.strokeWidth = 3
+  shape.strokeWidth = pixelWidth
 
   return shape
 }
 
 //draw circle as a shape
-export function drawCircleShape(oneKeypoint, secondKeypoint) {
+export function drawCircleShape(oneKeypoint, secondKeypoint, pixelWidth) {
   let color = getColor()
   const r = Math.sqrt(
     Math.pow(secondKeypoint.position.x - oneKeypoint.position.x, 2) +
@@ -200,13 +213,13 @@ export function drawCircleShape(oneKeypoint, secondKeypoint) {
     r
   )
   shape.strokeColor = new Color(color.red, color.green, color.blue)
-  shape.strokeWidth = 5
+  shape.strokeWidth = pixelWidth
 
   return shape
 }
 
 //draw rectangle as a shape
-function drawRectangleShape(oneKeypoint, secondKeypoint) {
+function drawRectangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
   let color = getColor()
 
   const shape = new Path.Rectangle(
@@ -217,13 +230,13 @@ function drawRectangleShape(oneKeypoint, secondKeypoint) {
     )
   )
   shape.strokeColor = new Color(color.red, color.green, color.blue)
-  shape.strokeWidth = 5
+  shape.strokeWidth = pixelWidth
 
   return shape
 }
 
 //draw ellipse as a shape
-function drawEllipseShape(oneKeypoint, secondKeypoint) {
+function drawEllipseShape(oneKeypoint, secondKeypoint, pixelWidth) {
   let color = getColor()
 
   const shape = new Path.Ellipse({
@@ -233,14 +246,14 @@ function drawEllipseShape(oneKeypoint, secondKeypoint) {
       secondKeypoint.position.y - oneKeypoint.position.y
     ],
     strokeColor: new Color(color.red, color.green, color.blue),
-    strokeWidth: 5
+    strokeWidth: pixelWidth
   })
 
   return shape
 }
 
 //draw triangle as a line
-function drawTriangleLine(oneKeypoint) {
+function drawTriangleLine(oneKeypoint, pixelWidth) {
   let color = getColor()
 
   const triangle = new Path.RegularPolygon(
@@ -249,12 +262,13 @@ function drawTriangleLine(oneKeypoint) {
     30
   )
   triangle.strokeColor = new Color(color.red, color.green, color.blue)
+  triangle.strokeWidth = pixelWidth
 
   return triangle
 }
 
 //draw triangle as a shape
-function drawTriangleShape(oneKeypoint, secondKeypoint) {
+function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
   let color = getColor()
 
   let side = Math.sqrt(
@@ -267,6 +281,7 @@ function drawTriangleShape(oneKeypoint, secondKeypoint) {
     side
   )
   triangle.strokeColor = new Color(color.red, color.green, color.blue)
+  triangle.strokeWidth = pixelWidth
 
   return triangle
 }
