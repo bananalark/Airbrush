@@ -8,7 +8,9 @@ import {
   smooth
 } from './draw.js'
 
-import store from '../store'
+import {Path} from 'paper'
+
+import store, {toggleErase, toggleDraw} from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
@@ -95,6 +97,7 @@ const guiState = {
 
 let handRight
 let handLeft
+let eraseSwitchedOff = false
 
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
@@ -242,7 +245,6 @@ function detectPoseInRealTime(video, net) {
               console.log(lastFewXCoords)
 
               if (!lastFewXCoords.includes('null')) {
-                console.log('firing?')
                 keypoint = smooth(lastFewXCoords, lastFewYCoords)
               }
 
@@ -254,13 +256,23 @@ function detectPoseInRealTime(video, net) {
                 const thisPath = drawAnything(keypoint, path)
                 path = thisPath
               } else {
-                // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
+                path.removeSegment(path.segments.length - 1)
+
+                //this turns off both erase and draw mode once there are no more segments to remove
+                if (path.segments.length === 0) {
+                  path = null
+                  store.dispatch(toggleErase())
+                  if (store.getState().paintTools.drawModeOn === true) {
+                    store.dispatch(toggleDraw())
+                  }
+                }
               }
             }
           }
         }
       }
     })
+
     //increment/reset frame count
     currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
 
