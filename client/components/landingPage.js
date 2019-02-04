@@ -13,10 +13,10 @@ const styles = theme => ({
   margin: {
     margin: theme.spacing.unit,
     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+  },
+  extendedIcon: {
+    marginRight: theme.spacing.unit
   }
-  // extendedIcon: {
-  //   marginRight: theme.spacing.unit,
-  // },
 })
 
 class LandingPage extends React.Component {
