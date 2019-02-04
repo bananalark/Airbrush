@@ -7,7 +7,6 @@ import {
   Signup,
   UserHome,
   CameraComponent,
-  About,
   LandingPage,
   Privacy
 } from './components'
@@ -31,7 +30,7 @@ class Routes extends Component {
       <PoseGroup>
         <RouteContainer key={location.pathname}>
           <Switch location={location}>
-            <Route exact path="/" component={LandingPage} key="landingPage" />
+            {/* <Route exact path="/" component={LandingPage} key="landingPage" /> */}
             <Route path="/login" component={Login} key="login" />
             <Route path="/camera" component={CameraComponent} key="camera" />
             <Route path="/privacy" component={Privacy} key="privacy" />
