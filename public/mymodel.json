@@ -5,7 +5,7 @@
       {
         "class_name": "Flatten",
         "config": {
-          "name": "flatten_Flatten2",
+          "name": "flatten_Flatten1",
           "trainable": true,
           "batch_input_shape": [null, 7, 7, 256],
           "dtype": "float32"
@@ -32,7 +32,7 @@
           "activity_regularizer": null,
           "kernel_constraint": null,
           "bias_constraint": null,
-          "name": "dense_Dense3",
+          "name": "dense_Dense1",
           "trainable": true
         }
       },
@@ -57,7 +57,7 @@
           "activity_regularizer": null,
           "kernel_constraint": null,
           "bias_constraint": null,
-          "name": "dense_Dense4",
+          "name": "dense_Dense2",
           "trainable": true
         }
       }
@@ -70,12 +70,12 @@
       "paths": ["./mymodel.weights.bin"],
       "weights": [
         {
-          "name": "dense_Dense3/kernel",
+          "name": "dense_Dense1/kernel",
           "shape": [12544, 100],
           "dtype": "float32"
         },
-        {"name": "dense_Dense3/bias", "shape": [100], "dtype": "float32"},
-        {"name": "dense_Dense4/kernel", "shape": [100, 2], "dtype": "float32"}
+        {"name": "dense_Dense1/bias", "shape": [100], "dtype": "float32"},
+        {"name": "dense_Dense2/kernel", "shape": [100, 2], "dtype": "float32"}
       ]
     }
   ]
