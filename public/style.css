@@ -71,6 +71,10 @@ form div {
   left: 160px;
 }
 
+#bodypart-options {
+  text-align: center;
+}
+
 #closed {
   display: none;
 }

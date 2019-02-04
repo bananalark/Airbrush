@@ -22,7 +22,7 @@ import {
   toggleErase,
   toggleVoice,
   toggleBrush,
-  toggleBodypart
+  toggleBodyPart
 } from '../store'
 
 import ColorPicker from './colorPicker'
@@ -175,7 +175,7 @@ const mapDispatchToProps = dispatch => ({
   toggleVoice: () => dispatch(toggleVoice()),
   toggleDraw: () => dispatch(toggleDraw()),
   toggleBrush: () => dispatch(toggleBrush()),
-  toggleBodyPart: () => dispatch(toggleBodypart())
+  toggleBodyPart: () => dispatch(toggleBodyPart())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ButtonsChrome)

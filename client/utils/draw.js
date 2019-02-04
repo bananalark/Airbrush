@@ -123,6 +123,12 @@ function setSize(size) {
 
 /*eslint-disable*/
 export function drawAnything(nose, leftHand, rightHand, path) {
+  const {bodyPart, brush, colorPicker} = store.getState().expansionPanels
+
+  if (bodyPart || brush || colorPicker) {
+    return null
+  }
+
   const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
 
   const pixelWidth = setSize(size)
