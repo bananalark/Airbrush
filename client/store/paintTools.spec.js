@@ -19,7 +19,8 @@ describe('paintTools reducer', () => {
       voiceModeOn: false,
       drawModeOn: false,
       chosenBrush: 'defaultLine',
-      chosenBodyPart: 'rightHand'
+      chosenBodyPart: 'rightHand',
+      size: 'small'
     })
   })
 
@@ -44,7 +45,9 @@ describe('action creators', () => {
     eraseModeOn: false,
     voiceModeOn: false,
     drawModeOn: false,
-    chosenBrush: 'defaultLine'
+    chosenBrush: 'defaultLine',
+    chosenBodyPart: 'rightHand',
+    size: 'small'
   }
 
   beforeEach(() => {
