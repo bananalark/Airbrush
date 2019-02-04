@@ -15,7 +15,7 @@ import {
 const styles = {
   card: {
     maxWidth: 345,
-    justifu: 'center',
+    justify: 'center',
     alignItems: 'center',
     borderRadius: 20
   },
