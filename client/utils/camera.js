@@ -282,18 +282,10 @@ function detectPoseInRealTime(video, net) {
                 //this calls a utility function in draw.js that chooses which brush tool to use based on our store
                 const thisPath = drawAnything(nose, handLeft, handRight, path)
                 beginPath = thisPath
-                // console.log('beginpath---->', beginPath)
 
                 path = thisPath
               } else {
-                console.log(path.segments.length - 1)
-
                 path.removeSegment(path.segments.length - 1)
-                // console.log('should be removing!')
-                // path.removeSegment(0)
-                //   // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
-                //   // eraseTool(path)
-                //   eraseTool(path)
               }
             }
           }
