@@ -127,8 +127,8 @@ function detectPoseInRealTime(video, net) {
   later, as needed.*/
   let currentPoseNum = 0
   const frames = 5
-  let lastFewXCoords = Array(frames)
-  let lastFewYCoords = Array(frames)
+  let lastFewXCoords = Array(frames).fill('null')
+  let lastFewYCoords = Array(frames).fill('null')
   /*End of smoothing tech*/
 
   async function poseDetectionFrame(prevPoses = [], path) {
@@ -239,8 +239,10 @@ function detectPoseInRealTime(video, net) {
               //add to arrays for averaging over frames
               lastFewXCoords[currentPoseNum] = x
               lastFewYCoords[currentPoseNum] = y
+              console.log(lastFewXCoords)
 
-              if (lastFewXCoords[4] !== null) {
+              if (!lastFewXCoords.includes('null')) {
+                console.log('firing?')
                 keypoint = smooth(lastFewXCoords, lastFewYCoords)
               }
 
@@ -265,6 +267,8 @@ function detectPoseInRealTime(video, net) {
     if (store.getState().paintTools.drawModeOn === false) {
       path = null
       paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
+      lastFewXCoords = Array(frames).fill('null')
+      lastFewYCoords = Array(frames).fill('null')
     }
 
     requestAnimationFrame(() => poseDetectionFrame(poses, path))

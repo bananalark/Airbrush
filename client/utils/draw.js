@@ -394,8 +394,10 @@ export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
 
   paintingPointerCtx.beginPath()
 
+  paintingPointerCtx.moveTo(x, y)
+
   paintingPointerCtx.arc(x, y, 30, 0, 2 * Math.PI, true)
-  if (x > 0 && y < 200) {
+  if (y > 0 && x < 200) {
     //pointer changes to white in the toolbar
     paintingPointerCtx.fillStyle = 'rgba(255, 255, 255, 0.88)'
   } else {
