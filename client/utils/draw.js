@@ -71,11 +71,11 @@ function getColor() {
 }
 
 export function getBodyPart() {
-  return store.getState().chosenBodyPart
+  return store.getState().paintTools.chosenBodyPart
 }
 
 const prevStateDifferent = (function() {
-  let prevBodyPart = store.getState().chosenBodyPart
+  let prevBodyPart = store.getState().paintTools.chosenBodyPart
   return function(bodyPart) {
     if (prevBodyPart !== bodyPart) {
       prevBodyPart = bodyPart

@@ -14,7 +14,8 @@ import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
-
+let model
+let mobileNet
 /*
 Setup video size
 */
@@ -88,8 +89,8 @@ const guiState = {
  * happens. This function loops with a requestAnimationFrame method.
  */
 
-let handRight
-let handLeft
+let rightHand
+let leftHand
 let arrayOfShapes = []
 let colorModeToggled = false
 let brushModeToggled = false
@@ -226,11 +227,8 @@ function detectPoseInRealTime(video, net) {
 
           //****DRAWING ACTION ****/
 
-          let currentBodyPart = store.getState().paintTools.chosenBodyPart
-
           //track gesture
-          console.log(currentBodyPart)
-          if (currentBodyPart !== 'nose') {
+          if (chosenPart !== 'nose') {
             trackHand(handXRight, handYRight, handCanvas, backgroundCanvas)
           }
 
@@ -239,12 +237,12 @@ function detectPoseInRealTime(video, net) {
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
               let keypoint
-              if (currentBodyPart === 'nose') {
+              if (chosenPart === 'nose') {
                 keypoint = nose
-              } else if (currentBodyPart === 'leftHand') {
-                keypoint = handLeft
+              } else if (chosenPart === 'leftHand') {
+                keypoint = leftHand
               } else {
-                keypoint = handRight
+                keypoint = rightHand
               }
 
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
@@ -292,8 +290,8 @@ function detectPoseInRealTime(video, net) {
                 const thisPath = drawAnything(
                   keypoint,
                   path,
-                  handLeft,
-                  handRight,
+                  leftHand,
+                  rightHand,
                   nose
                 )
                 path = thisPath
@@ -327,7 +325,7 @@ function detectPoseInRealTime(video, net) {
 
     //implement hand recognition from trackHand.js
 
-    if (currentBodyPart !== 'nose') {
+    if (chosenPart !== 'nose') {
       predict(handCanvas, model, mobileNet)
     }
 
@@ -370,8 +368,8 @@ async function loadTruncatedMobileNet() {
 export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
-  const model = await loadModel()
-  const mobileNet = await loadTruncatedMobileNet()
+  model = await loadModel()
+  mobileNet = await loadTruncatedMobileNet()
 
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
