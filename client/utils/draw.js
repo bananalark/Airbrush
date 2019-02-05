@@ -32,19 +32,6 @@ const yFilter = new KalmanFilter()
 
 let fullImageStr
 
-// export const buttonHandHover = drawingHand => {
-//   let selectorX = drawingHand.position.x
-//   let selectorY = drawingHand.position.y
-
-//   const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
-//   if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
-//     // console.log('here are your y-coords---->', selectorY)
-//     console.log('you may be in the VOICE zone')
-//     // if (selectorY > voiceZone[0].y && selectorY < voiceZone[1].y) {
-//     // }
-//   }
-// }
-
 export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)
@@ -54,12 +41,17 @@ export function clearCanvas() {
   paper.project.clear()
 }
 
-export function eraseTool() {
-  const canvas = document.getElementById('output')
-  const ctx = canvas.getContext('2d')
-  ctx.clearRect(0, 0, ctx.width, ctx.height)
-  paper.project.clear()
-}
+// export function eraseTool(path) {
+//   console.log('you should be erasing')
+//   // myPath = new Path()
+//   path.removeSegment(0)
+//   // if (store.getState().paintTools.eraseModeOn === false) {
+//   // }
+//   // const canvas = document.getElementById('output')
+//   // const ctx = canvas.getContext('2d')
+//   // ctx.clearRect(0, 0, ctx.width, ctx.height)
+//   // paper.project.clear()
+// }
 
 export function saveCanvas() {
   const backgroundCanvas = document.getElementById('background')
@@ -164,7 +156,8 @@ export function drawAnything(part, path) {
   }
 }
 /*eslint-enable*/
-
+let oldColor = store.getState().color.color
+let compare = oldColor
 //draw lines
 function drawLine(oneKeypoint, path, pixelWidth) {
   let color = getColor()
@@ -175,14 +168,14 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     strokeWidth: pixelWidth,
     strokeCap: 'round'
   })
-  if (!path) {
-    path = pathStyle
+
+  if (store.getState().color.color !== compare) {
+    path = null
+    compare = store.getState().color.color
   }
+  if (!path) path = pathStyle
+
   path.add(oneKeypoint.position)
-  if (path.segments.length > 5) {
-    path.smooth({type: 'continuous'})
-    path = pathStyle
-  }
 
   return path
 }

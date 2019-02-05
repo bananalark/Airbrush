@@ -12,6 +12,9 @@ import {
 import {trackHand, predict} from './trackHand'
 
 import store from '../store'
+import {Path} from 'paper'
+
+import store, {toggleErase, toggleDraw} from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
 
@@ -94,6 +97,7 @@ const guiState = {
 let handRight
 let handLeft
 let handSpan
+let eraseSwitchedOff = false
 
 //this function loops through each frame, feeding an image to posenet for pose estimation
 function detectPoseInRealTime(video, net, model, mobileNet) {
@@ -271,9 +275,18 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
               if (draw()) {
                 const thisPath = drawAnything(keypoint, path)
                 path = thisPath
+              } else {
+                path.removeSegment(path.segments.length - 1)
+
+                //this turns off both erase and draw mode once there are no more segments to remove
+                if (path.segments.length === 0) {
+                  path = null
+                  store.dispatch(toggleErase())
+                  if (store.getState().paintTools.drawModeOn === true) {
+                    store.dispatch(toggleDraw())
+                  }
+                }
               }
-            } else {
-              // TODO: Figure out how to implement Paper.js undo/erase functionality. -Amber
             }
           }
         }
