@@ -82,6 +82,10 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
+export function getBodyPart() {
+  return store.getState().chosenBodyPart
+}
+
 const prevStateDifferent = (function() {
   let prevBodyPart = store.getState().chosenBodyPart
   return function(bodyPart) {
@@ -106,8 +110,10 @@ function setSize(size) {
   }
 }
 
+//i broke it
+
 /*eslint-disable*/
-export function drawAnything(part, path) {
+export function drawAnything(part, rightHand, leftHand, nose, path) {
   const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
   const pixelWidth = setSize(size)
 
@@ -176,6 +182,9 @@ function drawLine(oneKeypoint, path, pixelWidth) {
   if (!path) path = pathStyle
 
   path.add(oneKeypoint.position)
+  if (path.segments.length % 5 === 0) {
+    path.smooth({type: 'continuous'})
+  }
 
   return path
 }
@@ -281,9 +290,8 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
 }
 
 //on-off switch with gesture
-export function draw() {
-  let drawMode = document.getElementById('draw-button').value
-  return drawMode === 'true'
+export function getDrawMode() {
+  return store.getState().paintTools.drawModeOn === true
 }
 
 let voiceZoneHoverStart = 0
