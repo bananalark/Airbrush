@@ -302,14 +302,16 @@ function detectPoseInRealTime(video, net) {
                     }
                   }
                 } else {
-                  path.removeSegment(path.segments.length - 1)
+                  if (path) {
+                    path.removeSegment(path.segments.length - 1)
 
-                  //this turns off both erase and draw mode once there are no more segments to remove
-                  if (path.segments.length === 0) {
-                    path = null
-                    store.dispatch(toggleErase())
-                    if (store.getState().paintTools.drawModeOn === true) {
-                      store.dispatch(toggleDraw())
+                    //this turns off both erase and draw mode once there are no more segments to remove
+                    if (path.segments.length === 0) {
+                      path = null
+                      store.dispatch(toggleErase())
+                      if (store.getState().paintTools.drawModeOn === true) {
+                        store.dispatch(toggleDraw())
+                      }
                     }
                   }
                 }
