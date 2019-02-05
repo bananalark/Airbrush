@@ -9,20 +9,26 @@ import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogContentText
-} from '@material-ui/core/'
-import Save from '@material-ui/icons/Save'
-import Camera from '@material-ui/icons/Camera'
+import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
-import {saveCanvas, clearCanvas} from '../utils/draw'
+import Camera from '@material-ui/icons/Camera'
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
 
+import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
 
-import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
+import {
+  getCommand,
+  toggleDraw,
+  toggleErase,
+  toggleVoice,
+  toggleBrush,
+  toggleBodyPart
+} from '../store'
+
+import {isChrome} from '../utils/speechUtil'
 
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
@@ -30,17 +36,12 @@ import BodyPartOptions from './bodyPartOptions'
 import CustomPopUp from './customPopUp'
 import LineThickness from './LineThickness'
 
-class ButtonsNonChrome extends Component {
+class Buttons extends Component {
   constructor() {
     super()
     this.state = {
-      brushOpen: false,
-      bodyPartOpen: false,
       voiceDialogOpen: false
     }
-    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
-    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
-
     this.handleSpeak = this.handleSpeak.bind(this)
     this.handleNonChrome = this.handleNonChrome.bind(this)
     this.handleDialogClose = this.handleDialogClose.bind(this)
@@ -48,19 +49,13 @@ class ButtonsNonChrome extends Component {
 
   async handleSpeak() {
     let {toggleVoice} = this.props
-
     await toggleVoice()
-
     voiceModeStartStop()
   }
 
-  toggleBrushOpen() {
-    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
-  }
-
-  toggleBodyPartOpen() {
-    this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  }
+  // toggleBodyPartOpen() {
+  //   this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
+  // }
 
   handleNonChrome() {
     this.setState({voiceDialogOpen: true})
@@ -70,47 +65,73 @@ class ButtonsNonChrome extends Component {
     this.setState({voiceDialogOpen: false})
   }
 
-  toggleOpen() {
-    this.setState(prevState => ({open: !prevState.open}))
-  }
-
   render() {
     let {
       openLightbox,
       eraseModeOn,
       drawModeOn,
+      voiceModeOn,
       toggleErase,
-      toggleDraw
+      toggleDraw,
+      toggleBrush,
+      toggleBodyPart,
+      brushOpen,
+      bodyPartOpen
     } = this.props
+
     return (
       <div id="navbar">
-        <CustomPopUp />
-        <Button onClick={() => this.handleNonChrome()}>
-          <div>
-            <VoiceOverOff />
-            Voice Disabled
-          </div>
-        </Button>
-        <Dialog
-          maxWidth="xs"
-          open={this.state.voiceDialogOpen}
-          onClose={this.handleDialogClose}
-          aria-labelledby="max-width-dialog-title"
-        >
-          <DialogContent>
-            <DialogContentText align="center">
-              Voice Mode is not compatible with this browser. Please use Chrome
-              for the best experience!
-            </DialogContentText>
-          </DialogContent>
-        </Dialog>
-        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
-          <Hand />
-          currently drawing with {this.props.chosenBodyPart}
-          <Drawer anchor="left" open={this.state.bodyPartOpen}>
+        {!isChrome ? (
+          <>
+            <Button onClick={() => this.handleNonChrome()}>
+              <div>
+                <VoiceOverOff />
+                Voice Disabled
+              </div>
+            </Button>
+            <Dialog
+              maxWidth="xs"
+              open={this.state.voiceDialogOpen}
+              onClose={this.handleDialogClose}
+              aria-labelledby="max-width-dialog-title"
+            >
+              <DialogContent>
+                <DialogContentText align="center">
+                  Voice Mode is not compatible with this browser. Please use
+                  Chrome for the best experience!
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
+          </>
+        ) : (
+          <Button id="voice-button" onClick={() => this.handleSpeak()}>
+            {voiceModeOn ? (
+              <div>
+                <RecordVoiceOver />
+                Voice Currently On
+              </div>
+            ) : (
+              <div>
+                <VoiceOverOff />
+                Voice Currently OFF
+              </div>
+            )}
+          </Button>
+        )}
+        <div>
+          <Button id="body-part-option" onClick={toggleBodyPart}>
+            <Hand />
+            currently drawing with {this.props.chosenBodyPart}
+            {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+            {/* </Drawer> */}
+          </Button>
+          <CustomPopUp
+            id="bodypart-options"
+            className={bodyPartOpen ? 'open' : 'closed'}
+          >
             <BodyPartOptions />
-          </Drawer>
-        </Button>
+          </CustomPopUp>
+        </div>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -128,14 +149,19 @@ class ButtonsNonChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="brush-button" onClick={this.toggleBrushOpen}>
-          <Brush />
-          Brush option
-          <Drawer anchor="left" open={this.state.brushOpen}>
+        <div>
+          <Button id="brush-button" onClick={toggleBrush}>
+            <Brush />
+            Brush option
+          </Button>
+          <CustomPopUp
+            id="brush-options-popup"
+            className={brushOpen ? 'open' : 'closed'}
+          >
             <BrushOptions />
             <LineThickness />
-          </Drawer>
-        </Button>
+          </CustomPopUp>
+        </div>
         <Button
           id="erase-button"
           value={eraseModeOn}
@@ -162,13 +188,6 @@ class ButtonsNonChrome extends Component {
           <Clear />Clear Canvas
         </Button>
         <Button
-          id="save-canvas"
-          value="Save Canvas"
-          onClick={() => saveCanvas()}
-        >
-          <Save />Save Canvas
-        </Button>
-        <Button
           id="take-snapshot"
           value="Take Snapshot"
           onClick={() => {
@@ -188,13 +207,17 @@ const mapStateToProps = state => ({
   voiceModeOn: state.paintTools.voiceModeOn,
   drawModeOn: state.paintTools.drawModeOn,
   chosenBrush: state.paintTools.chosenBrush,
-  chosenBodyPart: state.paintTools.chosenBodyPart
+  chosenBodyPart: state.paintTools.chosenBodyPart,
+  bodyPartOpen: state.expansionPanels.bodyPart,
+  brushOpen: state.expansionPanels.brush
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
   toggleErase: () => dispatch(toggleErase()),
   toggleVoice: () => dispatch(toggleVoice()),
-  toggleDraw: () => dispatch(toggleDraw())
+  toggleDraw: () => dispatch(toggleDraw()),
+  toggleBrush: () => dispatch(toggleBrush()),
+  toggleBodyPart: () => dispatch(toggleBodyPart())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(ButtonsNonChrome)
+export default connect(mapStateToProps, mapDispatchToProps)(Buttons)

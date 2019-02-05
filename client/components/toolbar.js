@@ -18,8 +18,7 @@ import {
 import Save from '@material-ui/icons/Save'
 import Drawer from '@material-ui/core/Drawer'
 
-import ButtonsNonChrome from './buttonsNonChrome'
-import ButtonsChrome from './buttonsChrome'
+import Buttons from './buttons'
 
 import voiceRecognition, {isChrome} from '../utils/speechUtil'
 
@@ -35,11 +34,7 @@ class Toolbar extends Component {
 
     return (
       <div>
-        {isChrome ? (
-          <ButtonsChrome openLightbox={openLightbox} />
-        ) : (
-          <ButtonsNonChrome openLightbox={openLightbox} />
-        )}
+        <Buttons openLightbox={openLightbox} />
       </div>
     )
   }
