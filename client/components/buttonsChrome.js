@@ -16,23 +16,24 @@ import Camera from '@material-ui/icons/Camera'
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
 
-import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
+import {
+  getCommand,
+  toggleDraw,
+  toggleErase,
+  toggleVoice,
+  toggleBrush,
+  toggleBodyPart
+} from '../store'
 
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
+import CustomPopUp from './customPopUp'
 import LineThickness from './LineThickness'
 
 class ButtonsChrome extends Component {
   constructor() {
     super()
-    this.state = {
-      brushOpen: false,
-      bodyPartOpen: false
-    }
-    this.toggleBrushOpen = this.toggleBrushOpen.bind(this)
-    this.toggleBodyPartOpen = this.toggleBodyPartOpen.bind(this)
-
     this.handleSpeak = this.handleSpeak.bind(this)
   }
 
@@ -40,10 +41,6 @@ class ButtonsChrome extends Component {
     let {toggleVoice} = this.props
     await toggleVoice()
     voiceModeStartStop()
-  }
-
-  toggleBrushOpen() {
-    this.setState(prevState => ({brushOpen: !prevState.brushOpen}))
   }
 
   toggleBodyPartOpen() {
@@ -57,7 +54,11 @@ class ButtonsChrome extends Component {
       drawModeOn,
       voiceModeOn,
       toggleErase,
-      toggleDraw
+      toggleDraw,
+      toggleBrush,
+      toggleBodyPart,
+      brushOpen,
+      bodyPartOpen
     } = this.props
 
     return (
@@ -75,13 +76,20 @@ class ButtonsChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="body-part-option" onClick={this.toggleBodyPartOpen}>
-          <Hand />
-          currently drawing with {this.props.chosenBodyPart}
-          <Drawer anchor="left" open={this.state.bodyPartOpen}>
+        <div>
+          <Button id="body-part-option" onClick={toggleBodyPart}>
+            <Hand />
+            currently drawing with {this.props.chosenBodyPart}
+            {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+            {/* </Drawer> */}
+          </Button>
+          <CustomPopUp
+            id="bodypart-options"
+            className={bodyPartOpen ? 'open' : 'closed'}
+          >
             <BodyPartOptions />
-          </Drawer>
-        </Button>
+          </CustomPopUp>
+        </div>
         <Button
           id="draw-button"
           value={drawModeOn}
@@ -99,14 +107,19 @@ class ButtonsChrome extends Component {
             </div>
           )}
         </Button>
-        <Button id="brush-button" onClick={this.toggleBrushOpen}>
-          <Brush />
-          Brush option
-          <Drawer anchor="left" open={this.state.brushOpen}>
+        <div>
+          <Button id="brush-button" onClick={toggleBrush}>
+            <Brush />
+            Brush option
+          </Button>
+          <CustomPopUp
+            id="brush-options-popup"
+            className={brushOpen ? 'open' : 'closed'}
+          >
             <BrushOptions />
             <LineThickness />
-          </Drawer>
-        </Button>
+          </CustomPopUp>
+        </div>
         <Button
           id="erase-button"
           value={eraseModeOn}
@@ -152,13 +165,17 @@ const mapStateToProps = state => ({
   voiceModeOn: state.paintTools.voiceModeOn,
   drawModeOn: state.paintTools.drawModeOn,
   chosenBrush: state.paintTools.chosenBrush,
-  chosenBodyPart: state.paintTools.chosenBodyPart
+  chosenBodyPart: state.paintTools.chosenBodyPart,
+  bodyPartOpen: state.expansionPanels.bodyPart,
+  brushOpen: state.expansionPanels.brush
 })
 const mapDispatchToProps = dispatch => ({
   getCommand: command => dispatch(getCommand(command)),
   toggleErase: () => dispatch(toggleErase()),
   toggleVoice: () => dispatch(toggleVoice()),
-  toggleDraw: () => dispatch(toggleDraw())
+  toggleDraw: () => dispatch(toggleDraw()),
+  toggleBrush: () => dispatch(toggleBrush()),
+  toggleBodyPart: () => dispatch(toggleBodyPart())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ButtonsChrome)

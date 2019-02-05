@@ -2,27 +2,18 @@ import React from 'react'
 import reactCSS from 'reactcss'
 import {SwatchesPicker} from 'react-color'
 import {connect} from 'react-redux'
+import {toggleColorPicker} from '../store'
 
 import FormatPaint from '@material-ui/icons/FormatPaint'
 
 class ColorPicker extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      displayColorPicker: false
-    }
-  }
-
   handleClick = () => {
-    this.setState({displayColorPicker: !this.state.displayColorPicker})
-  }
-
-  handleClose = () => {
-    this.setState({displayColorPicker: false})
+    this.props.toggleColorPicker()
   }
 
   handleChange = color => {
     this.props.setColor(color.rgb)
+    this.props.toggleColorPicker()
   }
 
   render() {
@@ -66,9 +57,9 @@ class ColorPicker extends React.Component {
         <div style={styles.swatch} onClick={this.handleClick}>
           <div style={styles.color} />
         </div>
-        {this.state.displayColorPicker ? (
+        {this.props.colorPicker ? (
           <div style={styles.popover}>
-            <div style={styles.cover} onClick={this.handleClose} />
+            <div style={styles.cover} onClick={this.handleClick} />
             <SwatchesPicker
               color={this.props.selectedColor}
               onChange={this.handleChange}
@@ -82,7 +73,8 @@ class ColorPicker extends React.Component {
 
 const mapStateToProps = function(state) {
   return {
-    selectedColor: state.color
+    selectedColor: state.color,
+    colorPicker: state.expansionPanels.colorPicker
   }
 }
 
@@ -90,6 +82,9 @@ const mapDispatchToProps = dispatch => {
   return {
     setColor(color) {
       dispatch({type: 'GET_COLOR', color})
+    },
+    toggleColorPicker: () => {
+      dispatch(toggleColorPicker())
     }
   }
 }

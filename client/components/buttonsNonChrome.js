@@ -27,6 +27,7 @@ import {getCommand, toggleDraw, toggleErase, toggleVoice} from '../store'
 import ColorPicker from './colorPicker'
 import BrushOptions from './brushOptions'
 import BodyPartOptions from './bodyPartOptions'
+import CustomPopUp from './customPopUp'
 import LineThickness from './LineThickness'
 
 class ButtonsNonChrome extends Component {
@@ -83,6 +84,7 @@ class ButtonsNonChrome extends Component {
     } = this.props
     return (
       <div id="navbar">
+        <CustomPopUp />
         <Button onClick={() => this.handleNonChrome()}>
           <div>
             <VoiceOverOff />
