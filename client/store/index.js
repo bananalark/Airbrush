@@ -5,7 +5,8 @@ import {composeWithDevTools} from 'redux-devtools-extension'
 import user from './user'
 import color from './color'
 import paintTools from './paintTools'
-const reducer = combineReducers({user, color, paintTools})
+import expansionPanels from './expansionPanels'
+const reducer = combineReducers({user, color, paintTools, expansionPanels})
 
 const middleware = composeWithDevTools(
   applyMiddleware(thunkMiddleware, createLogger({collapsed: true}))
@@ -16,3 +17,4 @@ export default store
 export * from './user'
 export * from './color'
 export * from './paintTools'
+export * from './expansionPanels'
