@@ -1,21 +1,26 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
-import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
-import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
-import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
-import Clear from '@material-ui/icons/Clear'
-import Button from '@material-ui/core/Button'
-import Drawer from '@material-ui/core/Drawer'
-import Camera from '@material-ui/icons/Camera'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import Undo from '@material-ui/icons/Undo'
+import {
+  Switch,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Button,
+  withStyles,
+  FormControlLabel
+} from '@material-ui/core'
+import {
+  VoiceOverOff,
+  RecordVoiceOver,
+  Brush,
+  Clear,
+  Camera,
+  Undo
+} from '@material-ui/icons'
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -37,11 +42,55 @@ import BodyPartOptions from './bodyPartOptions'
 import CustomPopUp from './customPopUp'
 import LineThickness from './LineThickness'
 
+// const styles = theme => ({
+//   colorBar: {},
+//   colorChecked: {},
+//   iOSSwitchBase: {
+//     '&$iOSChecked': {
+//       color: theme.palette.common.white,
+//       '& + $iOSBar': {
+//         backgroundColor: '#52d869',
+//       },
+//     },
+//     transition: theme.transitions.create('transform', {
+//       duration: theme.transitions.duration.shortest,
+//       easing: theme.transitions.easing.sharp,
+//     }),
+//   },
+//   iOSChecked: {
+//     transform: 'translateX(15px)',
+//     '& + $iOSBar': {
+//       opacity: 1,
+//       border: 'none',
+//     },
+//   },
+//   iOSBar: {
+//     borderRadius: 13,
+//     width: 42,
+//     height: 26,
+//     marginTop: -13,
+//     marginLeft: -21,
+//     border: 'solid 1px',
+//     borderColor: theme.palette.grey[400],
+//     backgroundColor: theme.palette.grey[50],
+//     opacity: 1,
+//     transition: theme.transitions.create(['background-color', 'border']),
+//   },
+//   iOSIcon: {
+//     width: 24,
+//     height: 24,
+//   },
+//   iOSIconChecked: {
+//     boxShadow: theme.shadows[1],
+//   },
+// });
+
 class Buttons extends Component {
   constructor() {
     super()
     this.state = {
       voiceDialogOpen: false
+      //checkedButton: false
     }
     this.handleSpeak = this.handleSpeak.bind(this)
     this.handleNonChrome = this.handleNonChrome.bind(this)
@@ -61,6 +110,9 @@ class Buttons extends Component {
   handleDialogClose() {
     this.setState({voiceDialogOpen: false})
   }
+  // handleChange = name => event => {
+  //   this.setState({ [name]: event.target.checked });
+  // }
 
   /*eslint-disable*/
   render() {
@@ -75,139 +127,168 @@ class Buttons extends Component {
       toggleBodyPart,
       brushOpen,
       bodyPartOpen
+      //classes
     } = this.props
 
+    // let canvas = document.getElementById('output')
+    // let domRect = canvas.getBoundingClientRect();
+    // let {bottom, right} = domRect
+    // console.log('bottom', bottom)
+    // console.log('right', right)
+
     return (
-      <div id="navbar">
-        {!isChrome ? (
-          <>
-            <Button onClick={() => this.handleNonChrome()}>
-              <div>
-                <VoiceOverOff />
-                Voice Disabled
-              </div>
-            </Button>
-            <Dialog
-              maxWidth="xs"
-              open={this.state.voiceDialogOpen}
-              onClose={this.handleDialogClose}
-              aria-labelledby="max-width-dialog-title"
+      <div>
+        <div id="navbar">
+          {!isChrome ? (
+            <>
+              <Button onClick={() => this.handleNonChrome()}>
+                <div>
+                  <VoiceOverOff />
+                  Voice Disabled
+                </div>
+              </Button>
+              <Dialog
+                maxWidth="xs"
+                open={this.state.voiceDialogOpen}
+                onClose={this.handleDialogClose}
+                aria-labelledby="max-width-dialog-title"
+              >
+                <DialogContent>
+                  <DialogContentText align="center">
+                    Voice Mode is not compatible with this browser. Please use
+                    Chrome for the best experience!
+                  </DialogContentText>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : (
+            <Button
+              id="voice-button"
+              className={voiceModeOn ? 'active' : ''}
+              onClick={() => this.handleSpeak()}
             >
-              <DialogContent>
-                <DialogContentText align="center">
-                  Voice Mode is not compatible with this browser. Please use
-                  Chrome for the best experience!
-                </DialogContentText>
-              </DialogContent>
-            </Dialog>
-          </>
-        ) : (
+              {voiceModeOn ? (
+                <div>
+                  <RecordVoiceOver />
+                  Voice Currently On
+                </div>
+              ) : (
+                <div>
+                  <VoiceOverOff />
+                  Voice Currently OFF
+                </div>
+              )}
+            </Button>
+          )}
+          <div>
+            <Button
+              className={bodyPartOpen ? 'active' : ''}
+              id="body-part-option"
+              onClick={toggleBodyPart}
+            >
+              <Hand />
+              currently drawing with {this.props.chosenBodyPart}
+              {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+              {/* </Drawer> */}
+            </Button>
+            <CustomPopUp
+              id="bodypart-options"
+              className={bodyPartOpen ? 'open' : 'closed'}
+            >
+              <BodyPartOptions />
+            </CustomPopUp>
+          </div>
           <Button
-            id="voice-button"
-            className={voiceModeOn ? 'active' : ''}
-            onClick={() => this.handleSpeak()}
+            className={drawModeOn ? 'active' : ''}
+            id="draw-button"
+            value={drawModeOn}
+            onClick={() => toggleDraw()}
           >
-            {voiceModeOn ? (
+            {drawModeOn ? (
               <div>
-                <RecordVoiceOver />
-                Voice Currently On
+                <Pencil />
+                Draw Mode ON
               </div>
             ) : (
               <div>
-                <VoiceOverOff />
-                Voice Currently OFF
+                <PencilOff />
+                Draw Mode OFF
               </div>
             )}
           </Button>
-        )}
-        <div>
+          <div>
+            <Button
+              id="brush-button"
+              className={brushOpen ? 'active' : ''}
+              onClick={toggleBrush}
+            >
+              <Brush />
+              Brush option
+            </Button>
+            <CustomPopUp
+              id="brush-options-popup"
+              className={brushOpen ? 'open' : 'closed'}
+            >
+              <BrushOptions />
+              <LineThickness />
+            </CustomPopUp>
+          </div>
           <Button
-            className={bodyPartOpen ? 'active' : ''}
-            id="body-part-option"
-            onClick={toggleBodyPart}
+            className={eraseModeOn ? 'active' : ''}
+            id="erase-button"
+            value={eraseModeOn}
+            onClick={() => toggleErase()}
           >
-            <Hand />
-            currently drawing with {this.props.chosenBodyPart}
-            {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
-            {/* </Drawer> */}
-          </Button>
-          <CustomPopUp
-            id="bodypart-options"
-            className={bodyPartOpen ? 'open' : 'closed'}
-          >
-            <BodyPartOptions />
-          </CustomPopUp>
-        </div>
-        <Button
-          className={drawModeOn ? 'active' : ''}
-          id="draw-button"
-          value={drawModeOn}
-          onClick={() => toggleDraw()}
-        >
-          {drawModeOn ? (
-            <div>
-              <Pencil />
-              Draw Mode ON
-            </div>
-          ) : (
-            <div>
-              <PencilOff />
-              Draw Mode OFF
-            </div>
-          )}
-        </Button>
-        <div>
+            {eraseModeOn ? (
+              <div>
+                <Undo />
+                Undo Mode ON
+              </div>
+            ) : (
+              <div>
+                <Undo />
+                Undo Mode OFF
+              </div>
+            )}
+          </Button>{' '}
+          <ColorPicker />
           <Button
-            id="brush-button"
-            className={brushOpen ? 'active' : ''}
-            onClick={toggleBrush}
+            id="clear-button"
+            value="Clear Canvas"
+            onClick={() => clearCanvas()}
           >
-            <Brush />
-            Brush option
+            <Clear />Clear Canvas
           </Button>
-          <CustomPopUp
-            id="brush-options-popup"
-            className={brushOpen ? 'open' : 'closed'}
+          <Button
+            id="take-snapshot"
+            value="Take Snapshot"
+            onClick={() => {
+              openLightbox(saveCanvas())
+            }}
           >
-            <BrushOptions />
-            <LineThickness />
-          </CustomPopUp>
+            <Camera />Take Snapshot
+          </Button>
         </div>
-        <Button
-          className={eraseModeOn ? 'active' : ''}
-          id="erase-button"
-          value={eraseModeOn}
-          onClick={() => toggleErase()}
-        >
-          {eraseModeOn ? (
-            <div>
-              <Undo />
-              Undo Mode ON
-            </div>
-          ) : (
-            <div>
-              <Undo />
-              Undo Mode OFF
-            </div>
-          )}
-        </Button>{' '}
-        <ColorPicker />
-        <Button
-          id="clear-button"
-          value="Clear Canvas"
-          onClick={() => clearCanvas()}
-        >
-          <Clear />Clear Canvas
-        </Button>
-        <Button
-          id="take-snapshot"
-          value="Take Snapshot"
-          onClick={() => {
-            openLightbox(saveCanvas())
-          }}
-        >
-          <Camera />Take Snapshot
-        </Button>
+        {/* <div id='OnOffButton' >
+        <FormControlLabel
+          control={
+            <Switch
+              classes={{
+                switchBase: classes.iOSSwitchBase,
+                bar: classes.iOSBar,
+                icon: classes.iOSIcon,
+                iconChecked: classes.iOSIconChecked,
+                checked: classes.iOSChecked,
+              }}
+              disableRipple
+              checked={this.state.checkedButton}
+              onChange={this.handleChange('checkedButton')}
+              value="checkedButton"
+            />
+          }
+          label="On"
+        />
+        </div> */}
       </div>
     )
   }
@@ -233,4 +314,5 @@ const mapDispatchToProps = dispatch => ({
   toggleBodyPart: () => dispatch(toggleBodyPart())
 })
 
+//export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Buttons))
 export default connect(mapStateToProps, mapDispatchToProps)(Buttons)

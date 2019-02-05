@@ -37,7 +37,14 @@ form div {
   flex-direction: column;
   justify-content: space-between;
 }
-
+#OnOffButton {
+  position: absolute;
+  left: 50%;
+  margin-left: 520px;
+  z-index: 6;
+  top: 50vh;
+  margin-top: 320px;
+}
 .active {
   color: black !important;
   background-color: rgba(251, 193, 0, 0.7) !important;
