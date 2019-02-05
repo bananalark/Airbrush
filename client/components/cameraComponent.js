@@ -48,8 +48,6 @@ class CameraComponent extends Component {
               ]}
               onCloseRequest={() => this.setState({showLightbox: false})}
               enableZoom={false}
-              // in case we want to put a title to the image
-              imageTitle=""
             />
           </div>
         )}

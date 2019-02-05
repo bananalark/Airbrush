@@ -1,27 +1,26 @@
+import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
 import {
-  draw,
   createProject,
   drawAnything,
   drawTracker,
   hoverToChooseTool,
-  smooth
+  smooth,
+  getDrawMode,
+  getBodyPart
 } from './draw.js'
 
-import {Path} from 'paper'
-
+import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
 //will be moved to UI
 let minPartConfidence = 0.75
-
+let model
+let mobileNet
 /*
 Setup video size
 */
-// vv Amber's hardcoded data until resolution fix
-// export let videoHeight = 723
-// export let videoWidth = 964
-export let videoHeight
-export let videoWidth
+let videoHeight
+let videoWidth
 
 if (3 * parent.innerWidth / 4 > parent.innerHeight) {
   videoHeight = parent.innerHeight
@@ -32,14 +31,9 @@ if (3 * parent.innerWidth / 4 > parent.innerHeight) {
 }
 
 //this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
-if (videoHeight > 723 || videoWidth > 964) {
-  videoHeight = 723
-  videoWidth = 964
-}
-
-//FOR DEBUG PURPOSES
 videoHeight = 723
 videoWidth = 964
+
 /*
  Loads a the camera to be used on canvas
  */
@@ -95,8 +89,8 @@ const guiState = {
  * happens. This function loops with a requestAnimationFrame method.
  */
 
-let handRight
-let handLeft
+let rightHand
+let leftHand
 let arrayOfShapes = []
 let colorModeToggled = false
 let brushModeToggled = false
@@ -105,6 +99,7 @@ let colorAtStart = store.getState().color.color
 let brushAtStart = store.getState().paintTools.chosenBrush
 
 let togglePoint
+
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
@@ -126,7 +121,6 @@ function detectPoseInRealTime(video, net) {
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
   //begin the paper.js project, located in utils/draw.js
-
   createProject(window, canvas, ctx)
 
   // ***** SELECTION CIRCLE SMOOTHING TECH *****
@@ -135,13 +129,18 @@ function detectPoseInRealTime(video, net) {
   'framesAveraged' to a const, so that we can easily change this
   later, as needed.*/
   let currentPoseNum = 0
-  const frames = 5
+  const frames = 3
   let lastFewXCoords = Array(frames).fill('null')
   let lastFewYCoords = Array(frames).fill('null')
   /*End of smoothing tech*/
 
+  let drawModeOn
+  let chosenPart
+
   async function poseDetectionFrame(prevPoses = [], path) {
-    //start our frame counter, reset if reached 5
+    //set draw status for frame
+    drawModeOn = getDrawMode()
+    chosenPart = getBodyPart()
 
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
@@ -176,74 +175,71 @@ function detectPoseInRealTime(video, net) {
     /*eslint-disable*/
     poses.forEach(({score, keypoints}) => {
       if (score >= minPoseConfidence) {
-        if (draw(keypoints, minPartConfidence)) {
-          if (prevPoses.length) {
-            let eraseMode = document.getElementById('erase-button')
-            let eraseModeValue = eraseMode.attributes.value.nodeValue
-            const [
-              nose,
-              leftEye,
-              rightEye,
-              leftEar,
-              rightEar,
-              leftShoulder,
-              rightShoulder,
-              leftElbow,
-              rightElbow,
-              leftWrist,
-              rightWrist,
-              leftHip,
-              rightHip,
-              leftKnee,
-              rightKnee,
-              leftAnkle,
-              rightAnkle
-            ] = keypoints
+        if (prevPoses.length) {
+          let eraseMode = document.getElementById('erase-button')
+          let eraseModeValue = eraseMode.attributes.value.nodeValue
+          const [
+            nose,
+            leftEye,
+            rightEye,
+            leftEar,
+            rightEar,
+            leftShoulder,
+            rightShoulder,
+            leftElbow,
+            rightElbow,
+            leftWrist,
+            rightWrist,
+            leftHip,
+            rightHip,
+            leftKnee,
+            rightKnee,
+            leftAnkle,
+            rightAnkle
+          ] = keypoints
 
-            //hand "keypoint" defintion: manual definition for each smooths rendering
+          //hand "keypoint" defintion: manual definition for each hand smooths rendering
 
-            //define "hand" on the right arm using wrist and elbow position
-            const yDiffRight = leftWrist.position.y - leftElbow.position.y
-            const handYRight = yDiffRight / 2 + leftWrist.position.y
-            const xDiffRight = leftWrist.position.x - leftElbow.position.x
-            const handXRight = xDiffRight / 2 + leftWrist.position.x
-            handRight = {
-              score: leftWrist.score,
-              position: {y: handYRight, x: handXRight}
-            }
-            keypoints[17] = handRight
+          //define "hand" on the right arm using wrist and elbow position
+          const yDiffRight = leftWrist.position.y - leftElbow.position.y
+          const handYRight = yDiffRight / 2 + leftWrist.position.y
+          const xDiffRight = leftWrist.position.x - leftElbow.position.x
+          const handXRight = xDiffRight / 2 + leftWrist.position.x
+          rightHand = {
+            score: leftWrist.score,
+            position: {y: handYRight, x: handXRight}
+          }
+          keypoints[17] = rightHand
 
-            //left arm
-            const yDiffLeft = rightWrist.position.y - rightElbow.position.y
-            const handYLeft = yDiffLeft / 2 + rightWrist.position.y
-            const xDiffLeft = rightWrist.position.x - rightElbow.position.x
-            const handXLeft = xDiffLeft / 2 + rightWrist.position.x
-            handLeft = {
-              score: rightWrist.score,
-              position: {y: handYLeft, x: handXLeft}
-            }
-            keypoints[18] = handLeft
+          //here we define "hand" on the left arm using wrist and elbow position
+          const yDiffLeft = rightWrist.position.y - rightElbow.position.y
+          const handYLeft = yDiffLeft / 2 + rightWrist.position.y
+          const xDiffLeft = rightWrist.position.x - rightElbow.position.x
+          const handXLeft = xDiffLeft / 2 + rightWrist.position.x
+          leftHand = {
+            score: rightWrist.score,
+            position: {y: handYLeft, x: handXLeft}
+          }
+          keypoints[18] = leftHand
 
-            //****DRAWING ACTION ****/
+          //****DRAWING ACTION ****/
 
-            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+          //track gesture
+          if (chosenPart !== 'nose') {
+            trackHand(handXRight, handYRight, backgroundCanvas)
+          }
 
-            //if somebody is there, calculate drawing needs
+          //if somebody is there and drawMode is on, calculate drawing needs
+          if (drawModeOn) {
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
-              //I had to remove this ternary, as it was messing up the drawAnything func
-              // let keypoint =
-              //   currentBodyPart === 'nose'
-              //     ? nose
-              //     : currentBodyPart === 'leftHand' ? handLeft : handRight
-
               let keypoint
-              if (currentBodyPart === 'nose') {
+              if (chosenPart === 'nose') {
                 keypoint = nose
-              } else if (currentBodyPart === 'leftHand') {
-                keypoint = handLeft
+              } else if (chosenPart === 'leftHand') {
+                keypoint = leftHand
               } else {
-                keypoint = handRight
+                keypoint = rightHand
               }
 
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
@@ -254,7 +250,7 @@ function detectPoseInRealTime(video, net) {
                 hoverToChooseTool(x, y)
               }
 
-              //to smooth tracking circle:
+              //to smooth points
               //add to arrays for averaging over frames
               lastFewXCoords[currentPoseNum] = x
               lastFewYCoords[currentPoseNum] = y
@@ -263,6 +259,7 @@ function detectPoseInRealTime(video, net) {
                 keypoint = smooth(lastFewXCoords, lastFewYCoords)
               }
 
+              //draw dot
               drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
               arrayOfShapes.push(path)
@@ -290,8 +287,8 @@ function detectPoseInRealTime(video, net) {
                 const thisPath = drawAnything(
                   keypoint,
                   path,
-                  handLeft,
-                  handRight,
+                  leftHand,
+                  rightHand,
                   nose
                 )
                 path = thisPath
@@ -305,14 +302,16 @@ function detectPoseInRealTime(video, net) {
                     }
                   }
                 } else {
-                  path.removeSegment(path.segments.length - 1)
+                  if (path) {
+                    path.removeSegment(path.segments.length - 1)
 
-                  //this turns off both erase and draw mode once there are no more segments to remove
-                  if (path.segments.length === 0) {
-                    path = null
-                    store.dispatch(toggleErase())
-                    if (store.getState().paintTools.drawModeOn === true) {
-                      store.dispatch(toggleDraw())
+                    //this turns off both erase and draw mode once there are no more segments to remove
+                    if (path.segments.length === 0) {
+                      path = null
+                      store.dispatch(toggleErase())
+                      if (store.getState().paintTools.drawModeOn === true) {
+                        store.dispatch(toggleDraw())
+                      }
                     }
                   }
                 }
@@ -323,10 +322,16 @@ function detectPoseInRealTime(video, net) {
       }
     })
 
+    //implement hand recognition from trackHand.js
+
+    if (chosenPart !== 'nose') {
+      predict(model, mobileNet)
+    }
+
     //increment/reset frame count
     currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
 
-    if (store.getState().paintTools.drawModeOn === false) {
+    if (!drawModeOn) {
       path = null
 
       paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
@@ -341,13 +346,23 @@ function detectPoseInRealTime(video, net) {
 }
 /*eslint-enable*/
 
-/**
- * Kicks off the demo by loading the posenet model, finding and loading
- * available camera devices, and setting off the detectPoseInRealTime function.
- */
+//also highly-trained model it was built on
+async function loadTruncatedMobileNet() {
+  const mobilenet = await tf.loadModel(
+    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json'
+  )
+
+  const layer = mobilenet.getLayer('conv_pw_13_relu')
+  const tmn = tf.model({inputs: mobilenet.inputs, outputs: layer.output})
+  return tmn
+}
+
+//load models, find camera, set off detectPose
 export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
+  mobileNet = await loadTruncatedMobileNet()
+  model = await tf.loadModel('mymodel.json')
 
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
@@ -365,7 +380,7 @@ export async function bindPage() {
     throw e
   }
 
-  setTimeout(() => detectPoseInRealTime(video, net), 1000)
+  setTimeout(() => detectPoseInRealTime(video, net, model, mobileNet), 1000)
 }
 
 // kick off the demo
