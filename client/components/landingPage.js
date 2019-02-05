@@ -8,7 +8,6 @@ import {
 import About from './about'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
-import {yellow} from '@material-ui/core/colors'
 
 const styles = theme => ({
   margin: {
