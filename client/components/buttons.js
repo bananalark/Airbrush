@@ -15,6 +15,7 @@ import Camera from '@material-ui/icons/Camera'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
+import Undo from '@material-ui/icons/Undo'
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -180,13 +181,13 @@ class Buttons extends Component {
         >
           {eraseModeOn ? (
             <div>
-              <Eraser />
-              Eraser Mode ON
+              <Undo />
+              Undo Mode ON
             </div>
           ) : (
             <div>
-              <Eraser />
-              Eraser Mode OFF
+              <Undo />
+              Undo Mode OFF
             </div>
           )}
         </Button>{' '}
