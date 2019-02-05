@@ -20,6 +20,7 @@ import store, {
   chooseBodyPart,
   toggleDraw,
   chooseBrush,
+  drawOff,
   toggleErase
 } from '../store'
 import {Size, Path} from 'paper'
@@ -37,14 +38,11 @@ export function createProject(window, cnv) {
   paper.setup(cnv)
 }
 
-const sleep = milliseconds => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
 export async function clearCanvas() {
   paper.project.clear()
-  //restarts drawing line
-  store.dispatch(toggleDraw())
+
+  //restarts drawing line, also needed as bugfix
+  store.dispatch(drawOff())
 }
 
 export function saveCanvas() {

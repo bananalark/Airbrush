@@ -99,16 +99,13 @@ let colorAtStart = store.getState().color.color
 let brushAtStart = store.getState().paintTools.chosenBrush
 
 let togglePoint
+
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
 
   const backgroundCanvas = document.getElementById('background')
   const backgroundctx = backgroundCanvas.getContext('2d')
-
-  const handCanvas = document.getElementById('hand')
-  handCanvas.height = 224
-  handCanvas.width = 224
 
   const paintingPointerCanvas = document.getElementById('painting-pointer')
   paintingPointerCanvas.width = videoWidth
@@ -229,7 +226,7 @@ function detectPoseInRealTime(video, net) {
 
           //track gesture
           if (chosenPart !== 'nose') {
-            trackHand(handXRight, handYRight, handCanvas, backgroundCanvas)
+            trackHand(handXRight, handYRight, backgroundCanvas)
           }
 
           //if somebody is there and drawMode is on, calculate drawing needs
@@ -326,7 +323,7 @@ function detectPoseInRealTime(video, net) {
     //implement hand recognition from trackHand.js
 
     if (chosenPart !== 'nose') {
-      predict(handCanvas, model, mobileNet)
+      predict(model, mobileNet)
     }
 
     //increment/reset frame count
@@ -347,12 +344,6 @@ function detectPoseInRealTime(video, net) {
 }
 /*eslint-enable*/
 
-// model to our pretrained version
-async function loadModel() {
-  let ml = await tf.loadModel('mymodel.json')
-  return ml
-}
-
 //also highly-trained model it was built on
 async function loadTruncatedMobileNet() {
   const mobilenet = await tf.loadModel(
@@ -360,7 +351,7 @@ async function loadTruncatedMobileNet() {
   )
 
   const layer = mobilenet.getLayer('conv_pw_13_relu')
-  let tmn = tf.model({inputs: mobilenet.inputs, outputs: layer.output})
+  const tmn = tf.model({inputs: mobilenet.inputs, outputs: layer.output})
   return tmn
 }
 
@@ -368,8 +359,8 @@ async function loadTruncatedMobileNet() {
 export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
-  model = await loadModel()
   mobileNet = await loadTruncatedMobileNet()
+  model = await tf.loadModel('mymodel.json')
 
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'

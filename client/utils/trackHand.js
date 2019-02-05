@@ -2,19 +2,20 @@ import * as tf from '@tensorflow/tfjs'
 import {drawOn, drawOff} from '../store/paintTools'
 import store from '../store'
 
-//TODO
-//remove handCanvas
+//pixel count corresponding to dataset model was trained on
+const span = 224
 
-const span = 224 //hardcoded to keep data in line with dataset model was trained on
+//small hidden canvas element
+const handCanvas = document.createElement('canvas')
+handCanvas.height = span
+handCanvas.width = span
+const handCtx = handCanvas.getContext('2d')
 
-export function trackHand(hx, hy, hCanvas, bgCanvas) {
+export function trackHand(hx, hy, bgCanvas) {
   const halfSpan = span / 2
   const left = hx - halfSpan
   const top = hy - halfSpan
 
-  // canvas for observation
-
-  const handCtx = hCanvas.getContext('2d')
   handCtx.drawImage(bgCanvas, left, top, span, span, 0, 0, span, span)
 }
 
@@ -58,10 +59,10 @@ let latestSureClass
 let count = 0
 
 //Makes the magic happen
-export async function predict(canvas, myModel, mobileModel) {
+export async function predict(myModel, mobileModel) {
   const predictedClass = tf.tidy(() => {
     // Capture the frame from the webcam.
-    const img = makeTensor(canvas)
+    const img = makeTensor(handCanvas)
 
     // Make a prediction through mobilenet
     const embeddings = mobileModel.predict(img)
