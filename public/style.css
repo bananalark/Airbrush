@@ -38,6 +38,12 @@ form div {
   justify-content: space-between;
 }
 
+.active {
+  color: black !important;
+  background-color: rgba(251, 193, 0, 0.7) !important;
+  border-radius: 10px !important;
+}
+
 .custom-pop-up {
   position: absolute;
   left: 0;

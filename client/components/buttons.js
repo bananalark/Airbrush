@@ -53,10 +53,6 @@ class Buttons extends Component {
     voiceModeStartStop()
   }
 
-  // toggleBodyPartOpen() {
-  //   this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  // }
-
   handleNonChrome() {
     this.setState({voiceDialogOpen: true})
   }
@@ -65,6 +61,7 @@ class Buttons extends Component {
     this.setState({voiceDialogOpen: false})
   }
 
+  /*eslint-disable*/
   render() {
     let {
       openLightbox,
@@ -104,7 +101,11 @@ class Buttons extends Component {
             </Dialog>
           </>
         ) : (
-          <Button id="voice-button" onClick={() => this.handleSpeak()}>
+          <Button
+            id="voice-button"
+            className={voiceModeOn ? 'active' : ''}
+            onClick={() => this.handleSpeak()}
+          >
             {voiceModeOn ? (
               <div>
                 <RecordVoiceOver />
@@ -119,7 +120,11 @@ class Buttons extends Component {
           </Button>
         )}
         <div>
-          <Button id="body-part-option" onClick={toggleBodyPart}>
+          <Button
+            className={bodyPartOpen ? 'active' : ''}
+            id="body-part-option"
+            onClick={toggleBodyPart}
+          >
             <Hand />
             currently drawing with {this.props.chosenBodyPart}
             {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
@@ -133,6 +138,7 @@ class Buttons extends Component {
           </CustomPopUp>
         </div>
         <Button
+          className={drawModeOn ? 'active' : ''}
           id="draw-button"
           value={drawModeOn}
           onClick={() => toggleDraw()}
@@ -150,7 +156,11 @@ class Buttons extends Component {
           )}
         </Button>
         <div>
-          <Button id="brush-button" onClick={toggleBrush}>
+          <Button
+            id="brush-button"
+            className={brushOpen ? 'active' : ''}
+            onClick={toggleBrush}
+          >
             <Brush />
             Brush option
           </Button>
@@ -163,6 +173,7 @@ class Buttons extends Component {
           </CustomPopUp>
         </div>
         <Button
+          className={eraseModeOn ? 'active' : ''}
           id="erase-button"
           value={eraseModeOn}
           onClick={() => toggleErase()}
@@ -200,6 +211,7 @@ class Buttons extends Component {
     )
   }
 }
+/*eslint-enable*/
 
 const mapStateToProps = state => ({
   currentCommand: state.paintTools.currentCommand,
