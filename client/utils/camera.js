@@ -1,12 +1,7 @@
 import * as posenet from '@tensorflow-models/posenet'
-import {
-  draw,
-  createProject,
-  drawAnything,
-  drawTracker,
-  hoverToChooseTool,
-  smooth
-} from './draw.js'
+import {draw, createProject, drawAnything, drawTracker, smooth} from './draw.js'
+
+import {hoverToChooseTool} from './hoverButton'
 
 import {Path} from 'paper'
 
@@ -251,6 +246,7 @@ function detectPoseInRealTime(video, net) {
               let {x, y} = keypoint.position
 
               if (x > 0 && y < 200) {
+                // console.log('y-coords', y)
                 hoverToChooseTool(x, y)
               }
 
@@ -305,14 +301,17 @@ function detectPoseInRealTime(video, net) {
                     }
                   }
                 } else {
-                  path.removeSegment(path.segments.length - 1)
+                  if (path) {
+                    //this prevents a weird bug where clicking erase with nothing on screen throws an error
+                    path.removeSegment(path.segments.length - 1)
 
-                  //this turns off both erase and draw mode once there are no more segments to remove
-                  if (path.segments.length === 0) {
-                    path = null
-                    store.dispatch(toggleErase())
-                    if (store.getState().paintTools.drawModeOn === true) {
-                      store.dispatch(toggleDraw())
+                    //this turns off both erase and draw mode once there are no more segments to remove
+                    if (path.segments.length === 0) {
+                      path = null
+                      store.dispatch(toggleErase())
+                      if (store.getState().paintTools.drawModeOn === true) {
+                        store.dispatch(toggleDraw())
+                      }
                     }
                   }
                 }
