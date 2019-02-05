@@ -219,7 +219,8 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
           let currentBodyPart = store.getState().paintTools.chosenBodyPart
 
           //track gesture
-          if (chosenPart !== 'nose') {
+          console.log(currentBodyPart)
+          if (currentBodyPart !== 'nose') {
             trackHand(handXRight, handYRight, handCanvas, backgroundCanvas)
           }
 
@@ -283,7 +284,7 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
 
     //implement hand recognition from trackHand.js
 
-    if (chosenPart !== 'nose') {
+    if (currentBodyPart !== 'nose') {
       predict(handCanvas, model, mobileNet)
     }
 
