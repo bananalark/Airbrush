@@ -20,8 +20,8 @@ const initialState = {
   eraseModeOn: false,
   voiceModeOn: false,
   drawModeOn: false,
-  chosenBrush: 'circleLine',
-  chosenBodyPart: 'nose',
+  chosenBrush: 'defaultLine',
+  chosenBodyPart: 'rightHand',
   size: 'small'
 }
 
