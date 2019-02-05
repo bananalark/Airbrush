@@ -11,8 +11,6 @@ import {
 import {Path} from 'paper'
 
 import store, {toggleErase, toggleDraw} from '../store'
-import {array} from '@tensorflow/tfjs-data'
-import {arrayOf} from 'prop-types'
 //will be moved to UI
 let minPartConfidence = 0.75
 
