@@ -14,3 +14,12 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('app')
 )
+
+// ReactDOM.render(
+//   <Provider store={store}>
+//     <Router history={history}>
+//       <Fun />
+//     </Router>
+//   </Provider>,
+//   document.getElementById('app')
+// )

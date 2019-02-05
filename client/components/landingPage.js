@@ -15,7 +15,13 @@ const styles = theme => ({
     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
   },
   extendedIcon: {
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
+    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+  },
+  button: {
+    margin: theme.spacing.unit,
+    right: 0,
+    bottom: 0
   },
   icon: {
     marginRight: theme.spacing.unit * 2
@@ -28,6 +34,7 @@ const styles = theme => ({
     margin: '0 auto',
     padding: `${theme.spacing.unit * 28}px 0 ${theme.spacing.unit * 16}px`
   },
+
   footer: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing.unit * 6
@@ -119,20 +126,25 @@ class LandingPage extends React.Component {
                   </Fab>
                 </RouterLink>
               </Grid>
+              <Grid>
+                <ScrollLink
+                  activeClass="active"
+                  className="test6"
+                  to="anchor"
+                  spy={true}
+                  smooth={true}
+                  duration={500}
+                >
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    className={classes.button}
+                  >
+                    Learn More
+                  </Button>
+                </ScrollLink>
+              </Grid>
             </Grid>
-
-            <ScrollLink
-              activeClass="active"
-              className="test6"
-              to="anchor"
-              spy={true}
-              smooth={true}
-              duration={500}
-            >
-              <Button>
-                <Typography variant="h5">Learn More</Typography>
-              </Button>
-            </ScrollLink>
           </div>
         </div>
 
