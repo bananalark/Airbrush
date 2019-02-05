@@ -83,12 +83,22 @@ const guiState = {
   net: null
 }
 
-let rightHand
-let leftHand
-let eraseSwitchedOff = false
+/**
+ * Feeds an image to posenet to estimate poses - this is where the magic
+ * happens. This function loops with a requestAnimationFrame method.
+ */
 
-//this function loops through each frame, feeding an image to posenet for pose estimation
-function detectPoseInRealTime(video, net, model, mobileNet) {
+let handRight
+let handLeft
+let arrayOfShapes = []
+let colorModeToggled = false
+let brushModeToggled = false
+
+let colorAtStart = store.getState().color.color
+let brushAtStart = store.getState().paintTools.chosenBrush
+
+let togglePoint
+function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
 
@@ -228,10 +238,14 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
           if (drawModeOn) {
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
-              let keypoint =
-                currentBodyPart === 'nose'
-                  ? nose
-                  : currentBodyPart === 'leftHand' ? leftHand : rightHand
+              let keypoint
+              if (currentBodyPart === 'nose') {
+                keypoint = nose
+              } else if (currentBodyPart === 'leftHand') {
+                keypoint = handLeft
+              } else {
+                keypoint = handRight
+              }
 
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
 
@@ -253,26 +267,55 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
               //draw dot
               drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
+              arrayOfShapes.push(path)
+
+              //every time the color or brush is changed, we should start a new path of shapes.
+              if (store.getState().color.color !== colorAtStart) {
+                colorModeToggled = true
+                togglePoint = arrayOfShapes.length
+                colorAtStart = store.getState().color.color
+
+                arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
+                colorModeToggled = false
+              }
+              if (store.getState().paintTools.chosenBrush !== brushAtStart) {
+                brushModeToggled = true
+                togglePoint = arrayOfShapes.length
+                brushAtStart = store.getState().paintTools.chosenBrush
+
+                arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
+                brushModeToggled = false
+              }
+
               if (eraseModeValue === 'false') {
                 ctx.globalCompositeOperation = 'source-over'
-                //where new drawing segment is added to canvas
                 const thisPath = drawAnything(
                   keypoint,
-                  rightHand,
-                  leftHand,
-                  nose,
-                  path
+                  path,
+                  handLeft,
+                  handRight,
+                  nose
                 )
                 path = thisPath
-              } else if (path) {
-                path.removeSegment(path.segments.length - 1)
+              } else {
+                //WHAT HAPPENS WHEN ERASE MODE IS ON
 
-                //this turns off both erase and draw mode once there are no more segments to remove
-                if (path.segments.length === 0) {
-                  path = null
-                  store.dispatch(toggleErase())
-                  if (drawModeOn) {
-                    store.dispatch(toggleDraw())
+                if (store.getState().paintTools.chosenBrush !== 'defaultLine') {
+                  for (let i = -1; i <= arrayOfShapes.length; i++) {
+                    if (arrayOfShapes[i]) {
+                      arrayOfShapes[i].removeSegment(0)
+                    }
+                  }
+                } else {
+                  path.removeSegment(path.segments.length - 1)
+
+                  //this turns off both erase and draw mode once there are no more segments to remove
+                  if (path.segments.length === 0) {
+                    path = null
+                    store.dispatch(toggleErase())
+                    if (store.getState().paintTools.drawModeOn === true) {
+                      store.dispatch(toggleDraw())
+                    }
                   }
                 }
               }
@@ -293,6 +336,7 @@ function detectPoseInRealTime(video, net, model, mobileNet) {
 
     if (!drawModeOn) {
       path = null
+
       paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
       lastFewXCoords = Array(frames).fill('null')
       lastFewYCoords = Array(frames).fill('null')
