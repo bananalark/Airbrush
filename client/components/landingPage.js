@@ -16,6 +16,21 @@ const styles = theme => ({
   },
   extendedIcon: {
     marginRight: theme.spacing.unit
+  },
+  icon: {
+    marginRight: theme.spacing.unit * 2
+  },
+  heroUnit: {
+    backgroundColor: theme.palette.background.paper
+  },
+  heroContent: {
+    maxWidth: 600,
+    margin: '0 auto',
+    padding: `${theme.spacing.unit * 28}px 0 ${theme.spacing.unit * 16}px`
+  },
+  footer: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing.unit * 6
   }
 })
 
@@ -79,44 +94,46 @@ class LandingPage extends React.Component {
     const {classes} = this.props
     return (
       <div>
-        <div>
-          <Grid
-            container
-            spacing={24}
-            direction="column"
-            justify="center"
-            alignItems="center"
-          >
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h1">Airbrush</Typography>
+        <div className={classes.heroUnit}>
+          <div className={classes.heroContent}>
+            <Grid
+              container
+              spacing={24}
+              direction="column"
+              justify="center"
+              alignItems="center"
+            >
+              <Grid item xs={12} sm={6}>
+                <Typography variant="h1">Airbrush</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <RouterLink to="/camera">
+                  <Fab
+                    variant="extended"
+                    size="medium"
+                    color="primary"
+                    aria-label="Add"
+                    className={classes.margin}
+                  >
+                    Start Drawing
+                  </Fab>
+                </RouterLink>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <RouterLink to="/camera">
-                <Fab
-                  variant="extended"
-                  size="medium"
-                  color="primary"
-                  aria-label="Add"
-                  className={classes.margin}
-                >
-                  Start Drawing{' '}
-                </Fab>
-              </RouterLink>
-            </Grid>
-          </Grid>
 
-          <ScrollLink
-            activeClass="active"
-            className="test6"
-            to="anchor"
-            spy={true}
-            smooth={true}
-            duration={500}
-          >
-            <Button>
-              <Typography variant="h5">Learn More</Typography>
-            </Button>
-          </ScrollLink>
+            <ScrollLink
+              activeClass="active"
+              className="test6"
+              to="anchor"
+              spy={true}
+              smooth={true}
+              duration={500}
+            >
+              <Button>
+                <Typography variant="h5">Learn More</Typography>
+              </Button>
+            </ScrollLink>
+          </div>
         </div>
 
         <div id="anchor" className="element">
