@@ -15,7 +15,11 @@ const styles = theme => ({
     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
   },
   extendedIcon: {
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
+    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+  },
+  button: {
+    margin: theme.spacing.unit
   },
   icon: {
     marginRight: theme.spacing.unit * 2
@@ -119,20 +123,25 @@ class LandingPage extends React.Component {
                   </Fab>
                 </RouterLink>
               </Grid>
+              <Grid item xs={12} sm={6}>
+                <ScrollLink
+                  activeClass="active"
+                  className="test6"
+                  to="anchor"
+                  spy={true}
+                  smooth={true}
+                  duration={500}
+                >
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    className={classes.button}
+                  >
+                    Learn More
+                  </Button>
+                </ScrollLink>
+              </Grid>
             </Grid>
-
-            <ScrollLink
-              activeClass="active"
-              className="test6"
-              to="anchor"
-              spy={true}
-              smooth={true}
-              duration={500}
-            >
-              <Button>
-                <Typography variant="h5">Learn More</Typography>
-              </Button>
-            </ScrollLink>
           </div>
         </div>
 
