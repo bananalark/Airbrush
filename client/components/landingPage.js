@@ -8,6 +8,7 @@ import {
 import About from './about'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
+import {yellow} from '@material-ui/core/colors'
 
 const styles = theme => ({
   margin: {
@@ -19,7 +20,9 @@ const styles = theme => ({
     color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
   },
   button: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
+    right: 0,
+    bottom: 0
   },
   icon: {
     marginRight: theme.spacing.unit * 2
@@ -32,6 +35,7 @@ const styles = theme => ({
     margin: '0 auto',
     padding: `${theme.spacing.unit * 28}px 0 ${theme.spacing.unit * 16}px`
   },
+
   footer: {
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing.unit * 6
@@ -123,7 +127,7 @@ class LandingPage extends React.Component {
                   </Fab>
                 </RouterLink>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid>
                 <ScrollLink
                   activeClass="active"
                   className="test6"
