@@ -37,8 +37,14 @@ export function createProject(window, cnv) {
   paper.setup(cnv)
 }
 
-export function clearCanvas() {
+const sleep = milliseconds => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export async function clearCanvas() {
   paper.project.clear()
+  //restarts drawing line
+  store.dispatch(toggleDraw())
 }
 
 export function saveCanvas() {
@@ -183,9 +189,10 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     colorToCompare = store.getState().color.color
     brushToCompare = store.getState().paintTools.chosenBrush
   }
-  if (!path) path = pathStyle
 
+  if (!path) path = pathStyle
   path.add(oneKeypoint.position)
+
   if (path.segments.length % 5 === 0) {
     path.smooth({type: 'continuous'})
   }

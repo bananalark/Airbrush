@@ -5,8 +5,9 @@ import store from '../store'
 //TODO
 //remove handCanvas
 
+const span = 224 //hardcoded to keep data in line with dataset model was trained on
+
 export function trackHand(hx, hy, hCanvas, bgCanvas) {
-  const span = 224 //hardcoded to keep data in line with dataset model was trained on
   const halfSpan = span / 2
   const left = hx - halfSpan
   const top = hy - halfSpan
@@ -27,7 +28,7 @@ function makeTensor(canvas) {
     // webcam.
     const croppedImage = cropImage(handImage)
 
-    // Expand the outer most dimension so we have a batch size of 1.
+    // Expand the outer most dimension so we have a batch span of 1.
     const batchedImage = croppedImage.expandDims(0)
 
     // Normalize the image between -1 and 1. The image comes in between 0-255,
@@ -41,12 +42,11 @@ function makeTensor(canvas) {
 
 //Crops an image tensor so we get a square image with no white space
 function cropImage(img) {
-  const size = 224
   const centerHeight = img.shape[0] / 2
-  const beginHeight = centerHeight - size / 2
+  const beginHeight = centerHeight - span / 2
   const centerWidth = img.shape[1] / 2
-  const beginWidth = centerWidth - size / 2
-  return img.slice([beginHeight, beginWidth, 0], [size, size, 3])
+  const beginWidth = centerWidth - span / 2
+  return img.slice([beginHeight, beginWidth, 0], [span, span, 3])
 }
 
 //TODO: turn off for nose??
@@ -86,10 +86,13 @@ export async function predict(canvas, myModel, mobileModel) {
       store.dispatch(drawOn())
       latestSureClass = 0
     }
-  } else if (lastFewPredicts.reduce((a, x) => a + x, 0) > 4 && !latestSureClass) {
-      store.dispatch(drawOff())
-      latestSureClass = 1
-    }
+  } else if (
+    lastFewPredicts.reduce((a, x) => a + x, 0) > 4 &&
+    !latestSureClass
+  ) {
+    store.dispatch(drawOff())
+    latestSureClass = 1
+  }
 
   count < frameCount - 1 ? ++count : (count = 0)
   await tf.nextFrame()
