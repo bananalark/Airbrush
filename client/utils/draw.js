@@ -32,32 +32,12 @@ const yFilter = new KalmanFilter()
 
 let fullImageStr
 
-// export const buttonHandHover = drawingHand => {
-//   let selectorX = drawingHand.position.x
-//   let selectorY = drawingHand.position.y
-
-//   const voiceZone = [{x: 100, y: 40}, {x: 200, y: 100}]
-//   if (selectorX > voiceZone[0].x && selectorX < voiceZone[1].x) {
-//     // console.log('here are your y-coords---->', selectorY)
-//     console.log('you may be in the VOICE zone')
-//     // if (selectorY > voiceZone[0].y && selectorY < voiceZone[1].y) {
-//     // }
-//   }
-// }
-
 export function createProject(window, cnv) {
   paper.install(window)
   paper.setup(cnv)
 }
 
 export function clearCanvas() {
-  paper.project.clear()
-}
-
-export function eraseTool() {
-  const canvas = document.getElementById('output')
-  const ctx = canvas.getContext('2d')
-  ctx.clearRect(0, 0, ctx.width, ctx.height)
   paper.project.clear()
 }
 
@@ -114,7 +94,7 @@ function setSize(size) {
 }
 
 /*eslint-disable*/
-export function drawAnything(part, path) {
+export function drawAnything(part, path, left, right, nose) {
   const {chosenBrush, chosenBodyPart, size} = store.getState().paintTools
   const pixelWidth = setSize(size)
 
@@ -139,30 +119,43 @@ export function drawAnything(part, path) {
     case 'triangleLine':
       return drawTriangleLine(part, pixelWidth)
     case 'rectangle':
-      return drawRectangleShape(rightHand, leftHand, pixelWidth)
+      return drawRectangleShape(right, left, pixelWidth)
     case 'circleShape':
-      if (part === rightHand || part === leftHand) {
-        return drawCircleShape(nose, part, pixelWidth)
-      } else {
-        return drawCircleShape(nose, rightHand, pixelWidth)
-      }
+      return drawCircleShape(nose, right, pixelWidth)
     case 'ellipse':
-      if (part === rightHand || part === leftHand) {
-        return drawEllipseShape(nose, part, pixelWidth)
-      } else {
-        return drawEllipseShape(nose, rightHand, pixelWidth)
-      }
+      return drawEllipseShape(nose, right, pixelWidth)
     case 'triangleShape':
-      if (part === rightHand || part === leftHand) {
-        return drawTriangleShape(nose, part, pixelWidth)
-      } else {
-        return drawTriangleShape(nose, rightHand, pixelWidth)
-      }
+      return drawTriangleShape(nose, right, pixelWidth)
+    // case 'circleShape':
+    //   console.log(part)
+    //   if (part === rightHand || part === leftHand) {
+    //     return drawCircleShape(nose, part, pixelWidth)
+    //   } else {
+    //     return drawCircleShape(nose, rightHand, pixelWidth)
+    //   }
+    // case 'ellipse':
+    //   if (part === rightHand || part === leftHand) {
+    //     return drawEllipseShape(nose, part, pixelWidth)
+    //   } else {
+    //     return drawEllipseShape(nose, rightHand, pixelWidth)
+    //   }
+    // case 'triangleShape':
+    //   if (part === rightHand || part === leftHand) {
+    //     return drawTriangleShape(nose, part, pixelWidth)
+    //   } else {
+    //     return drawTriangleShape(nose, rightHand, pixelWidth)
+    //   }
+
     default:
       return drawLine(part, path, pixelWidth)
   }
 }
 /*eslint-enable*/
+let oldColor = store.getState().color.color
+let colorToCompare = oldColor
+
+let oldBrush = store.getState().paintTools.chosenBrush
+let brushToCompare = oldBrush
 
 //draw lines
 function drawLine(oneKeypoint, path, pixelWidth) {
@@ -174,14 +167,18 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     strokeWidth: pixelWidth,
     strokeCap: 'round'
   })
-  if (!path) {
-    path = pathStyle
+
+  if (
+    store.getState().color.color !== colorToCompare ||
+    store.getState().paintTools.chosenBrush !== brushToCompare
+  ) {
+    path = null
+    colorToCompare = store.getState().color.color
+    brushToCompare = store.getState().paintTools.chosenBrush
   }
+  if (!path) path = pathStyle
+
   path.add(oneKeypoint.position)
-  if (path.segments.length > 5) {
-    path.smooth({type: 'continuous'})
-    path = pathStyle
-  }
 
   return path
 }
@@ -189,13 +186,30 @@ function drawLine(oneKeypoint, path, pixelWidth) {
 //draw circle as line
 export function drawCircleLine(oneKeypoint, pixelWidth) {
   let color = getColor()
-
-  const shape = new Path.Circle(
+  let shape = new Path.Circle(
     new Point(oneKeypoint.position.x, oneKeypoint.position.y),
     30
   )
+
   shape.strokeColor = new Color(color.red, color.green, color.blue)
   shape.strokeWidth = pixelWidth
+
+  if (
+    store.getState().color.color !== colorToCompare ||
+    store.getState().paintTools.chosenBrush !== brushToCompare
+  ) {
+    shape = null
+    colorToCompare = store.getState().color.color
+    brushToCompare = store.getState().paintTools.chosenBrush
+  }
+  if (!shape) {
+    shape = new Path.Circle(
+      new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+      30
+    )
+    shape.strokeColor = new Color(color.red, color.green, color.blue)
+    shape.strokeWidth = pixelWidth
+  }
 
   return shape
 }
@@ -256,13 +270,32 @@ function drawEllipseShape(oneKeypoint, secondKeypoint, pixelWidth) {
 function drawTriangleLine(oneKeypoint, pixelWidth) {
   let color = getColor()
 
-  const triangle = new Path.RegularPolygon(
+  let triangle = new Path.RegularPolygon(
     new Point(oneKeypoint.position.x, oneKeypoint.position.y),
     3,
     30
   )
   triangle.strokeColor = new Color(color.red, color.green, color.blue)
   triangle.strokeWidth = pixelWidth
+
+  if (
+    store.getState().color.color !== colorToCompare ||
+    store.getState().paintTools.chosenBrush !== brushToCompare
+  ) {
+    triangle = null
+    colorToCompare = store.getState().color.color
+    brushToCompare = store.getState().paintTools.chosenBrush
+  }
+
+  if (!triangle) {
+    triangle = new Path.RegularPolygon(
+      new Point(oneKeypoint.position.x, oneKeypoint.position.y),
+      3,
+      30
+    )
+    triangle.strokeColor = new Color(color.red, color.green, color.blue)
+    triangle.strokeWidth = pixelWidth
+  }
 
   return triangle
 }
