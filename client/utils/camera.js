@@ -4,11 +4,12 @@ import {
   createProject,
   drawAnything,
   drawTracker,
-  hoverToChooseTool,
   smooth,
   getDrawMode,
   getBodyPart
 } from './draw.js'
+
+import {hoverToChooseTool} from './hoverButton'
 
 import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
@@ -112,6 +113,12 @@ function detectPoseInRealTime(video, net) {
   paintingPointerCanvas.height = videoHeight
   const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
   paintingPointerCtx.globalCompositeOperation = 'destination-over'
+
+  const hoverButtonHandCanvas = document.getElementById('buttonHand-pointer')
+  hoverButtonHandCanvas.width = videoWidth
+  hoverButtonHandCanvas.height = videoHeight
+  const hoverButtonHandCtx = hoverButtonHandCanvas.getContext('2d')
+  hoverButtonHandCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
@@ -234,9 +241,11 @@ function detectPoseInRealTime(video, net) {
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
               let keypoint
-              if (chosenPart === 'nose') {
+              let buttonSelect //non-drawing hand selects buttons
+              let currentBodyPart = store.getState().paintTools.chosenBodyPart
+              if (currentBodyPart === 'nose') {
                 keypoint = nose
-              } else if (chosenPart === 'leftHand') {
+              } else if (currentBodyPart === 'leftHand') {
                 keypoint = leftHand
               } else {
                 keypoint = rightHand
@@ -246,9 +255,8 @@ function detectPoseInRealTime(video, net) {
 
               let {x, y} = keypoint.position
 
-              if (x > 0 && y < 200) {
-                hoverToChooseTool(x, y)
-              }
+              //This handles the button hover functionality
+              hoverToChooseTool(x, y)
 
               //to smooth points
               //add to arrays for averaging over frames
@@ -303,6 +311,7 @@ function detectPoseInRealTime(video, net) {
                   }
                 } else {
                   if (path) {
+                    //this prevents a weird bug where clicking erase with nothing on screen throws an error
                     path.removeSegment(path.segments.length - 1)
 
                     //this turns off both erase and draw mode once there are no more segments to remove
