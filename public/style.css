@@ -1,6 +1,5 @@
 body {
   font-family: sans-serif;
-  background-color: #f2eedd;
 }
 
 a {
@@ -215,4 +214,28 @@ canvas {
   left: -1000rem;
   width: 0;
   height: 0;
+}
+.footer {
+  background-color: rgb(97, 92, 85);
+  position: relative;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  padding: 0.8em;
+}
+.emoji {
+  margin-left: 6em;
+  padding: 2em;
+}
+
+.aboutContainer {
+  background-color: #f7f4e6;
+}
+
+.MuiGrid-container-8 {
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  justify-content: center;
 }

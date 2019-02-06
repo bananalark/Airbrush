@@ -6,9 +6,11 @@ import {
   scroller
 } from 'react-scroll'
 import About from './about'
+import Fun from './fun'
+import Footer from './footer'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
-import Fun from './fun'
+
 const styles = theme => ({
   margin: {
     margin: theme.spacing.unit,
@@ -153,7 +155,9 @@ class LandingPage extends React.Component {
           <About />
         </div>
 
-        <a onClick={this.scrollToTop}>To the top!</a>
+        <div className="element">
+          <Footer />
+        </div>
       </div>
     )
   }
