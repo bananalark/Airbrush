@@ -371,7 +371,7 @@ export async function bindPage() {
   // Load the PoseNet model weights with architecture 0.75
   const net = await posenet.load(0.75)
   mobileNet = await loadTruncatedMobileNet()
-  model = await tf.loadModel('mymodel.json')
+  model = await tf.loadModel('mymodel-demo.json')
 
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
