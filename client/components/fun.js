@@ -2,13 +2,13 @@ import React from 'react'
 import {ParallaxProvider, Parallax} from 'react-scroll-parallax'
 import TweenLite from 'gsap/TweenLite'
 
-//need to import style
 const getRandomInt = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min
+  return Math.floor(Math.random() * (max - min + 0.01)) + min
 }
 
 /*eslint-disable */
 
+//Airbrush Letters
 const A1 = {
   bounds: [167, 281],
   forms: [
@@ -102,29 +102,41 @@ const U6 = {
   ]
 }
 
+//colors of letters
 export const Gradients = () => (
   <svg width="50" height="50" version="1.1" className="hidden">
     <defs>
+      {/* green */}
       <linearGradient id="gradient-1" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#6ED0DD" />
-        <stop offset="100%" stopColor="#70E2B9" />
+        <stop offset="0%" stopColor="#abb735" />
+        <stop offset="100%" stopColor="#EFCE58" />
       </linearGradient>
+
+      {/* blue */}
       <linearGradient id="gradient-2" x1="0" x2="0" y1="0" y2="1">
         <stop offset="0%" stopColor="#405D86" />
-        <stop offset="100%" stopColor="#384257" />
+        <stop offset="100%" stopColor="#4765a3" />
       </linearGradient>
+
+      {/* more yellow */}
       <linearGradient id="gradient-3" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#ED6088" />
-        <stop offset="100%" stopColor="#C86FA3" />
+        <stop offset="0%" stopColor="FFE67A" />
+        <stop offset="100%" stopColor="#EFCE58" />
       </linearGradient>
+
+      {/* grapefruit */}
       <linearGradient id="gradient-4" x1="0" x2="0" y1="0" y2="1">
         <stop offset="0%" stopColor="#F07F6B" />
         <stop offset="100%" stopColor="#EFC15C" />
       </linearGradient>
+
+      {/* pink */}
       <linearGradient id="gradient-5" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#8D63B1" />
-        <stop offset="100%" stopColor="#8179CB" />
+        <stop offset="0%" stopColor="#ED6088" />
+        <stop offset="100%" stopColor="#C86FA3" />
       </linearGradient>
+
+      {/* yellow */}
       <linearGradient id="gradient-6" x1="0" x2="0" y1="0" y2="1">
         <stop offset="0%" stopColor="#EDD460" />
         <stop offset="100%" stopColor="#EDBC39" />
@@ -139,7 +151,7 @@ class Letter extends React.Component {
   render() {
     const {letter} = this.props
     const offset = getRandomInt(50, 150)
-    const isSlower = getRandomInt(0, 1) ? true : false
+    const isSlower = getRandomInt(0, 0.01) ? true : false
     return (
       <div
         className="letter"
@@ -152,8 +164,8 @@ class Letter extends React.Component {
           <Parallax
             className="form"
             key={i}
-            offsetYMin={-offset * (i + 1) + 'px'}
-            offsetYMax={offset * (i + 1) + 'px'}
+            offsetYMin={-offset * (i + 0.01) + 'px'}
+            offsetYMax={offset * (i + 0.01) + 'px'}
             slowerScrollRate={isSlower}
           >
             {X}
@@ -163,30 +175,6 @@ class Letter extends React.Component {
     )
   }
 }
-
-export const Github = () => (
-  <a
-    href="https://github.com/bananalark/Airbrush"
-    rel="noopener"
-    target="_blank"
-    className="button"
-  >
-    GitHub
-  </a>
-)
-
-export const Fullscreen = () => (
-  <a
-    href="https://codepen.io/jscottsmith/full/eREbwz/"
-    rel="noopener"
-    target="_blank"
-    className="fullscreen"
-  >
-    <svg version="1.1" x="0px" y="0px" viewBox="0 0 30 30">
-      <polygon points="16.5,15 23.1,8.3 26,11.2 26,4 18.8,4 21.7,6.9 15,13.5 8.3,6.9 11.2,4 4,4 4,11.2 6.9,8.3 13.5,15  6.9,21.7 4,18.8 4,26 11.2,26 8.3,23.1 15,16.5 21.7,23.1 18.8,26 26,26 26,18.8 23.1,21.7 	" />
-    </svg>
-  </a>
-)
 
 export const ParallaxWord = () => (
   <div className="word">
@@ -199,8 +187,6 @@ const Fun = () => (
     <main>
       <Gradients />
       <ParallaxWord />
-      <Github />
-      <Fullscreen />
     </main>
   </ParallaxProvider>
 )

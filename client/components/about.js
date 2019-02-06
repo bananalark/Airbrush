@@ -21,7 +21,9 @@ const styles = {
   },
   media: {
     height: 50,
-    width: 50
+    width: 50,
+    justify: 'center',
+    alignItems: 'center'
   },
   content: {
     height: 140

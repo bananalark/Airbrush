@@ -8,7 +8,7 @@ import {
 import About from './about'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
-
+import Fun from './fun'
 const styles = theme => ({
   margin: {
     margin: theme.spacing.unit,
@@ -27,12 +27,12 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2
   },
   heroUnit: {
-    backgroundColor: theme.palette.background.paper
+    backgroundColor: '#F2EED'
   },
   heroContent: {
     maxWidth: 600,
     margin: '0 auto',
-    padding: `${theme.spacing.unit * 28}px 0 ${theme.spacing.unit * 16}px`
+    padding: `${theme.spacing.unit * 14}px 0 ${theme.spacing.unit * 8}px`
   },
 
   footer: {
@@ -101,6 +101,7 @@ class LandingPage extends React.Component {
     const {classes} = this.props
     return (
       <div>
+        <Fun />
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Grid
@@ -110,9 +111,9 @@ class LandingPage extends React.Component {
               justify="center"
               alignItems="center"
             >
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <Typography variant="h1">Airbrush</Typography>
-              </Grid>
+              </Grid> */}
               <Grid item xs={12} sm={6}>
                 <RouterLink to="/camera">
                   <Fab
