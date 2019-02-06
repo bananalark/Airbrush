@@ -20,6 +20,7 @@ import store, {
   chooseBodyPart,
   toggleDraw,
   chooseBrush,
+  drawOff,
   toggleErase
 } from '../store'
 import {Size, Path} from 'paper'
@@ -37,8 +38,11 @@ export function createProject(window, cnv) {
   paper.setup(cnv)
 }
 
-export function clearCanvas() {
+export async function clearCanvas() {
   paper.project.clear()
+
+  //restarts drawing line, also needed as bugfix
+  store.dispatch(drawOff())
 }
 
 export function saveCanvas() {
@@ -54,6 +58,7 @@ export function saveCanvas() {
 
 //create a DOM element to hold download ref
 export function download() {
+  //create a DOM element to hold download ref
   let element = document.createElement('a')
   const file = fullImageStr.replace('image/png', 'image/octet-stream')
   element.href = file
@@ -69,8 +74,12 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
+export function getBodyPart() {
+  return store.getState().paintTools.chosenBodyPart
+}
+
 const prevStateDifferent = (function() {
-  let prevBodyPart = store.getState().chosenBodyPart
+  let prevBodyPart = store.getState().paintTools.chosenBodyPart
   return function(bodyPart) {
     if (prevBodyPart !== bodyPart) {
       prevBodyPart = bodyPart
@@ -92,6 +101,8 @@ function setSize(size) {
       return 3
   }
 }
+
+//i broke it
 
 /*eslint-disable*/
 export function drawAnything(part, path, left, right, nose) {
@@ -176,9 +187,13 @@ function drawLine(oneKeypoint, path, pixelWidth) {
     colorToCompare = store.getState().color.color
     brushToCompare = store.getState().paintTools.chosenBrush
   }
-  if (!path) path = pathStyle
 
+  if (!path) path = pathStyle
   path.add(oneKeypoint.position)
+
+  if (path.segments.length % 5 === 0) {
+    path.smooth({type: 'continuous'})
+  }
 
   return path
 }
@@ -320,13 +335,8 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
 }
 
 //on-off switch with gesture
-export function draw(keypoints, minPartConfidence) {
-  let drawMode = document.getElementById('draw-button').value
-  return (
-    (keypoints[10].score >= minPartConfidence &&
-      Math.abs(keypoints[10].position.y - keypoints[6].position.y) < 50) ||
-    drawMode === 'true'
-  )
+export function getDrawMode() {
+  return store.getState().paintTools.drawModeOn === true
 }
 
 //***** TRACKING CIRCLE *****

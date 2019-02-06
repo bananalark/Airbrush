@@ -48,8 +48,6 @@ class CameraComponent extends Component {
               ]}
               onCloseRequest={() => this.setState({showLightbox: false})}
               enableZoom={false}
-              // in case we want to put a title to the image
-              imageTitle=""
             />
           </div>
         )}
@@ -69,7 +67,6 @@ class CameraComponent extends Component {
                 <canvas id="background" />
                 <canvas id="output" />
                 <canvas id="painting-pointer" />
-                <canvas id="buttonHand-pointer" />
               </div>
             </div>
           </Grid>
