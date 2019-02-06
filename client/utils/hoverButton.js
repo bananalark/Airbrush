@@ -7,16 +7,23 @@ import store, {
   toggleColorPicker
 } from '../store'
 import {voiceModeStartStop} from './speechUtil'
-import {clearCanvas, download, saveCanvas} from './draw'
+import {clearCanvas, saveCanvas} from './draw'
+import 'lightbox-react/style.css'
+
+import Lightbox from 'lightbox-react'
 
 let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
-let hoverCoords = Array(hoverFramesCaptured)
+let hoveryCoords = Array(hoverFramesCaptured)
+let hoverxCoords = Array(hoverFramesCaptured)
 let frameNum = 0
+let lingerTimer = 0
 
 const resetCoordMarkers = () => {
   //user to reset frame info after each touch
-  hoverCoords = Array(hoverFramesCaptured)
+  hoveryCoords = Array(hoverFramesCaptured)
+  hoverxCoords = Array(hoverFramesCaptured)
   frameNum = 0
+  lingerTimer = 0
 }
 
 /*eslint-disable*/
@@ -28,10 +35,6 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   const drawingHandZone = document
     .getElementById('body-part-option')
-    .getBoundingClientRect()
-
-  const drawModeToggleZone = document
-    .getElementById('draw-button')
     .getBoundingClientRect()
 
   const brushSelectionZone = document
@@ -53,8 +56,16 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     .getElementById('take-snapshot')
     .getBoundingClientRect()
 
-  const toolbarRightBorder = voiceToggleZone.width + 20
+  // const toolbarLeftBorder = voiceToggleZone.width + 20
+  // const toolbarRightBorder = voiceToggleZone.width + 20
+  const toolbarOffset = 215
+  let toolbarLeftBorder = voiceToggleZone.left
+  let toolbarRightBorder = voiceToggleZone.right + 20
 
+  // console.log('your x-Coord', xCoord)
+  // // // console.log(voiceToggleZone)
+  // console.log('toolbarLeftborder', toolbarLeftBorder)
+  // console.log('toolbarRightborder', toolbarRightBorder)
   /*
   APPROACH: 
   Keep n coordinates (var hoverFramesCaptured) from unique 
@@ -65,112 +76,122 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   then that hover action yields a touch.
   */
 
-  hoverCoords[frameNum % hoverFramesCaptured] = yCoord
+  hoveryCoords[frameNum % hoverFramesCaptured] = yCoord
+  hoverxCoords[frameNum % hoverFramesCaptured] = xCoord
 
-  let lastFewHoverCoordsAverage
+  let lastFewHoverYcoordsAverage
+  let lastFewHoverXcoordsAverage
+  const offset = 45
 
-  if (hoverCoords[hoverFramesCaptured - 1]) {
-    lastFewHoverCoordsAverage =
-      hoverCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
-  }
+  lastFewHoverYcoordsAverage =
+    hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
+  // +offset
 
-  const userLingersInZone = (allowance, x, y) => {
-    return (
-      Math.abs(lastFewHoverCoordsAverage - y) <= allowance &&
-      x <= toolbarRightBorder
-    )
+  lastFewHoverYcoordsAverage += offset
+
+  lastFewHoverXcoordsAverage =
+    hoverxCoords.reduce((acc, coords) => acc + coords, 0) /
+      hoverFramesCaptured +
+    toolbarOffset
+
+  const userLingersInZone = (allowance, y) => {
+    if (
+      Math.abs(lastFewHoverYcoordsAverage - y) <= allowance &&
+      lastFewHoverXcoordsAverage <= toolbarRightBorder &&
+      lastFewHoverXcoordsAverage >= toolbarLeftBorder
+    ) {
+      lingerTimer += 1
+    }
+    if (lingerTimer === 10) {
+      lingerTimer = 0
+      return true
+    }
   }
 
   const buttonMidpoint = zone => {
-    let middle = (zone.top - zone.bottom) / 2
+    // console.log('zone bottom--->', zone.bottom)
+    // console.log('zone top--->', zone.top)
+    let middle = (zone.bottom - zone.top) / 2
     return zone.top + middle
   }
 
-  //This can be adjusted for fine-tuning. I find that 30 gives us
+  //This can be adjusted for fine-tuning. I find that 20 gives us
   //about the right amount of wiggle room.
-  const inaccuracyAllowance = 30
+  const inaccuracyAllowance = 20
 
   // TODO: This may need some serious refactoring. It's getting crazy. -Amber
+
+  //VOICE ON/OFF
   if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(voiceToggleZone)
-    ) &&
-    yCoord <= drawingHandZone.top
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(voiceToggleZone)) &&
+    lastFewHoverYcoordsAverage <= drawingHandZone.top
   ) {
     store.dispatch(toggleVoice())
     voiceModeStartStop()
     resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(drawingHandZone)
-    ) &&
-    yCoord >= voiceToggleZone.bottom
+  }
+
+  //HAND/NOSE SELECT
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(drawingHandZone)) &&
+    lastFewHoverYcoordsAverage <= brushSelectionZone.top
   ) {
     store.dispatch(toggleBodyPart())
     resetCoordMarkers()
-  } else if (
+  }
+
+  //BRUSH SELECT
+  if (
     userLingersInZone(
       inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(drawModeToggleZone)
-    ) &&
-    yCoord >= drawingHandZone.bottom
-  ) {
-    store.dispatch(toggleDraw())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
       buttonMidpoint(brushSelectionZone)
     ) &&
-    yCoord >= drawModeToggleZone.bottom
+    lastFewHoverYcoordsAverage <= eraseModeToggleZone.top
   ) {
     store.dispatch(toggleBrush())
     resetCoordMarkers()
-  } else if (
+  }
+  //UNDO
+  if (
     userLingersInZone(
       inaccuracyAllowance,
-      xCoord,
       buttonMidpoint(eraseModeToggleZone)
     ) &&
-    yCoord >= brushSelectionZone.bottom
+    lastFewHoverYcoordsAverage <= colorPickerToggleZone.top
   ) {
     store.dispatch(toggleErase())
     resetCoordMarkers()
-  } else if (
+  }
+
+  //COLOR PICKER
+  if (
     userLingersInZone(
       inaccuracyAllowance,
-      xCoord,
       buttonMidpoint(colorPickerToggleZone)
     ) &&
-    yCoord >= eraseModeToggleZone.bottom
+    lastFewHoverYcoordsAverage <= clearCanvasZone.top
   ) {
     store.dispatch(toggleColorPicker())
     resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(clearCanvasZone)
-    ) &&
-    yCoord >= colorPickerToggleZone.bottom
+  }
+
+  //CLEAR CANVAS
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(clearCanvasZone)) &&
+    lastFewHoverYcoordsAverage <= snapshotZone.top
   ) {
     clearCanvas()
     resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(snapshotZone)
-    ) &&
-    yCoord >= clearCanvasZone.bottom
+  }
+
+  //SNAPSHOT
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
+    lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
   ) {
+    //TODO: ShowLightbox needs to be moved to redux store in order to be accessed via touch. Setting photo to just download for now.
     saveCanvas()
+
     download()
     resetCoordMarkers()
   }
