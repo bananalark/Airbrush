@@ -13,12 +13,14 @@ let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
 let hoveryCoords = Array(hoverFramesCaptured)
 let hoverxCoords = Array(hoverFramesCaptured)
 let frameNum = 0
+let lingerTimer = 0
 
 const resetCoordMarkers = () => {
   //user to reset frame info after each touch
   hoveryCoords = Array(hoverFramesCaptured)
   hoverxCoords = Array(hoverFramesCaptured)
   frameNum = 0
+  lingerTimer = 0
 }
 
 /*eslint-disable*/
@@ -31,10 +33,6 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   const drawingHandZone = document
     .getElementById('body-part-option')
     .getBoundingClientRect()
-
-  // const drawModeToggleZone = document
-  //   .getElementById('draw-button')
-  //   .getBoundingClientRect()
 
   const brushSelectionZone = document
     .getElementById('brush-button')
@@ -55,8 +53,16 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     .getElementById('take-snapshot')
     .getBoundingClientRect()
 
-  const toolbarRightBorder = voiceToggleZone.width + 20
+  // const toolbarLeftBorder = voiceToggleZone.width + 20
+  // const toolbarRightBorder = voiceToggleZone.width + 20
+  const toolbarOffset = 215
+  let toolbarLeftBorder = voiceToggleZone.left
+  let toolbarRightBorder = voiceToggleZone.right + 20
 
+  // console.log('your x-Coord', xCoord)
+  // // // console.log(voiceToggleZone)
+  // console.log('toolbarLeftborder', toolbarLeftBorder)
+  // console.log('toolbarRightborder', toolbarRightBorder)
   /*
   APPROACH: 
   Keep n coordinates (var hoverFramesCaptured) from unique 
@@ -72,23 +78,32 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   let lastFewHoverYcoordsAverage
   let lastFewHoverXcoordsAverage
+  const offset = 120
 
   lastFewHoverYcoordsAverage =
-    hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
+    hoveryCoords.reduce((acc, coords) => acc + coords, 0) /
+      hoverFramesCaptured +
+    offset
 
   lastFewHoverXcoordsAverage =
-    hoverxCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
+    hoverxCoords.reduce((acc, coords) => acc + coords, 0) /
+      hoverFramesCaptured +
+    toolbarOffset
 
-  const offset = 120
-  // console.log(
-  //   'hoverAvg+offset--->',
-  //   Number(lastFewHoverYcoordsAverage + offset)
-  // )
   const userLingersInZone = (allowance, y) => {
-    return (
-      Math.abs(lastFewHoverYcoordsAverage + offset - y) <= allowance &&
-      lastFewHoverXcoordsAverage <= toolbarRightBorder
-    )
+    if (
+      Math.abs(lastFewHoverYcoordsAverage - y) <= allowance &&
+      lastFewHoverXcoordsAverage <= toolbarRightBorder &&
+      lastFewHoverXcoordsAverage >= toolbarLeftBorder
+    ) {
+      console.log('lingering!')
+      lingerTimer += 1
+      console.log(lingerTimer)
+    }
+    if (lingerTimer === 10) {
+      lingerTimer = 0
+      return true
+    }
   }
 
   const buttonMidpoint = zone => {
@@ -103,6 +118,8 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   const inaccuracyAllowance = 20
 
   // TODO: This may need some serious refactoring. It's getting crazy. -Amber
+
+  //VOICE ON/OFF
   if (
     userLingersInZone(inaccuracyAllowance, buttonMidpoint(voiceToggleZone)) &&
     lastFewHoverYcoordsAverage <= drawingHandZone.top
@@ -111,78 +128,57 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     voiceModeStartStop()
     resetCoordMarkers()
   }
-  // else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(drawingHandZone)
-  //   ) &&
-  //   yCoord >= voiceToggleZone.bottom
-  // ) {
-  //   store.dispatch(toggleBodyPart())
-  //   resetCoordMarkers()
-  // } else if (
-  //   //   userLingersInZone(
-  //   //     inaccuracyAllowance,
-  //   //     xCoord,
-  //   //     buttonMidpoint(drawModeToggleZone)
-  //   //   ) &&
-  //   //   yCoord >= drawingHandZone.bottom
-  //   // ) {
-  //   //   store.dispatch(toggleDraw())
-  //   //   resetCoordMarkers()
-  //   // } else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(brushSelectionZone)
-  //   ) &&
-  //   yCoord >= drawModeToggleZone.bottom
-  // ) {
-  //   store.dispatch(toggleBrush())
-  //   resetCoordMarkers()
-  // } else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(eraseModeToggleZone)
-  //   ) &&
-  //   yCoord >= brushSelectionZone.bottom
-  // ) {
-  //   store.dispatch(toggleErase())
-  //   resetCoordMarkers()
-  // } else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(colorPickerToggleZone)
-  //   ) &&
-  //   yCoord >= eraseModeToggleZone.bottom
-  // ) {
-  //   store.dispatch(toggleColorPicker())
-  //   resetCoordMarkers()
-  // } else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(clearCanvasZone)
-  //   ) &&
-  //   yCoord >= colorPickerToggleZone.bottom
-  // ) {
-  //   clearCanvas()
-  //   resetCoordMarkers()
-  // } else if (
-  //   userLingersInZone(
-  //     inaccuracyAllowance,
-  //     xCoord,
-  //     buttonMidpoint(snapshotZone)
-  //   ) &&
-  //   yCoord >= clearCanvasZone.bottom
-  // ) {
-  //   saveCanvas()
-  //   download()
-  //   resetCoordMarkers()
-  // }
+
+  //HAND/NOSE SELECT
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(drawingHandZone)) &&
+    lastFewHoverYcoordsAverage <= brushSelectionZone.top
+  ) {
+    store.dispatch(toggleBodyPart())
+    resetCoordMarkers()
+  }
+
+  //BRUSH SELECT
+  if (
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(brushSelectionZone)
+    ) &&
+    lastFewHoverYcoordsAverage <= eraseModeToggleZone.top
+  ) {
+    store.dispatch(toggleBrush())
+    resetCoordMarkers()
+  }
+
+  //COLOR PICKER
+  if (
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(colorPickerToggleZone)
+    ) &&
+    lastFewHoverYcoordsAverage <= clearCanvasZone.top
+  ) {
+    store.dispatch(toggleColorPicker())
+    resetCoordMarkers()
+  }
+
+  //CLEAR CANVAS
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(clearCanvasZone)) &&
+    lastFewHoverYcoordsAverage <= snapshotZone.top
+  ) {
+    clearCanvas()
+    resetCoordMarkers()
+  }
+
+  //SNAPSHOT
+  if (
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
+    lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
+  ) {
+    saveCanvas()
+    resetCoordMarkers()
+  }
 
   frameNum += 1
 }
