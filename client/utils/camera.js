@@ -263,16 +263,14 @@ function detectPoseInRealTime(video, net) {
               let {x, y} = keypoint.position
               let {hoverX, hoverY} = buttonSelect.position
 
-              const toolbarZone = document
-                .getElementById('navbar')
-                .getBoundingClientRect()
-
-              if (x > 0 && y < 200) {
-                hoverToChooseTool(y)
-              }
-              // if (hoverX > 0 && hoverY < 200) {
+              // if (x > 0 && y < 200) {
               //   hoverToChooseTool(y)
               // }
+              // if (x >= toolbarZone.left && x < toolbarZone.right) {
+              // }
+
+              //This handles the button hover functionality
+              hoverToChooseTool(x, y)
 
               //to smooth tracking circle:
               //add to arrays for averaging over frames

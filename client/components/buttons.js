@@ -80,122 +80,126 @@ class Buttons extends Component {
     } = this.props
 
     return (
-      <div id="navbar">
-        {!isChrome ? (
-          <>
-            <Button onClick={() => this.handleNonChrome()}>
-              <div id="voice-button">
-                <VoiceOverOff />
-                Voice Disabled
-              </div>
+      <div>
+        <div id="navbar">
+          {!isChrome ? (
+            <>
+              <Button onClick={() => this.handleNonChrome()}>
+                <div id="voice-button">
+                  <VoiceOverOff />
+                  Voice Disabled
+                </div>
+              </Button>
+              <Dialog
+                maxWidth="xs"
+                open={this.state.voiceDialogOpen}
+                onClose={this.handleDialogClose}
+                aria-labelledby="max-width-dialog-title"
+              >
+                <DialogContent>
+                  <DialogContentText align="center">
+                    Voice Mode is not compatible with this browser. Please use
+                    Chrome for the best experience!
+                  </DialogContentText>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : (
+            <Button id="voice-button" onClick={() => this.handleSpeak()}>
+              {voiceModeOn ? (
+                <div>
+                  <RecordVoiceOver />
+                  Voice Currently On
+                </div>
+              ) : (
+                <div>
+                  <VoiceOverOff />
+                  Voice Currently OFF
+                </div>
+              )}
             </Button>
-            <Dialog
-              maxWidth="xs"
-              open={this.state.voiceDialogOpen}
-              onClose={this.handleDialogClose}
-              aria-labelledby="max-width-dialog-title"
+          )}
+          <div>
+            <Button onClick={toggleBodyPart}>
+              <span id="body-part-option">
+                <Hand />
+                currently drawing with {this.props.chosenBodyPart}
+                {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+                {/* </Drawer> */}
+              </span>
+            </Button>
+            <CustomPopUp
+              id="bodypart-options"
+              className={bodyPartOpen ? 'open' : 'closed'}
             >
-              <DialogContent>
-                <DialogContentText align="center">
-                  Voice Mode is not compatible with this browser. Please use
-                  Chrome for the best experience!
-                </DialogContentText>
-              </DialogContent>
-            </Dialog>
-          </>
-        ) : (
-          <Button id="voice-button" onClick={() => this.handleSpeak()}>
-            {voiceModeOn ? (
+              <BodyPartOptions />
+            </CustomPopUp>
+          </div>
+          <Button
+            id="draw-button"
+            value={drawModeOn}
+            onClick={() => toggleDraw()}
+          >
+            {drawModeOn ? (
               <div>
-                <RecordVoiceOver />
-                Voice Currently On
+                <Pencil />
+                Draw Mode ON
               </div>
             ) : (
               <div>
-                <VoiceOverOff />
-                Voice Currently OFF
+                <PencilOff />
+                Draw Mode OFF
               </div>
             )}
           </Button>
-        )}
-        <div>
-          <Button id="body-part-option" onClick={toggleBodyPart}>
-            <Hand />
-            currently drawing with {this.props.chosenBodyPart}
-            {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
-            {/* </Drawer> */}
-          </Button>
-          <CustomPopUp
-            id="bodypart-options"
-            className={bodyPartOpen ? 'open' : 'closed'}
+          <div>
+            <Button id="brush-button" onClick={toggleBrush}>
+              <Brush />
+              Brush option
+            </Button>
+            <CustomPopUp
+              id="brush-options-popup"
+              className={brushOpen ? 'open' : 'closed'}
+            >
+              <BrushOptions />
+              <LineThickness />
+            </CustomPopUp>
+          </div>
+          <Button
+            id="erase-button"
+            value={eraseModeOn}
+            onClick={() => toggleErase()}
           >
-            <BodyPartOptions />
-          </CustomPopUp>
-        </div>
-        <Button
-          id="draw-button"
-          value={drawModeOn}
-          onClick={() => toggleDraw()}
-        >
-          {drawModeOn ? (
-            <div>
-              <Pencil />
-              Draw Mode ON
-            </div>
-          ) : (
-            <div>
-              <PencilOff />
-              Draw Mode OFF
-            </div>
-          )}
-        </Button>
-        <div>
-          <Button id="brush-button" onClick={toggleBrush}>
-            <Brush />
-            Brush option
-          </Button>
-          <CustomPopUp
-            id="brush-options-popup"
-            className={brushOpen ? 'open' : 'closed'}
+            {eraseModeOn ? (
+              <div>
+                <Eraser />
+                Eraser Mode ON
+              </div>
+            ) : (
+              <div>
+                <Eraser />
+                Eraser Mode OFF
+              </div>
+            )}
+          </Button>{' '}
+          <ColorPicker />
+          <Button
+            id="clear-button"
+            value="Clear Canvas"
+            onClick={() => clearCanvas()}
           >
-            <BrushOptions />
-            <LineThickness />
-          </CustomPopUp>
+            <Clear />Clear Canvas
+          </Button>
+          <Button
+            id="take-snapshot"
+            value="Take Snapshot"
+            onClick={() => {
+              openLightbox(saveCanvas())
+            }}
+          >
+            <Camera />Take Snapshot
+          </Button>
         </div>
-        <Button
-          id="erase-button"
-          value={eraseModeOn}
-          onClick={() => toggleErase()}
-        >
-          {eraseModeOn ? (
-            <div>
-              <Eraser />
-              Eraser Mode ON
-            </div>
-          ) : (
-            <div>
-              <Eraser />
-              Eraser Mode OFF
-            </div>
-          )}
-        </Button>{' '}
-        <ColorPicker />
-        <Button
-          id="clear-button"
-          value="Clear Canvas"
-          onClick={() => clearCanvas()}
-        >
-          <Clear />Clear Canvas
-        </Button>
-        <Button
-          id="take-snapshot"
-          value="Take Snapshot"
-          onClick={() => {
-            openLightbox(saveCanvas())
-          }}
-        >
-          <Camera />Take Snapshot
-        </Button>
       </div>
     )
   }
