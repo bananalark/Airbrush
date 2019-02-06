@@ -1,5 +1,12 @@
 import * as posenet from '@tensorflow-models/posenet'
-import {draw, createProject, drawAnything, drawTracker, smooth} from './draw.js'
+import {
+  draw,
+  createProject,
+  drawAnything,
+  drawTracker,
+  smooth,
+  hoverButtonHandTracker
+} from './draw.js'
 
 import {hoverToChooseTool} from './hoverButton'
 
@@ -112,6 +119,12 @@ function detectPoseInRealTime(video, net) {
   paintingPointerCanvas.height = videoHeight
   const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
   paintingPointerCtx.globalCompositeOperation = 'destination-over'
+
+  const hoverButtonHandCanvas = document.getElementById('buttonHand-pointer')
+  hoverButtonHandCanvas.width = videoWidth
+  hoverButtonHandCanvas.height = videoHeight
+  const hoverButtonHandCtx = hoverButtonHandCanvas.getContext('2d')
+  hoverButtonHandCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
@@ -233,22 +246,33 @@ function detectPoseInRealTime(video, net) {
               //     : currentBodyPart === 'leftHand' ? handLeft : handRight
 
               let keypoint
+              let buttonSelect //non-drawing hand selects buttons
               if (currentBodyPart === 'nose') {
                 keypoint = nose
+                buttonSelect = nose
               } else if (currentBodyPart === 'leftHand') {
                 keypoint = handLeft
+                buttonSelect = handRight
               } else {
                 keypoint = handRight
+                buttonSelect = handLeft
               }
 
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
 
               let {x, y} = keypoint.position
+              let {hoverX, hoverY} = buttonSelect.position
+
+              const toolbarZone = document
+                .getElementById('navbar')
+                .getBoundingClientRect()
 
               if (x > 0 && y < 200) {
-                // console.log('y-coords', y)
-                hoverToChooseTool(x, y)
+                hoverToChooseTool(y)
               }
+              // if (hoverX > 0 && hoverY < 200) {
+              //   hoverToChooseTool(y)
+              // }
 
               //to smooth tracking circle:
               //add to arrays for averaging over frames
@@ -259,8 +283,14 @@ function detectPoseInRealTime(video, net) {
                 keypoint = smooth(lastFewXCoords, lastFewYCoords)
               }
 
+              //Green circle for painting hand, blue circle for hover-button hand
               drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-
+              // hoverButtonHandTracker(
+              //   buttonSelect,
+              //   videoWidth,
+              //   videoHeight,
+              //   hoverButtonHandCtx
+              // )
               arrayOfShapes.push(path)
 
               //every time the color or brush is changed, we should start a new path of shapes.

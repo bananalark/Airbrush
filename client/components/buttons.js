@@ -84,7 +84,7 @@ class Buttons extends Component {
         {!isChrome ? (
           <>
             <Button onClick={() => this.handleNonChrome()}>
-              <div>
+              <div id="voice-button">
                 <VoiceOverOff />
                 Voice Disabled
               </div>
