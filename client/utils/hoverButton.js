@@ -10,12 +10,14 @@ import {voiceModeStartStop} from './speechUtil'
 import {clearCanvas, download, saveCanvas} from './draw'
 
 let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
-let hoverCoords = Array(hoverFramesCaptured)
+let hoveryCoords = Array(hoverFramesCaptured)
+let hoverxCoords = Array(hoverFramesCaptured)
 let frameNum = 0
 
 const resetCoordMarkers = () => {
   //user to reset frame info after each touch
-  hoverCoords = Array(hoverFramesCaptured)
+  hoveryCoords = Array(hoverFramesCaptured)
+  hoverxCoords = Array(hoverFramesCaptured)
   frameNum = 0
 }
 
@@ -30,9 +32,9 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     .getElementById('body-part-option')
     .getBoundingClientRect()
 
-  const drawModeToggleZone = document
-    .getElementById('draw-button')
-    .getBoundingClientRect()
+  // const drawModeToggleZone = document
+  //   .getElementById('draw-button')
+  //   .getBoundingClientRect()
 
   const brushSelectionZone = document
     .getElementById('brush-button')
@@ -65,115 +67,122 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   then that hover action yields a touch.
   */
 
-  hoverCoords[frameNum % hoverFramesCaptured] = yCoord
+  hoveryCoords[frameNum % hoverFramesCaptured] = yCoord
+  hoverxCoords[frameNum % hoverFramesCaptured] = xCoord
 
-  let lastFewHoverCoordsAverage
+  let lastFewHoverYcoordsAverage
+  let lastFewHoverXcoordsAverage
 
-  if (hoverCoords[hoverFramesCaptured - 1]) {
-    lastFewHoverCoordsAverage =
-      hoverCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
-  }
+  lastFewHoverYcoordsAverage =
+    hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
 
-  const userLingersInZone = (allowance, x, y) => {
+  lastFewHoverXcoordsAverage =
+    hoverxCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
+
+  const offset = 120
+  // console.log(
+  //   'hoverAvg+offset--->',
+  //   Number(lastFewHoverYcoordsAverage + offset)
+  // )
+  const userLingersInZone = (allowance, y) => {
     return (
-      Math.abs(lastFewHoverCoordsAverage - y) <= allowance &&
-      x <= toolbarRightBorder
+      Math.abs(lastFewHoverYcoordsAverage + offset - y) <= allowance &&
+      lastFewHoverXcoordsAverage <= toolbarRightBorder
     )
   }
 
   const buttonMidpoint = zone => {
-    let middle = (zone.top - zone.bottom) / 2
+    // console.log('zone bottom--->', zone.bottom)
+    // console.log('zone top--->', zone.top)
+    let middle = (zone.bottom - zone.top) / 2
     return zone.top + middle
   }
 
   //This can be adjusted for fine-tuning. I find that 30 gives us
   //about the right amount of wiggle room.
-  const inaccuracyAllowance = 30
+  const inaccuracyAllowance = 20
 
   // TODO: This may need some serious refactoring. It's getting crazy. -Amber
   if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(voiceToggleZone)
-    ) &&
-    yCoord <= drawingHandZone.top
+    userLingersInZone(inaccuracyAllowance, buttonMidpoint(voiceToggleZone)) &&
+    lastFewHoverYcoordsAverage <= drawingHandZone.top
   ) {
     store.dispatch(toggleVoice())
     voiceModeStartStop()
     resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(drawingHandZone)
-    ) &&
-    yCoord >= voiceToggleZone.bottom
-  ) {
-    store.dispatch(toggleBodyPart())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(drawModeToggleZone)
-    ) &&
-    yCoord >= drawingHandZone.bottom
-  ) {
-    store.dispatch(toggleDraw())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(brushSelectionZone)
-    ) &&
-    yCoord >= drawModeToggleZone.bottom
-  ) {
-    store.dispatch(toggleBrush())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(eraseModeToggleZone)
-    ) &&
-    yCoord >= brushSelectionZone.bottom
-  ) {
-    store.dispatch(toggleErase())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(colorPickerToggleZone)
-    ) &&
-    yCoord >= eraseModeToggleZone.bottom
-  ) {
-    store.dispatch(toggleColorPicker())
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(clearCanvasZone)
-    ) &&
-    yCoord >= colorPickerToggleZone.bottom
-  ) {
-    clearCanvas()
-    resetCoordMarkers()
-  } else if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      xCoord,
-      buttonMidpoint(snapshotZone)
-    ) &&
-    yCoord >= clearCanvasZone.bottom
-  ) {
-    saveCanvas()
-    download()
-    resetCoordMarkers()
   }
+  // else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(drawingHandZone)
+  //   ) &&
+  //   yCoord >= voiceToggleZone.bottom
+  // ) {
+  //   store.dispatch(toggleBodyPart())
+  //   resetCoordMarkers()
+  // } else if (
+  //   //   userLingersInZone(
+  //   //     inaccuracyAllowance,
+  //   //     xCoord,
+  //   //     buttonMidpoint(drawModeToggleZone)
+  //   //   ) &&
+  //   //   yCoord >= drawingHandZone.bottom
+  //   // ) {
+  //   //   store.dispatch(toggleDraw())
+  //   //   resetCoordMarkers()
+  //   // } else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(brushSelectionZone)
+  //   ) &&
+  //   yCoord >= drawModeToggleZone.bottom
+  // ) {
+  //   store.dispatch(toggleBrush())
+  //   resetCoordMarkers()
+  // } else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(eraseModeToggleZone)
+  //   ) &&
+  //   yCoord >= brushSelectionZone.bottom
+  // ) {
+  //   store.dispatch(toggleErase())
+  //   resetCoordMarkers()
+  // } else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(colorPickerToggleZone)
+  //   ) &&
+  //   yCoord >= eraseModeToggleZone.bottom
+  // ) {
+  //   store.dispatch(toggleColorPicker())
+  //   resetCoordMarkers()
+  // } else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(clearCanvasZone)
+  //   ) &&
+  //   yCoord >= colorPickerToggleZone.bottom
+  // ) {
+  //   clearCanvas()
+  //   resetCoordMarkers()
+  // } else if (
+  //   userLingersInZone(
+  //     inaccuracyAllowance,
+  //     xCoord,
+  //     buttonMidpoint(snapshotZone)
+  //   ) &&
+  //   yCoord >= clearCanvasZone.bottom
+  // ) {
+  //   saveCanvas()
+  //   download()
+  //   resetCoordMarkers()
+  // }
 
   frameNum += 1
 }
