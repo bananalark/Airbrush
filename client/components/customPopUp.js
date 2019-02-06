@@ -3,10 +3,16 @@ import {connect} from 'react-redux'
 
 class CustomPopUp extends Component {
   render() {
+    console.log(this.props.part)
+
+    const popUpClass =
+      this.props.part === 'rightHand' ? 'custom-pop-up-right' : 'custom-pop-up'
+
+    console.log(popUpClass)
     return (
       <div
         id={'child-' + this.props.id}
-        className={'custom-pop-up ' + (this.props.className || 'closed')}
+        className={popUpClass + ' ' + (this.props.className || 'closed')}
       >
         {this.props.children}
       </div>
@@ -14,4 +20,10 @@ class CustomPopUp extends Component {
   }
 }
 
-export default CustomPopUp
+function mapStateToProps(state) {
+  return {
+    part: state.paintTools.chosenBodyPart
+  }
+}
+
+export default connect(mapStateToProps)(CustomPopUp)
