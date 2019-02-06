@@ -114,11 +114,11 @@ function detectPoseInRealTime(video, net) {
   const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
   paintingPointerCtx.globalCompositeOperation = 'destination-over'
 
-  const hoverButtonHandCanvas = document.getElementById('buttonHand-pointer')
-  hoverButtonHandCanvas.width = videoWidth
-  hoverButtonHandCanvas.height = videoHeight
-  const hoverButtonHandCtx = hoverButtonHandCanvas.getContext('2d')
-  hoverButtonHandCtx.globalCompositeOperation = 'destination-over'
+  // const hoverButtonHandCanvas = document.getElementById('buttonHand-pointer')
+  // hoverButtonHandCanvas.width = videoWidth
+  // hoverButtonHandCanvas.height = videoHeight
+  // const hoverButtonHandCtx = hoverButtonHandCanvas.getContext('2d')
+  // hoverButtonHandCtx.globalCompositeOperation = 'destination-over'
 
   const flipHorizontal = true
 
