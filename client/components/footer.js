@@ -7,13 +7,6 @@ const styles = theme => ({
   root: {
     flexGrow: 1
   }
-  //   fooder: {
-  //     margin: theme.spacing.unit,
-  //     position: "fixed",
-  //     left: 0,
-  //     bottom: 0,
-  //     background: '#A9A9A9'
-  //   }
 })
 
 function Footer(props) {
@@ -22,7 +15,7 @@ function Footer(props) {
   return (
     <div className={classes.root}>
       <Grid container spacing={24}>
-        <Grid item xs={6} sm={3}>
+        {/* <Grid item xs={6} sm={3}>
           Amber
         </Grid>
         <Grid item xs={6} sm={3}>
@@ -33,7 +26,7 @@ function Footer(props) {
         </Grid>
         <Grid item xs={6} sm={3}>
           Wenyi
-        </Grid>
+        </Grid> */}
         <div className="footer">
           <Link to="/privacy">
             <Typography variant="button" gutterBottom>

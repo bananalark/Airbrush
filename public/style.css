@@ -240,3 +240,16 @@ canvas {
   box-sizing: border-box;
   justify-content: center;
 }
+
+.instructionContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10em;
+  margin-right: 10em;
+}
+
+.motionControlContainer {
+  background-color: #f7f4e6;
+  border-color: #f7f4e6;
+}

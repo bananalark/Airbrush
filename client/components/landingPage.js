@@ -6,8 +6,10 @@ import {
   scroller
 } from 'react-scroll'
 import About from './about'
-import Fun from './fun'
+//import Fun from './fun'
 import InstructionAccessibility from './instructionAccessibility'
+import InstructionMotion from './instructionMotion'
+import InstructionVoice from './instructionVoice'
 import Footer from './footer'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
@@ -15,11 +17,11 @@ import {Link as RouterLink} from 'react-router-dom'
 const styles = theme => ({
   margin: {
     margin: theme.spacing.unit,
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+    background: 'linear-gradient(45deg, #EFCF3E 30%, #EFCF3E 90%)'
   },
   extendedIcon: {
     marginRight: theme.spacing.unit,
-    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+    color: 'linear-gradient(45deg, #EFCF3E 30%, #EFCF3E 90%)'
   },
   button: {
     margin: theme.spacing.unit,
@@ -30,7 +32,7 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2
   },
   heroUnit: {
-    backgroundColor: '#F2EED'
+    backgroundColor: 'EFCF3E' //'#F2EED'
   },
   heroContent: {
     maxWidth: 600,
@@ -43,6 +45,10 @@ const styles = theme => ({
     padding: theme.spacing.unit * 6
   }
 })
+
+// const Github = () => (
+//   <a href="https://github.com/bananalark/Airbrush" rel="noopener" target="_blank" className="buttom">GitHub</a>
+// );
 
 class LandingPage extends React.Component {
   constructor(props) {
@@ -104,7 +110,7 @@ class LandingPage extends React.Component {
     const {classes} = this.props
     return (
       <div>
-        <Fun />
+        {/* <Fun /> */}
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Grid
@@ -113,10 +119,11 @@ class LandingPage extends React.Component {
               direction="column"
               justify="center"
               alignItems="center"
+              justify="space-between"
             >
-              {/* <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <Typography variant="h1">Airbrush</Typography>
-              </Grid> */}
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <RouterLink to="/camera">
                   <Fab
@@ -159,6 +166,18 @@ class LandingPage extends React.Component {
         <div id="anchor2" className="element">
           <InstructionAccessibility />
         </div>
+
+        <div id="anchor3" className="element">
+          <InstructionMotion />
+        </div>
+
+        <div id="anchor4" className="element">
+          <InstructionVoice />
+        </div>
+
+        {/* <div className="buttom">
+          <Github/>
+        </div> */}
 
         <div className="element">
           <Footer />

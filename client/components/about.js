@@ -98,9 +98,18 @@ function About(props) {
                     </CardContent>
                   </CardActionArea>
                   <CardActions>
-                    <Button size="small" color="primary">
-                      Learn More
-                    </Button>
+                    <Link
+                      activeClass="active"
+                      className="test6"
+                      to="anchor3"
+                      spy={true}
+                      smooth={true}
+                      duration={500}
+                    >
+                      <Button size="small" color="primary">
+                        Learn More
+                      </Button>
+                    </Link>
                   </CardActions>
                 </Card>
               </Grid>
@@ -122,9 +131,18 @@ function About(props) {
                     </CardContent>
                   </CardActionArea>
                   <CardActions>
-                    <Button size="small" color="primary">
-                      Learn More
-                    </Button>
+                    <Link
+                      activeClass="active"
+                      className="test6"
+                      to="anchor4"
+                      spy={true}
+                      smooth={true}
+                      duration={500}
+                    >
+                      <Button size="small" color="primary">
+                        Learn More
+                      </Button>
+                    </Link>
                   </CardActions>
                 </Card>
               </Grid>

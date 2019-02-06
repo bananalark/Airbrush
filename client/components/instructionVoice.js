@@ -4,7 +4,7 @@ import {Grid, Card, CardMedia, Typography, withStyles} from '@material-ui/core'
 
 const styles = {
   card: {
-    maxWidth: 250,
+    maxWidth: 255,
     justify: 'center',
     alignItems: 'center'
   },
@@ -14,7 +14,7 @@ const styles = {
   }
 }
 
-function InstructionAccessibility(props) {
+function InstructionVoice(props) {
   const {classes} = props
   return (
     <div className="instructionContainer">
@@ -29,17 +29,16 @@ function InstructionAccessibility(props) {
         <Grid container spacing={24}>
           <Grid item md={3}>
             <Card className={classes.card}>
-              <CardMedia className={classes.media} image="nose.png" />
+              <CardMedia className={classes.media} image="voice.png" />
             </Card>
           </Grid>
 
           <Grid item md={9}>
-            <Typography variant="h3">Accessibility</Typography>
+            <Typography variant="h3">Voice Control</Typography>
             <Typography component="p">
-              Create your drawing in your own way! You can choose from the tool
-              bar to draw with you right hand, your left hand, or even your
-              nose. Nose is our favorite drawing tool when we are sitting near
-              the camera.
+              When Voice Mode is turned on, you can start painting by saying
+              "Start," stop painting by saying "Stop," and erase by saying...
+              you guessed, it - "Erase"!
             </Typography>
           </Grid>
         </Grid>
@@ -48,7 +47,7 @@ function InstructionAccessibility(props) {
   )
 }
 
-InstructionAccessibility.propTypes = {
+InstructionVoice.propTypes = {
   classes: PropTypes.object.isRequired
 }
-export default withStyles(styles)(InstructionAccessibility)
+export default withStyles(styles)(InstructionVoice)
