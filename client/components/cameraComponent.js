@@ -8,7 +8,7 @@ import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
 import {createMuiTheme} from '@material-ui/core/styles'
 import store from '../store'
-import {takeSnapshot} from '../store/lightbox'
+import {takeSnapshot, lightboxOff} from '../store/lightbox'
 import {connect} from 'react-redux'
 import {Switch, withStyles, FormControlLabel} from '@material-ui/core'
 
@@ -90,6 +90,7 @@ class CameraComponent extends Component {
         primary: {main: '#FFFFFF'}
       }
     })
+    console.log('here', this.props.showLightbox)
     return (
       <div>
         {this.props.showLightbox && (
@@ -102,7 +103,7 @@ class CameraComponent extends Component {
                   <Save /> download
                 </Button>
               ]}
-              onCloseRequest={() => this.setState({showLightbox: false})}
+              onCloseRequest={() => store.dispatch(lightboxOff())}
               enableZoom={false}
             />
           </div>
@@ -154,8 +155,8 @@ class CameraComponent extends Component {
 
 const mapState = state => {
   return {
-    showLightbox: state.showLightbox,
-    snapshot: state.imageStr
+    showLightbox: state.lightbox.showLightbox,
+    snapshot: state.lightbox.imageStr
   }
 }
 
