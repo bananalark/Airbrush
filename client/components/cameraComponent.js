@@ -7,6 +7,9 @@ import 'lightbox-react/style.css'
 import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
 import {createMuiTheme} from '@material-ui/core/styles'
+import store from '../store'
+import {takeSnapshot} from '../store/lightbox'
+import {connect} from 'react-redux'
 
 class CameraComponent extends Component {
   constructor(props) {
@@ -18,10 +21,13 @@ class CameraComponent extends Component {
   componentDidMount() {
     require('../utils/camera')
   }
+  componentDidUpdate(prevProps) {
+    return prevProps.showLightbox !==this.props.showLightbox
+  }
 
   //defining this here allows "str" (which is the canvas.toDataURL()) info to be pulled up from the Toolbar component and fed to Lightbox
   openLightbox(str) {
-    this.setState({showLightbox: true, snapshot: str})
+    store.dispatch(takeSnapshot(str))
   }
 
   render() {
@@ -36,10 +42,10 @@ class CameraComponent extends Component {
     })
     return (
       <div>
-        {this.state.showLightbox && (
+        {this.props.showLightbox && (
           <div>
             <Lightbox
-              mainSrc={this.state.snapshot}
+              mainSrc={this.props.snapshot}
               imagePadding={10}
               toolbarButtons={[
                 <Button id="download" onClick={download} color="primary">
@@ -76,4 +82,11 @@ class CameraComponent extends Component {
   }
 }
 
-export default CameraComponent
+const mapState = state => {
+  return {
+    showLightbox: state.showLightbox,
+    snapshot: state.imageStr
+  }
+}
+
+export default connect(mapState)(CameraComponent)
