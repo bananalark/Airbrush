@@ -16,45 +16,39 @@ const styles = {
   card: {
     maxWidth: 345,
     justify: 'center',
-    alignItems: 'center',
-    borderRadius: 20
+    alignItems: 'center'
   },
   media: {
-    height: 50,
-    width: 50
-  },
-  content: {
-    height: 140
+    height: 450,
+    width: 450
   }
 }
 
-function InstructionVoice(props) {
+function InstructionAccessibility(props) {
   const {classes} = props
   return (
-    <div className="InstructionVoiceContainer">
+    <div className="InstructionAccessibilityContainer">
       <Grid
         container
         spacing={24}
         direction="column"
         alignItems="center"
-        justify="center"
         style={{minHeight: '100vh'}}
         justify="space-around"
       >
-        <div className="InstructionVoiceCardContainer">
+        <div className="InstructionAccessibilityCardContainer">
           <Grid>
-            <Grid container spacing={40}>
+            <Grid container spacing={16}>
               <Grid item md={3}>
                 <Card className={classes.card}>
-                  <CardActionArea>
-                    <div className="emoji">
-                      <CardMedia className={classes.media} image="nose.png" />
-                    </div>
-                  </CardActionArea>
+                  <CardMedia
+                    className={classes.media}
+                    image="accessibility.jpg"
+                  />
                 </Card>
               </Grid>
               <Grid item md={9}>
-                Place Holder for discriptions
+                <Typography variant="h3">Accessibility</Typography>
               </Grid>
             </Grid>
           </Grid>
@@ -64,7 +58,7 @@ function InstructionVoice(props) {
   )
 }
 
-InstructionVoice.propTypes = {
+InstructionAccessibility.propTypes = {
   classes: PropTypes.object.isRequired
 }
-export default withStyles(styles)(InstructionVoice)
+export default withStyles(styles)(InstructionAccessibility)

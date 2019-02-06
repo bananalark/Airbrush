@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from 'react-scroll'
 import {
   Grid,
   Card,
@@ -64,9 +65,18 @@ function About(props) {
                     </CardContent>
                   </CardActionArea>
                   <CardActions>
-                    <Button size="small" color="primary">
-                      Learn More
-                    </Button>
+                    <Link
+                      activeClass="active"
+                      className="test6"
+                      to="anchor2"
+                      spy={true}
+                      smooth={true}
+                      duration={500}
+                    >
+                      <Button size="small" color="primary">
+                        Learn More
+                      </Button>
+                    </Link>
                   </CardActions>
                 </Card>
               </Grid>

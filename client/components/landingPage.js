@@ -7,7 +7,7 @@ import {
 } from 'react-scroll'
 import About from './about'
 import Fun from './fun'
-import InstructionVoice from './instructionVoice'
+import InstructionAccessibility from './instructionAccessibility'
 import Footer from './footer'
 import {Grid, Typography, Button, Fab, withStyles} from '@material-ui/core'
 import {Link as RouterLink} from 'react-router-dom'
@@ -156,8 +156,8 @@ class LandingPage extends React.Component {
           <About />
         </div>
 
-        <div id="anchor" className="element">
-          <InstructionVoice />
+        <div id="anchor2" className="element">
+          <InstructionAccessibility />
         </div>
 
         <div className="element">
