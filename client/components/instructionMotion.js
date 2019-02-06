@@ -28,12 +28,6 @@ function InstructionMotion(props) {
           justify="space-around"
         >
           <Grid container spacing={24}>
-            <Grid item md={3}>
-              <Card className={classes.card}>
-                <CardMedia className={classes.media} image="hand.png" />
-              </Card>
-            </Grid>
-
             <Grid item md={9}>
               <Typography variant="h3">Motion Control</Typography>
               <Typography component="p">
@@ -48,6 +42,11 @@ function InstructionMotion(props) {
                 from your computer, and with your whole upper body in the frame.
                 To stop a line, close your hand into a fist.
               </Typography>
+            </Grid>
+            <Grid item md={3}>
+              <Card className={classes.card}>
+                <CardMedia className={classes.media} image="hand.png" />
+              </Card>
             </Grid>
           </Grid>
         </Grid>
