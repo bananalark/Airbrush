@@ -55,11 +55,11 @@ function About(props) {
                     </div>
                     <CardContent className={classes.content}>
                       <Typography gutterBottom variant="h5" component="h2">
-                        Accessibility for Everyone
+                        Accessibility
                       </Typography>
                       <Typography component="p">
-                        Create your drawing with any part of body that you would
-                        like to be traced on. It can be even on your nose.
+                        Create your drawing with your body movement. It can be
+                        your right hand, left hand, even your nose.
                       </Typography>
                     </CardContent>
                   </CardActionArea>
@@ -82,8 +82,8 @@ function About(props) {
                       </Typography>
                       <Typography component="p">
                         Mouse free experience. Toggle to the tool bar. Hold it
-                        for three seconds and now you can grab your favorite
-                        brush and color.
+                        for three seconds. And you will see the menu changes
+                        automatically.
                       </Typography>
                     </CardContent>
                   </CardActionArea>
