@@ -119,6 +119,7 @@ class CameraComponent extends Component {
                 <canvas id="background" />
                 <canvas id="output" />
                 <canvas id="painting-pointer" />
+                <canvas id="second-tracker" />
                 <div id="OnOffButton">
                   <FormControlLabel
                     control={

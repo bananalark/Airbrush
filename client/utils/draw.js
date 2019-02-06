@@ -339,8 +339,8 @@ export function getDrawMode() {
   return store.getState().paintTools.drawModeOn === true
 }
 
-//***** TRACKING CIRCLE *****
-//Here we construct a small green circle to follow the hand or nose
+//***** TRACKING CIRCLES *****
+//Here we construct a small green circle to follow te drawing tool, and a small pink circle to track the hand you'll use for button presses
 
 export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
   let x = keypoint.position.x

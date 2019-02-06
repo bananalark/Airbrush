@@ -6,7 +6,8 @@ import {
   drawTracker,
   smooth,
   getDrawMode,
-  getBodyPart
+  getBodyPart,
+  hoverButtonHandTracker
 } from './draw.js'
 
 import {hoverToChooseTool} from './hoverButton'
@@ -254,19 +255,23 @@ function detectPoseInRealTime(video, net) {
             if (nose.score >= minPartConfidence) {
               //determine current drawing tool and its coordinates
               let keypoint
+              let keypoint2
               let buttonSelect //non-drawing hand selects buttons
               let currentBodyPart = store.getState().paintTools.chosenBodyPart
               if (currentBodyPart === 'nose') {
                 keypoint = nose
               } else if (currentBodyPart === 'leftHand') {
                 keypoint = leftHand
+                keypoint2 = rightHand
               } else {
                 keypoint = rightHand
+                keypoint2 = leftHand
               }
 
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
 
               let {x, y} = keypoint.position
+              let {x2, y2} = keypoint2.position
 
               //to smooth points
               //add to arrays for averaging over frames
@@ -281,7 +286,12 @@ function detectPoseInRealTime(video, net) {
               drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
               //draw second dot
-              drawTracker(keypoint, videoWidth, videoHeight, hoverButtonHandCtx)
+              hoverButtonHandTracker(
+                keypoint2,
+                videoWidth,
+                videoHeight,
+                hoverButtonHandCtx
+              )
 
               arrayOfShapes.push(path)
 
