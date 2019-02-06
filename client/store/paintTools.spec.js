@@ -19,7 +19,7 @@ describe('paintTools reducer', () => {
       voiceModeOn: false,
       drawModeOn: false,
       chosenBrush: 'defaultLine',
-      chosenBodyPart: 'hand',
+      chosenBodyPart: 'leftHand',
       size: 'small'
     })
   })

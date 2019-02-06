@@ -1,20 +1,25 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
-import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
-import Brush from '@material-ui/icons/Brush'
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Button
+} from '@material-ui/core'
+
+import {
+  VoiceOverOff,
+  RecordVoiceOver,
+  Brush,
+  Clear,
+  Camera,
+  Undo
+} from '@material-ui/icons'
+
 import Pencil from 'mdi-material-ui/Pencil'
-import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
-import Clear from '@material-ui/icons/Clear'
-import Button from '@material-ui/core/Button'
-import Drawer from '@material-ui/core/Drawer'
-import Camera from '@material-ui/icons/Camera'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -36,11 +41,55 @@ import BodyPartOptions from './bodyPartOptions'
 import CustomPopUp from './customPopUp'
 import LineThickness from './LineThickness'
 
+// const styles = theme => ({
+//   colorBar: {},
+//   colorChecked: {},
+//   iOSSwitchBase: {
+//     '&$iOSChecked': {
+//       color: theme.palette.common.white,
+//       '& + $iOSBar': {
+//         backgroundColor: '#52d869',
+//       },
+//     },
+//     transition: theme.transitions.create('transform', {
+//       duration: theme.transitions.duration.shortest,
+//       easing: theme.transitions.easing.sharp,
+//     }),
+//   },
+//   iOSChecked: {
+//     transform: 'translateX(15px)',
+//     '& + $iOSBar': {
+//       opacity: 1,
+//       border: 'none',
+//     },
+//   },
+//   iOSBar: {
+//     borderRadius: 13,
+//     width: 42,
+//     height: 26,
+//     marginTop: -13,
+//     marginLeft: -21,
+//     border: 'solid 1px',
+//     borderColor: theme.palette.grey[400],
+//     backgroundColor: theme.palette.grey[50],
+//     opacity: 1,
+//     transition: theme.transitions.create(['background-color', 'border']),
+//   },
+//   iOSIcon: {
+//     width: 24,
+//     height: 24,
+//   },
+//   iOSIconChecked: {
+//     boxShadow: theme.shadows[1],
+//   },
+// });
+
 class Buttons extends Component {
   constructor() {
     super()
     this.state = {
       voiceDialogOpen: false
+      //checkedButton: false
     }
     this.handleSpeak = this.handleSpeak.bind(this)
     this.handleNonChrome = this.handleNonChrome.bind(this)
@@ -53,10 +102,6 @@ class Buttons extends Component {
     voiceModeStartStop()
   }
 
-  // toggleBodyPartOpen() {
-  //   this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  // }
-
   handleNonChrome() {
     this.setState({voiceDialogOpen: true})
   }
@@ -64,7 +109,11 @@ class Buttons extends Component {
   handleDialogClose() {
     this.setState({voiceDialogOpen: false})
   }
+  // handleChange = name => event => {
+  //   this.setState({ [name]: event.target.checked });
+  // }
 
+  /*eslint-disable*/
   render() {
     let {
       openLightbox,
@@ -76,12 +125,22 @@ class Buttons extends Component {
       toggleBrush,
       toggleBodyPart,
       brushOpen,
-      bodyPartOpen
+      bodyPartOpen,
+      chosenBodyPart
     } = this.props
+
+    // let canvas = document.getElementById('output')
+    // let domRect = canvas.getBoundingClientRect();
+    // let {bottom, right} = domRect
+    // console.log('bottom', bottom)
+    // console.log('right', right)
 
     return (
       <div>
-        <div id="navbar">
+        <div
+          id="navbar"
+          className={chosenBodyPart === 'rightHand' ? 'right' : ''}
+        >
           {!isChrome ? (
             <>
               <Button onClick={() => this.handleNonChrome()}>
@@ -105,7 +164,11 @@ class Buttons extends Component {
               </Dialog>
             </>
           ) : (
-            <Button id="voice-button" onClick={() => this.handleSpeak()}>
+            <Button
+              id="voice-button"
+              className={voiceModeOn ? 'active' : ''}
+              onClick={() => this.handleSpeak()}
+            >
               {voiceModeOn ? (
                 <div>
                   <RecordVoiceOver />
@@ -120,7 +183,10 @@ class Buttons extends Component {
             </Button>
           )}
           <div>
-            <Button onClick={toggleBodyPart}>
+            <Button
+              onClick={toggleBodyPart}
+              className={bodyPartOpen ? 'active' : ''}
+            >
               <span id="body-part-option">
                 <Hand />
                 currently drawing with {this.props.chosenBodyPart}
@@ -138,6 +204,7 @@ class Buttons extends Component {
           <Button
             id="draw-button"
             value={drawModeOn}
+            className={drawModeOn ? 'active' : ''}
             onClick={() => toggleDraw()}
           >
             {drawModeOn ? (
@@ -153,7 +220,11 @@ class Buttons extends Component {
             )}
           </Button>
           <div>
-            <Button id="brush-button" onClick={toggleBrush}>
+            <Button
+              id="brush-button"
+              className={brushOpen ? 'active' : ''}
+              onClick={toggleBrush}
+            >
               <Brush />
               Brush option
             </Button>
@@ -167,18 +238,19 @@ class Buttons extends Component {
           </div>
           <Button
             id="erase-button"
+            className={eraseModeOn ? 'active' : ''}
             value={eraseModeOn}
             onClick={() => toggleErase()}
           >
             {eraseModeOn ? (
               <div>
-                <Eraser />
-                Eraser Mode ON
+                <Undo />
+                Undo Mode ON
               </div>
             ) : (
               <div>
-                <Eraser />
-                Eraser Mode OFF
+                <Undo />
+                Undo Mode OFF
               </div>
             )}
           </Button>{' '}
@@ -204,6 +276,7 @@ class Buttons extends Component {
     )
   }
 }
+/*eslint-enable*/
 
 const mapStateToProps = state => ({
   currentCommand: state.paintTools.currentCommand,
@@ -224,4 +297,5 @@ const mapDispatchToProps = dispatch => ({
   toggleBodyPart: () => dispatch(toggleBodyPart())
 })
 
+//export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Buttons))
 export default connect(mapStateToProps, mapDispatchToProps)(Buttons)
