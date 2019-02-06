@@ -29,17 +29,21 @@ class BrushOptions extends Component {
     return (
       <div id="brush-options">
         <p>Brush Options</p>
-        {this.state.brushes.map(brush => {
-          return (
-            <Button
-              key={brush}
-              className={this.props.brush === brush ? 'active' : ''}
-              onClick={() => this.handleClick(brush)}
-            >
-              {brush}
-            </Button>
-          )
-        })}
+        <div>
+          {this.state.brushes.map(brush => {
+            return (
+              <div id={'button-brush-' + brush} key={brush}>
+                <Button
+                  size="large"
+                  className={this.props.brush === brush ? 'active' : ''}
+                  onClick={() => this.handleClick(brush)}
+                >
+                  {brush}
+                </Button>
+              </div>
+            )
+          })}
+        </div>
       </div>
     )
   }

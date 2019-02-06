@@ -1,19 +1,25 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
-import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
-import Brush from '@material-ui/icons/Brush'
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Button
+} from '@material-ui/core'
+
+import {
+  VoiceOverOff,
+  RecordVoiceOver,
+  Brush,
+  Clear,
+  Camera,
+  Undo
+} from '@material-ui/icons'
+
 import Pencil from 'mdi-material-ui/Pencil'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
-import Clear from '@material-ui/icons/Clear'
-import Button from '@material-ui/core/Button'
-import Camera from '@material-ui/icons/Camera'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import Undo from '@material-ui/icons/Undo'
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -52,10 +58,6 @@ class Buttons extends Component {
     voiceModeStartStop()
   }
 
-  // toggleBodyPartOpen() {
-  //   this.setState(prevState => ({bodyPartOpen: !prevState.bodyPartOpen}))
-  // }
-
   handleNonChrome() {
     this.setState({voiceDialogOpen: true})
   }
@@ -76,12 +78,16 @@ class Buttons extends Component {
       toggleBrush,
       toggleBodyPart,
       brushOpen,
-      bodyPartOpen
+      bodyPartOpen,
+      chosenBodyPart
     } = this.props
 
     return (
       <div>
-        <div id="navbar">
+        <div
+          id="navbar"
+          className={chosenBodyPart === 'rightHand' ? 'right' : ''}
+        >
           {!isChrome ? (
             <>
               <Button onClick={() => this.handleNonChrome()}>

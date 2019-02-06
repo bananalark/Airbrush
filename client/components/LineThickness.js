@@ -21,15 +21,19 @@ class LineThickness extends Component {
     return (
       <div id="line-thickness">
         <p>Line Thickness Options</p>
-        {this.state.size.map(size => (
-          <Button
-            className={size === this.props.size ? 'active' : ''}
-            onClick={() => this.handleClick(size)}
-            key={size}
-          >
-            {size}
-          </Button>
-        ))}
+        <div>
+          {this.state.size.map(size => (
+            <div id={'button-size-' + size} key={size}>
+              <Button
+                size="large"
+                className={size === this.props.size ? 'active' : ''}
+                onClick={() => this.handleClick(size)}
+              >
+                {size}
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

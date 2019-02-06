@@ -23,7 +23,7 @@ const initialState = {
   voiceModeOn: false,
   drawModeOn: false,
   chosenBrush: 'defaultLine',
-  chosenBodyPart: 'rightHand',
+  chosenBodyPart: 'leftHand',
   size: 'small'
 }
 

@@ -22,15 +22,19 @@ class BodyPartOptions extends Component {
     return (
       <div id="bodypart-options">
         <p>Drawing Options</p>
-        {this.state.parts.map(part => (
-          <Button
-            onClick={() => this.handleClick(part)}
-            className={this.props.part === part ? 'active' : ''}
-            key={part}
-          >
-            {part}
-          </Button>
-        ))}
+        <div>
+          {this.state.parts.map(part => (
+            <div id={'button-bodypart-' + part} key={part}>
+              <Button
+                size="large"
+                onClick={() => this.handleClick(part)}
+                className={this.props.part === part ? 'active' : ''}
+              >
+                {part}
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
