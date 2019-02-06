@@ -235,6 +235,19 @@ function detectPoseInRealTime(video, net) {
           if (chosenPart !== 'nose') {
             trackHand(handXRight, handYRight, backgroundCanvas)
           }
+          //determine current drawing tool and its coordinates
+          let keypoint
+          let currentBodyPart = store.getState().paintTools.chosenBodyPart
+          if (currentBodyPart === 'nose') {
+            keypoint = nose
+          } else if (currentBodyPart === 'rightHand') {
+            keypoint = rightHand
+          } else {
+            keypoint = leftHand
+          }
+
+          //This handles the button hover functionality with LEFT hand only, for now
+          hoverToChooseTool(keypoint.position.x, keypoint.position.y)
 
           //if somebody is there and drawMode is on, calculate drawing needs
           if (drawModeOn) {
@@ -254,9 +267,6 @@ function detectPoseInRealTime(video, net) {
               //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
 
               let {x, y} = keypoint.position
-
-              //This handles the button hover functionality
-              hoverToChooseTool(x, y)
 
               //to smooth points
               //add to arrays for averaging over frames
