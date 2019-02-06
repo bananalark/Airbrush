@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
+<<<<<<< HEAD
 import Pencil from 'mdi-material-ui/Pencil'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
@@ -21,6 +22,27 @@ import {
   Camera,
   Undo
 } from '@material-ui/icons'
+=======
+import {
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Button
+} from '@material-ui/core'
+
+import {
+  VoiceOverOff,
+  RecordVoiceOver,
+  Brush,
+  Clear,
+  Camera,
+  Undo
+} from '@material-ui/icons'
+
+import Pencil from 'mdi-material-ui/Pencil'
+import PencilOff from 'mdi-material-ui/PencilOff'
+import Hand from 'mdi-material-ui/Hand'
+>>>>>>> e802f85e7e5060a417c1b2e06b194e4694470f1a
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -126,8 +148,8 @@ class Buttons extends Component {
       toggleBrush,
       toggleBodyPart,
       brushOpen,
-      bodyPartOpen
-      //classes
+      bodyPartOpen,
+      chosenBodyPart
     } = this.props
 
     // let canvas = document.getElementById('output')
@@ -138,11 +160,14 @@ class Buttons extends Component {
 
     return (
       <div>
-        <div id="navbar">
+        <div
+          id="navbar"
+          className={chosenBodyPart === 'rightHand' ? 'right' : ''}
+        >
           {!isChrome ? (
             <>
               <Button onClick={() => this.handleNonChrome()}>
-                <div>
+                <div id="voice-button">
                   <VoiceOverOff />
                   Voice Disabled
                 </div>
@@ -182,14 +207,15 @@ class Buttons extends Component {
           )}
           <div>
             <Button
-              className={bodyPartOpen ? 'active' : ''}
-              id="body-part-option"
               onClick={toggleBodyPart}
+              className={bodyPartOpen ? 'active' : ''}
             >
-              <Hand />
-              currently drawing with {this.props.chosenBodyPart}
-              {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
-              {/* </Drawer> */}
+              <span id="body-part-option">
+                <Hand />
+                currently drawing with {this.props.chosenBodyPart}
+                {/* <Drawer anchor="left" open={this.state.bodyPartOpen}> */}
+                {/* </Drawer> */}
+              </span>
             </Button>
             <CustomPopUp
               id="bodypart-options"
@@ -199,9 +225,9 @@ class Buttons extends Component {
             </CustomPopUp>
           </div>
           <Button
-            className={drawModeOn ? 'active' : ''}
             id="draw-button"
             value={drawModeOn}
+            className={drawModeOn ? 'active' : ''}
             onClick={() => toggleDraw()}
           >
             {drawModeOn ? (
@@ -234,8 +260,8 @@ class Buttons extends Component {
             </CustomPopUp>
           </div>
           <Button
-            className={eraseModeOn ? 'active' : ''}
             id="erase-button"
+            className={eraseModeOn ? 'active' : ''}
             value={eraseModeOn}
             onClick={() => toggleErase()}
           >
@@ -269,26 +295,6 @@ class Buttons extends Component {
             <Camera />Take Snapshot
           </Button>
         </div>
-        {/* <div id='OnOffButton' >
-        <FormControlLabel
-          control={
-            <Switch
-              classes={{
-                switchBase: classes.iOSSwitchBase,
-                bar: classes.iOSBar,
-                icon: classes.iOSIcon,
-                iconChecked: classes.iOSIconChecked,
-                checked: classes.iOSChecked,
-              }}
-              disableRipple
-              checked={this.state.checkedButton}
-              onChange={this.handleChange('checkedButton')}
-              value="checkedButton"
-            />
-          }
-          label="On"
-        />
-        </div> */}
       </div>
     )
   }
