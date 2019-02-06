@@ -31,9 +31,15 @@ const expansionPanels = (state = initialState, action) => {
   let newState = {...state}
   switch (action.type) {
     case TOGGLE_BODYPART:
+      if (state.brush) {
+        newState.brush = false
+      }
       newState.bodyPart = !state.bodyPart
       return newState
     case TOGGLE_BRUSH:
+      if (state.bodyPart) {
+        newState.bodyPart = false
+      }
       newState.brush = !state.brush
       return newState
     case TOGGLE_COLORPICKER:
