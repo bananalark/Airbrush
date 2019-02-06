@@ -1,28 +1,6 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-<<<<<<< HEAD
-import Pencil from 'mdi-material-ui/Pencil'
-import PencilOff from 'mdi-material-ui/PencilOff'
-import Hand from 'mdi-material-ui/Hand'
-import {
-  Switch,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  Button,
-  withStyles,
-  FormControlLabel
-} from '@material-ui/core'
-import {
-  VoiceOverOff,
-  RecordVoiceOver,
-  Brush,
-  Clear,
-  Camera,
-  Undo
-} from '@material-ui/icons'
-=======
 import {
   Dialog,
   DialogContent,
@@ -42,7 +20,6 @@ import {
 import Pencil from 'mdi-material-ui/Pencil'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
->>>>>>> e802f85e7e5060a417c1b2e06b194e4694470f1a
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
