@@ -7,7 +7,6 @@ import {
   Signup,
   UserHome,
   CameraComponent,
-  About,
   LandingPage,
   Privacy
 } from './components'
