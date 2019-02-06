@@ -14,7 +14,6 @@ import {connect} from 'react-redux'
 class CameraComponent extends Component {
   constructor(props) {
     super(props)
-    this.state = {showLightbox: false, snapshot: '', showCanvas: false}
     this.openLightbox = this.openLightbox.bind(this)
   }
 
@@ -22,7 +21,7 @@ class CameraComponent extends Component {
     require('../utils/camera')
   }
   componentDidUpdate(prevProps) {
-    return prevProps.showLightbox !==this.props.showLightbox
+    return prevProps.showLightbox !== this.props.showLightbox
   }
 
   //defining this here allows "str" (which is the canvas.toDataURL()) info to be pulled up from the Toolbar component and fed to Lightbox
@@ -31,6 +30,7 @@ class CameraComponent extends Component {
   }
 
   render() {
+    console.log(this.props.showLightbox)
     //for changing button color
     const theme = createMuiTheme({
       typography: {
