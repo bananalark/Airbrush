@@ -18,16 +18,27 @@ class BodyPartOptions extends Component {
   }
 
   render() {
+    console.log(this.props.part)
     return (
       <div id="bodypart-options">
         <p>Drawing Options</p>
         {this.state.parts.map(part => (
-          <Button onClick={() => this.handleClick(part)} key={part}>
+          <Button
+            onClick={() => this.handleClick(part)}
+            className={this.props.part === part ? 'active' : ''}
+            key={part}
+          >
             {part}
           </Button>
         ))}
       </div>
     )
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    part: state.paintTools.chosenBodyPart
   }
 }
 
@@ -38,4 +49,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(null, mapDispatchToProps)(BodyPartOptions)
+export default connect(mapStateToProps, mapDispatchToProps)(BodyPartOptions)

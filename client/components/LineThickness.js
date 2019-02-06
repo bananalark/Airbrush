@@ -22,12 +22,22 @@ class LineThickness extends Component {
       <div id="line-thickness">
         <p>Line Thickness Options</p>
         {this.state.size.map(size => (
-          <Button onClick={() => this.handleClick(size)} key={size}>
+          <Button
+            className={size === this.props.size ? 'active' : ''}
+            onClick={() => this.handleClick(size)}
+            key={size}
+          >
             {size}
           </Button>
         ))}
       </div>
     )
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    size: state.paintTools.size
   }
 }
 
@@ -38,4 +48,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(null, mapDispatchToProps)(LineThickness)
+export default connect(mapStateToProps, mapDispatchToProps)(LineThickness)

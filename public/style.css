@@ -108,6 +108,11 @@ form div {
   margin-bottom: 10px;
 }
 
+.active {
+  color: black !important;
+  background-color: rgb(239, 207, 62, 0.7) !important;
+}
+
 #display {
   position: relative;
 }

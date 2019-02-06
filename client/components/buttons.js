@@ -5,16 +5,15 @@ import VoiceOverOff from '@material-ui/icons/VoiceOverOff'
 import RecordVoiceOver from '@material-ui/icons/RecordVoiceOver'
 import Brush from '@material-ui/icons/Brush'
 import Pencil from 'mdi-material-ui/Pencil'
-import Eraser from 'mdi-material-ui/Eraser'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 import Clear from '@material-ui/icons/Clear'
 import Button from '@material-ui/core/Button'
-import Drawer from '@material-ui/core/Drawer'
 import Camera from '@material-ui/icons/Camera'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
+import Undo from '@material-ui/icons/Undo'
 
 import {saveCanvas, clearCanvas} from '../utils/draw'
 import {voiceModeStartStop} from '../utils/speechUtil'
@@ -65,6 +64,7 @@ class Buttons extends Component {
     this.setState({voiceDialogOpen: false})
   }
 
+  /*eslint-disable*/
   render() {
     let {
       openLightbox,
@@ -105,7 +105,11 @@ class Buttons extends Component {
               </Dialog>
             </>
           ) : (
-            <Button id="voice-button" onClick={() => this.handleSpeak()}>
+            <Button
+              id="voice-button"
+              className={voiceModeOn ? 'active' : ''}
+              onClick={() => this.handleSpeak()}
+            >
               {voiceModeOn ? (
                 <div>
                   <RecordVoiceOver />
@@ -120,7 +124,10 @@ class Buttons extends Component {
             </Button>
           )}
           <div>
-            <Button onClick={toggleBodyPart}>
+            <Button
+              onClick={toggleBodyPart}
+              className={bodyPartOpen ? 'active' : ''}
+            >
               <span id="body-part-option">
                 <Hand />
                 currently drawing with {this.props.chosenBodyPart}
@@ -138,6 +145,7 @@ class Buttons extends Component {
           <Button
             id="draw-button"
             value={drawModeOn}
+            className={drawModeOn ? 'active' : ''}
             onClick={() => toggleDraw()}
           >
             {drawModeOn ? (
@@ -153,7 +161,11 @@ class Buttons extends Component {
             )}
           </Button>
           <div>
-            <Button id="brush-button" onClick={toggleBrush}>
+            <Button
+              id="brush-button"
+              className={brushOpen ? 'active' : ''}
+              onClick={toggleBrush}
+            >
               <Brush />
               Brush option
             </Button>
@@ -167,18 +179,19 @@ class Buttons extends Component {
           </div>
           <Button
             id="erase-button"
+            className={eraseModeOn ? 'active' : ''}
             value={eraseModeOn}
             onClick={() => toggleErase()}
           >
             {eraseModeOn ? (
               <div>
-                <Eraser />
-                Eraser Mode ON
+                <Undo />
+                Undo Mode ON
               </div>
             ) : (
               <div>
-                <Eraser />
-                Eraser Mode OFF
+                <Undo />
+                Undo Mode OFF
               </div>
             )}
           </Button>{' '}
@@ -204,6 +217,7 @@ class Buttons extends Component {
     )
   }
 }
+/*eslint-enable*/
 
 const mapStateToProps = state => ({
   currentCommand: state.paintTools.currentCommand,

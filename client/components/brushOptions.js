@@ -31,13 +31,23 @@ class BrushOptions extends Component {
         <p>Brush Options</p>
         {this.state.brushes.map(brush => {
           return (
-            <Button key={brush} onClick={() => this.handleClick(brush)}>
+            <Button
+              key={brush}
+              className={this.props.brush === brush ? 'active' : ''}
+              onClick={() => this.handleClick(brush)}
+            >
               {brush}
             </Button>
           )
         })}
       </div>
     )
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    brush: state.paintTools.chosenBrush
   }
 }
 
@@ -48,5 +58,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const connectedBrushOptions = connect(null, mapDispatchToProps)(BrushOptions)
+const connectedBrushOptions = connect(mapStateToProps, mapDispatchToProps)(
+  BrushOptions
+)
 export default connectedBrushOptions
