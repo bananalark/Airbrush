@@ -7,7 +7,7 @@ import store, {
   toggleColorPicker
 } from '../store'
 import {voiceModeStartStop} from './speechUtil'
-import {clearCanvas, saveCanvas} from './draw'
+import {clearCanvas, saveCanvas, download} from './draw'
 import 'lightbox-react/style.css'
 
 import Lightbox from 'lightbox-react'
@@ -56,23 +56,17 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     .getElementById('take-snapshot')
     .getBoundingClientRect()
 
-  // const toolbarLeftBorder = voiceToggleZone.width + 20
-  // const toolbarRightBorder = voiceToggleZone.width + 20
   const toolbarOffset = 215
   let toolbarLeftBorder = voiceToggleZone.left
   let toolbarRightBorder = voiceToggleZone.right + 20
 
-  // console.log('your x-Coord', xCoord)
-  // // // console.log(voiceToggleZone)
-  // console.log('toolbarLeftborder', toolbarLeftBorder)
-  // console.log('toolbarRightborder', toolbarRightBorder)
   /*
-  APPROACH: 
-  Keep n coordinates (var hoverFramesCaptured) from unique 
-  frames in an array (var hoverCoords). 
-  
-  Check the average of those coordinates. If that average 
-  falls within an acceptable innaccuracy boundary (var inaccuracyAllowance), 
+  APPROACH:
+  Keep n coordinates (var hoverFramesCaptured) from unique
+  frames in an array (var hoverCoords).
+
+  Check the average of those coordinates. If that average
+  falls within an acceptable innaccuracy boundary (var inaccuracyAllowance),
   then that hover action yields a touch.
   */
 
@@ -102,22 +96,20 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     ) {
       lingerTimer += 1
     }
-    if (lingerTimer === 10) {
+    if (lingerTimer === 15) {
       lingerTimer = 0
       return true
     }
   }
 
   const buttonMidpoint = zone => {
-    // console.log('zone bottom--->', zone.bottom)
-    // console.log('zone top--->', zone.top)
     let middle = (zone.bottom - zone.top) / 2
     return zone.top + middle
   }
 
   //This can be adjusted for fine-tuning. I find that 20 gives us
   //about the right amount of wiggle room.
-  const inaccuracyAllowance = 20
+  const inaccuracyAllowance = 30
 
   // TODO: This may need some serious refactoring. It's getting crazy. -Amber
 
