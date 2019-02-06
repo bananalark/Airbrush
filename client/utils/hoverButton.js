@@ -7,7 +7,10 @@ import store, {
   toggleColorPicker
 } from '../store'
 import {voiceModeStartStop} from './speechUtil'
-import {clearCanvas, download, saveCanvas} from './draw'
+import {clearCanvas, saveCanvas} from './draw'
+import 'lightbox-react/style.css'
+
+import Lightbox from 'lightbox-react'
 
 let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
 let hoveryCoords = Array(hoverFramesCaptured)
@@ -78,12 +81,13 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   let lastFewHoverYcoordsAverage
   let lastFewHoverXcoordsAverage
-  const offset = 120
+  const offset = 45
 
   lastFewHoverYcoordsAverage =
-    hoveryCoords.reduce((acc, coords) => acc + coords, 0) /
-      hoverFramesCaptured +
-    offset
+    hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
+  // +offset
+
+  lastFewHoverYcoordsAverage += offset
 
   lastFewHoverXcoordsAverage =
     hoverxCoords.reduce((acc, coords) => acc + coords, 0) /
@@ -96,9 +100,7 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
       lastFewHoverXcoordsAverage <= toolbarRightBorder &&
       lastFewHoverXcoordsAverage >= toolbarLeftBorder
     ) {
-      console.log('lingering!')
       lingerTimer += 1
-      console.log(lingerTimer)
     }
     if (lingerTimer === 10) {
       lingerTimer = 0
@@ -113,7 +115,7 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     return zone.top + middle
   }
 
-  //This can be adjusted for fine-tuning. I find that 30 gives us
+  //This can be adjusted for fine-tuning. I find that 20 gives us
   //about the right amount of wiggle room.
   const inaccuracyAllowance = 20
 
@@ -149,6 +151,17 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     store.dispatch(toggleBrush())
     resetCoordMarkers()
   }
+  //UNDO
+  if (
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(eraseModeToggleZone)
+    ) &&
+    lastFewHoverYcoordsAverage <= colorPickerToggleZone.top
+  ) {
+    store.dispatch(toggleErase())
+    resetCoordMarkers()
+  }
 
   //COLOR PICKER
   if (
@@ -176,7 +189,10 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
     lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
   ) {
+    //TODO: ShowLightbox needs to be moved to redux store in order to be accessed via touch. Setting photo to just download for now.
     saveCanvas()
+
+    download()
     resetCoordMarkers()
   }
 
