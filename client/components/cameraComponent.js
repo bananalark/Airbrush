@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
-import {download} from '../utils/draw'
+import {download} from '../utils/snapshot'
 import Lightbox from 'lightbox-react'
 import 'lightbox-react/style.css'
 import Button from '@material-ui/core/Button'
