@@ -4,7 +4,8 @@ import store, {
   toggleErase,
   toggleBodyPart,
   toggleBrush,
-  toggleColorPicker
+  toggleColorPicker,
+  takeSnapshot
 } from '../store'
 import {voiceModeStartStop} from './speechUtil'
 import {clearCanvas, saveCanvas, download} from './draw'
@@ -182,9 +183,11 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
   ) {
     //TODO: ShowLightbox needs to be moved to redux store in order to be accessed via touch. Setting photo to just download for now.
-    saveCanvas()
+    // saveCanvas()
 
-    download()
+    // download()
+    const imgStr = saveCanvas()
+    store.dispatch(takeSnapshot(imgStr))
     resetCoordMarkers()
   }
 
