@@ -49,7 +49,7 @@ form div {
 .active {
   color: black !important;
   background-color: rgba(251, 193, 0, 0.7) !important;
-  border-radius: 10px !important;
+  /* border-radius: 10px !important; */
 }
 
 .right {

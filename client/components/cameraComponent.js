@@ -1,12 +1,15 @@
 import React, {Component} from 'react'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from './toolbar'
-import {download} from '../utils/draw'
+import {download} from '../utils/snapshot'
 import Lightbox from 'lightbox-react'
 import 'lightbox-react/style.css'
 import Button from '@material-ui/core/Button'
 import Save from '@material-ui/icons/Save'
 import {createMuiTheme} from '@material-ui/core/styles'
+import store from '../store'
+import {takeSnapshot, lightboxOff} from '../store/lightbox'
+import {connect} from 'react-redux'
 import {Switch, withStyles, FormControlLabel} from '@material-ui/core'
 
 const styles = theme => ({
@@ -56,8 +59,6 @@ class CameraComponent extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      showLightbox: false,
-      snapshot: '',
       showCanvas: false,
       checkedButton: false
     }
@@ -67,10 +68,13 @@ class CameraComponent extends Component {
   componentDidMount() {
     require('../utils/camera')
   }
+  componentDidUpdate(prevProps) {
+    return prevProps.showLightbox !== this.props.showLightbox
+  }
 
   //defining this here allows "str" (which is the canvas.toDataURL()) info to be pulled up from the Toolbar component and fed to Lightbox
   openLightbox(str) {
-    this.setState({showLightbox: true, snapshot: str})
+    store.dispatch(takeSnapshot(str))
   }
   handleChange = name => event => {
     this.setState({[name]: event.target.checked})
@@ -86,19 +90,20 @@ class CameraComponent extends Component {
         primary: {main: '#FFFFFF'}
       }
     })
+    console.log('here', this.props.showLightbox)
     return (
       <div>
-        {this.state.showLightbox && (
+        {this.props.showLightbox && (
           <div>
             <Lightbox
-              mainSrc={this.state.snapshot}
+              mainSrc={this.props.snapshot}
               imagePadding={10}
               toolbarButtons={[
                 <Button id="download" onClick={download} color="primary">
                   <Save /> download
                 </Button>
               ]}
-              onCloseRequest={() => this.setState({showLightbox: false})}
+              onCloseRequest={() => store.dispatch(lightboxOff())}
               enableZoom={false}
             />
           </div>
@@ -148,4 +153,12 @@ class CameraComponent extends Component {
   }
 }
 
-export default withStyles(styles)(CameraComponent)
+const mapState = state => {
+  return {
+    showLightbox: state.lightbox.showLightbox,
+    snapshot: state.lightbox.imageStr
+  }
+}
+
+const connectedRedux = connect(mapState)(CameraComponent)
+export default withStyles(styles)(connectedRedux)

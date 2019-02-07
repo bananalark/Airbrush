@@ -21,7 +21,8 @@ import Pencil from 'mdi-material-ui/Pencil'
 import PencilOff from 'mdi-material-ui/PencilOff'
 import Hand from 'mdi-material-ui/Hand'
 
-import {saveCanvas, clearCanvas} from '../utils/draw'
+import {clearCanvas} from '../utils/draw'
+import {saveCanvas} from '../utils/snapshot'
 import {voiceModeStartStop} from '../utils/speechUtil'
 
 import {
