@@ -22,9 +22,9 @@ const A1 = {
 }
 
 const I2 = {
-  bounds: [110, 281],
+  bounds: [125, 281],
   forms: [
-    <svg viewBox="0 0 110 281" version="1.1">
+    <svg viewBox="0 0 125 281" version="1.1">
       <rect className="fill-1" y="22" width="55" height="204" />
     </svg>
   ]
@@ -49,16 +49,33 @@ const R3 = {
 }
 
 const B4 = {
-  bounds: [167, 281],
+  bounds: [134, 281],
+  // forms: [
+  //   <svg viewBox="0 0 134 281" version="1.1">
+  //     <path
+  //       className="fill-2"
+  //       d="M-0.5,1.5 L0,171.97727"
+  //       d="M3.53036051e-16,2.89601638 C56.9088542,-4.06321276 85.3632813,8.13517356 85.3632813,39.4911753 C85.3632813,44.1897202 77.9923346,69.129929 59.203125,74.8004394 C44.9159649,79.1122488 31.8949253,81.5237142 19.3515625,81.174133 C45.5410187,81.174133 67.6757932,92.3012982 77.4257813,98.2929755 C102.336923,113.601663 87.9215783,143.341601 77.4257813,153.81545 C65.2773438,165.938483 39.46875,172 0,172"
+  //     />
+  //   </svg>
+  // ]
   forms: [
-    <svg viewBox="0 -10 135 281" version="1.1">
-      <path
-        className="fill-2"
-        d="M-0.5,1.5 L0,171.97727"
-        d="M3.53036051e-16,2.89601638 C56.9088542,-4.06321276 85.3632813,8.13517356 85.3632813,39.4911753 C85.3632813,44.1897202 77.9923346,69.129929 59.203125,74.8004394 C44.9159649,79.1122488 31.8949253,81.5237142 19.3515625,81.174133 C45.5410187,81.174133 67.6757932,92.3012982 77.4257813,98.2929755 C102.336923,113.601663 87.9215783,143.341601 77.4257813,153.81545 C65.2773438,165.938483 39.46875,172 0,172"
-      />
-    </svg>
-  ]
+    <svg viewBox="0 0 134 281">
+        <rect className="fill-1" y="22" width="67" height="204"/>
+    </svg>,
+    <svg viewBox="0 0 134 281">
+        <ellipse className="fill-2" cx="67" cy="89" rx="67" ry="67"/>
+    </svg>,
+    <svg viewBox="0 0 134 281">
+        <circle className="fill-1" cx="67" cy="89" r="25"/>
+    </svg>,
+    <svg viewBox="0 0 134 281">
+    <ellipse className="fill-2" cx="67" cy="89" rx="67" ry="67"/>
+    </svg>,
+    <svg viewBox="0 0 134 281">
+    <circle className="fill-1" cx="67" cy="89" r="25"/>
+    </svg>,
+],
 }
 
 const R5 = {
@@ -145,13 +162,15 @@ export const Gradients = () => (
   </svg>
 )
 
-const word = [A1, I2, R3, B4, R5, U6]
+ const word = [A1, I2, R3, B4, R5, U6]
+//const word = [P1, A2, R3, A4, L5, L6, A7]
 
 class Letter extends React.Component {
   render() {
     const {letter} = this.props
-    const offset = getRandomInt(50, 150)
-    const isSlower = getRandomInt(0, 0.01) ? true : false
+    // const offset = getRandomInt(50, 150)
+    const offset = getRandomInt(50, 150);
+    const isSlower = getRandomInt(0, 1) ? true : false
     return (
       <div
         className="letter"
@@ -164,8 +183,8 @@ class Letter extends React.Component {
           <Parallax
             className="form"
             key={i}
-            offsetYMin={-offset * (i + 0.01) + 'px'}
-            offsetYMax={offset * (i + 0.01) + 'px'}
+            offsetYMin={-offset * (i + 1) + 'px'}
+            offsetYMax={offset * (i + 1) + 'px'}
             slowerScrollRate={isSlower}
           >
             {X}

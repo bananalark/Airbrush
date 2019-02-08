@@ -6,7 +6,7 @@ import {
   scroller
 } from 'react-scroll'
 import About from './about'
-//import Fun from './fun'
+import Fun from './fun'
 import InstructionAccessibility from './instructionAccessibility'
 import InstructionMotion from './instructionMotion'
 import InstructionVoice from './instructionVoice'
@@ -110,7 +110,9 @@ class LandingPage extends React.Component {
     const {classes} = this.props
     return (
       <div>
-        {/* <Fun /> */}
+        <div className="funContainer">
+        <Fun />
+        </div>
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Grid
@@ -121,9 +123,9 @@ class LandingPage extends React.Component {
               alignItems="center"
               justify="space-between"
             >
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <Typography variant="h1">Airbrush</Typography>
-              </Grid>
+              </Grid> */}
               <Grid item xs={12} sm={6}>
                 <RouterLink to="/camera">
                   <Fab

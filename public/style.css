@@ -290,3 +290,7 @@ canvas {
   background-color: #f7f4e6;
   border-color: #f7f4e6;
 }
+
+.funContainer {
+  padding: 5em;
+}
