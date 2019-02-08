@@ -8,7 +8,8 @@ import store, {
   takeSnapshot
 } from '../store'
 import {voiceModeStartStop} from './speechUtil'
-import {clearCanvas, saveCanvas, download} from './draw'
+import {saveCanvas} from './snapshot'
+import {clearCanvas} from './draw'
 import 'lightbox-react/style.css'
 
 import Lightbox from 'lightbox-react'
@@ -182,9 +183,6 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
     userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
     lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
   ) {
-    //TODO: ShowLightbox needs to be moved to redux store in order to be accessed via touch. Setting photo to just download for now.
-    // saveCanvas()
-
     // download()
     const imgStr = saveCanvas()
     store.dispatch(takeSnapshot(imgStr))

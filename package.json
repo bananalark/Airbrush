@@ -25,7 +25,7 @@
     "test": "NODE_ENV='test' mocha \"./server/**/*.spec.js\" \"./client/**/*.spec.js\" \"./script/**/*.spec.js\" --require @babel/polyfill --require @babel/register"
   },
   "lint-staged": {
-"*.{js,jsx}": [
+    "*.{js,jsx}": [
      "prettier --write",
      "npm run lint-fix",
      "git add"
