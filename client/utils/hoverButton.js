@@ -18,14 +18,26 @@ let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
 let hoveryCoords = Array(hoverFramesCaptured)
 let hoverxCoords = Array(hoverFramesCaptured)
 let frameNum = 0
-let lingerTimer = 0
+
+class LingerTimer {
+  constructor() {
+    this.voice = 0
+    this.handNose = 0
+    this.brush = 0
+    this.erase = 0
+    this.color = 0
+    this.clear = 0
+    this.snapshot = 0
+  }
+}
+
+let lingerTimer = new LingerTimer()
 
 const resetCoordMarkers = () => {
   //user to reset frame info after each touch
   hoveryCoords = Array(hoverFramesCaptured)
   hoverxCoords = Array(hoverFramesCaptured)
-  frameNum = 0
-  lingerTimer = 0
+  // frameNum = 0
 }
 
 /*eslint-disable*/
@@ -77,11 +89,12 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   let lastFewHoverYcoordsAverage
   let lastFewHoverXcoordsAverage
-  const offset = 45
+
+  //Our offset take different window sizes into effect
+  const offset = voiceToggleZone.top
 
   lastFewHoverYcoordsAverage =
     hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
-  // +offset
 
   lastFewHoverYcoordsAverage += offset
 
@@ -90,17 +103,20 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
       hoverFramesCaptured +
     toolbarOffset
 
-  const userLingersInZone = (allowance, y) => {
+  const userLingersInZone = (allowance, y, zone) => {
     if (
       Math.abs(lastFewHoverYcoordsAverage - y) <= allowance &&
       lastFewHoverXcoordsAverage <= toolbarRightBorder &&
       lastFewHoverXcoordsAverage >= toolbarLeftBorder
     ) {
-      lingerTimer += 1
+      lingerTimer[zone] += 1
+      // console.log(zone, lingerTimer[zone])
     }
-    if (lingerTimer === 15) {
-      lingerTimer = 0
+    if (lingerTimer[zone] === 15) {
+      lingerTimer[zone] = 0
       return true
+    } else {
+      return false
     }
   }
 
@@ -113,11 +129,13 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   //about the right amount of wiggle room.
   const inaccuracyAllowance = 30
 
-  // TODO: This may need some serious refactoring. It's getting crazy. -Amber
-
   //VOICE ON/OFF
   if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(voiceToggleZone)) &&
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(voiceToggleZone),
+      'voice'
+    ) &&
     lastFewHoverYcoordsAverage <= drawingHandZone.top
   ) {
     store.dispatch(toggleVoice())
@@ -127,8 +145,13 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   //HAND/NOSE SELECT
   if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(drawingHandZone)) &&
-    lastFewHoverYcoordsAverage <= brushSelectionZone.top
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(drawingHandZone),
+      'handNose'
+    ) &&
+    lastFewHoverYcoordsAverage <= brushSelectionZone.top &&
+    lastFewHoverYcoordsAverage >= voiceToggleZone.bottom
   ) {
     store.dispatch(toggleBodyPart())
     resetCoordMarkers()
@@ -138,9 +161,11 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   if (
     userLingersInZone(
       inaccuracyAllowance,
-      buttonMidpoint(brushSelectionZone)
+      buttonMidpoint(brushSelectionZone),
+      'brush'
     ) &&
-    lastFewHoverYcoordsAverage <= eraseModeToggleZone.top
+    lastFewHoverYcoordsAverage <= eraseModeToggleZone.top &&
+    lastFewHoverYcoordsAverage >= drawingHandZone.bottom
   ) {
     store.dispatch(toggleBrush())
     resetCoordMarkers()
@@ -149,9 +174,11 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   if (
     userLingersInZone(
       inaccuracyAllowance,
-      buttonMidpoint(eraseModeToggleZone)
+      buttonMidpoint(eraseModeToggleZone),
+      'erase'
     ) &&
-    lastFewHoverYcoordsAverage <= colorPickerToggleZone.top
+    lastFewHoverYcoordsAverage <= colorPickerToggleZone.top &&
+    lastFewHoverYcoordsAverage >= brushSelectionZone.bottom
   ) {
     store.dispatch(toggleErase())
     resetCoordMarkers()
@@ -161,29 +188,40 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
   if (
     userLingersInZone(
       inaccuracyAllowance,
-      buttonMidpoint(colorPickerToggleZone)
+      buttonMidpoint(colorPickerToggleZone),
+      'color'
     ) &&
-    lastFewHoverYcoordsAverage <= clearCanvasZone.top
+    lastFewHoverYcoordsAverage <= clearCanvasZone.top &&
+    lastFewHoverYcoordsAverage >= eraseModeToggleZone.bottom
   ) {
     store.dispatch(toggleColorPicker())
     resetCoordMarkers()
   }
 
-  //CLEAR CANVAS
+  ////CLEAR CANVAS
   if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(clearCanvasZone)) &&
-    lastFewHoverYcoordsAverage <= snapshotZone.top
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(clearCanvasZone),
+      'clear'
+    ) &&
+    lastFewHoverYcoordsAverage <= snapshotZone.top &&
+    lastFewHoverYcoordsAverage >= colorPickerToggleZone.bottom
   ) {
     clearCanvas()
     resetCoordMarkers()
   }
 
-  //SNAPSHOT
+  ////SNAPSHOT
   if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
-    lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
+    userLingersInZone(
+      inaccuracyAllowance,
+      buttonMidpoint(snapshotZone),
+      'snapshot'
+    ) &&
+    lastFewHoverYcoordsAverage >= clearCanvasZone.top &&
+    lastFewHoverYcoordsAverage <= snapshotZone.bottom + 20
   ) {
-    // download()
     const imgStr = saveCanvas()
     store.dispatch(takeSnapshot(imgStr))
     resetCoordMarkers()
