@@ -2,9 +2,9 @@ import React from 'react'
 import {ParallaxProvider, Parallax} from 'react-scroll-parallax'
 import TweenLite from 'gsap/TweenLite'
 
-const getRandomInt = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 0.01)) + min
-}
+// const getRandomInt = (min, max) => {
+//   return Math.floor(Math.random() * (max - min + 1)) + min
+// }
 
 /*eslint-disable */
 
@@ -25,7 +25,7 @@ const I2 = {
   bounds: [125, 281],
   forms: [
     <svg viewBox="0 0 125 281" version="1.1">
-      <rect className="fill-1" y="22" width="55" height="204" />
+      <rect className="fill-1" x="55" y="22" width="55" height="204" />
     </svg>
   ]
 }
@@ -50,31 +50,16 @@ const R3 = {
 
 const B4 = {
   bounds: [134, 281],
-  // forms: [
-  //   <svg viewBox="0 0 134 281" version="1.1">
-  //     <path
-  //       className="fill-2"
-  //       d="M-0.5,1.5 L0,171.97727"
-  //       d="M3.53036051e-16,2.89601638 C56.9088542,-4.06321276 85.3632813,8.13517356 85.3632813,39.4911753 C85.3632813,44.1897202 77.9923346,69.129929 59.203125,74.8004394 C44.9159649,79.1122488 31.8949253,81.5237142 19.3515625,81.174133 C45.5410187,81.174133 67.6757932,92.3012982 77.4257813,98.2929755 C102.336923,113.601663 87.9215783,143.341601 77.4257813,153.81545 C65.2773438,165.938483 39.46875,172 0,172"
-  //     />
-  //   </svg>
-  // ]
   forms: [
     <svg viewBox="0 0 134 281">
-        <rect className="fill-1" y="22" width="67" height="204"/>
+        <ellipse className="fill-2" cx="57" cy="79" rx="57" ry="57"/>
     </svg>,
     <svg viewBox="0 0 134 281">
-        <ellipse className="fill-2" cx="67" cy="89" rx="67" ry="67"/>
+    <ellipse className="fill-2" cx="67" cy="160" rx="67" ry="67"/>
     </svg>,
     <svg viewBox="0 0 134 281">
-        <circle className="fill-1" cx="67" cy="89" r="25"/>
-    </svg>,
-    <svg viewBox="0 0 134 281">
-    <ellipse className="fill-2" cx="67" cy="89" rx="67" ry="67"/>
-    </svg>,
-    <svg viewBox="0 0 134 281">
-    <circle className="fill-1" cx="67" cy="89" r="25"/>
-    </svg>,
+    <rect className="fill-1" y="22" width="47" height="204"/>
+</svg>,
 ],
 }
 
@@ -119,58 +104,85 @@ const U6 = {
   ]
 }
 
+const S7 = {
+  bounds: [167, 281],
+  forms: [
+    <svg viewBox="0 0 167 281" version="1.1">
+      <path className = 'fill-1' width = "35"
+  d="M70 30 A20 20 0 1 0 50 50 A20 20 0 1 1 30 70" />
+      />
+    </svg>
+  ]
+}
+
+const H8 = {
+  bounds: [125, 281],
+  forms: [
+    <svg viewBox="0 0 125 281" version="1.1">
+      <rect className="fill-1" x="55" y="22" width="55" height="204" />
+    </svg>,
+    <svg viewBox="0 0 125 281" version="1.1">
+    <rect className="fill-1" x="55" y="22" width="65" height="55" />
+    </svg>,
+     <svg viewBox="0 0 125 281" version="1.1">
+     <rect className="fill-1" x="62" y="22" width="55" height="204" />
+   </svg>
+  ]
+}
+
 //colors of letters
 export const Gradients = () => (
   <svg width="50" height="50" version="1.1" className="hidden">
     <defs>
       {/* green */}
       <linearGradient id="gradient-1" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#abb735" />
-        <stop offset="100%" stopColor="#EFCE58" />
+        <stop offset="0%" stopColor="#B6C61A" />
+        <stop offset="100%" stopColor="#B6C61A" />
       </linearGradient>
 
       {/* blue */}
       <linearGradient id="gradient-2" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#405D86" />
-        <stop offset="100%" stopColor="#4765a3" />
+        <stop offset="0%" stopColor="#006344" />
+        <stop offset="100%" stopColor="#006344" />
       </linearGradient>
 
       {/* more yellow */}
       <linearGradient id="gradient-3" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="FFE67A" />
-        <stop offset="100%" stopColor="#EFCE58" />
+        <stop offset="0%" stopColor="#FEC925" />
+        <stop offset="100%" stopColor="#FEC925" />
       </linearGradient>
 
-      {/* grapefruit */}
+      {/* orange */}
       <linearGradient id="gradient-4" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#F07F6B" />
-        <stop offset="100%" stopColor="#EFC15C" />
+        <stop offset="0%" stopColor="#F26419" />
+        <stop offset="100%" stopColor="#F26419" />
       </linearGradient>
 
-      {/* pink */}
+      {/* Blue */}
       <linearGradient id="gradient-5" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#ED6088" />
-        <stop offset="100%" stopColor="#C86FA3" />
+        <stop offset="0%" stopColor="#33658A" />
+        <stop offset="100%" stopColor="#33658A" />
       </linearGradient>
 
       {/* yellow */}
       <linearGradient id="gradient-6" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stopColor="#EDD460" />
-        <stop offset="100%" stopColor="#EDBC39" />
+        <stop offset="0%" stopColor="#D8A800" />
+        <stop offset="100%" stopColor="#EFCF3E" />
       </linearGradient>
     </defs>
   </svg>
 )
 
- const word = [A1, I2, R3, B4, R5, U6]
+ const word = [A1, I2, R3, B4, R5, U6, S7, H8]
 //const word = [P1, A2, R3, A4, L5, L6, A7]
 
 class Letter extends React.Component {
   render() {
     const {letter} = this.props
-    // const offset = getRandomInt(50, 150)
-    const offset = getRandomInt(50, 150);
-    const isSlower = getRandomInt(0, 1) ? true : false
+
+    const offset = 10
+    // const offset = getRandomInt(50, 150);
+    // const isSlower = getRandomInt(0, 1) ? true : false
     return (
       <div
         className="letter"
@@ -185,7 +197,7 @@ class Letter extends React.Component {
             key={i}
             offsetYMin={-offset * (i + 1) + 'px'}
             offsetYMax={offset * (i + 1) + 'px'}
-            slowerScrollRate={isSlower}
+            // slowerScrollRate={isSlower}
           >
             {X}
           </Parallax>
@@ -210,31 +222,31 @@ const Fun = () => (
   </ParallaxProvider>
 )
 
-const run = () => {
-  const root = document.createElement('div')
-  document.body.appendChild(root)
+// const run = () => {
+//   const root = document.createElement('div')
+//   document.body.appendChild(root)
 
-  const scrollAnimation = {scrollTop: 0}
-  const scrollTop = document.body.clientHeight / 2 - window.innerHeight / 2
+//   const scrollAnimation = {scrollTop: 0}
+//   const scrollTop = document.body.clientHeight / 2 - window.innerHeight / 2
 
-  const tween = TweenLite.to(scrollAnimation, 2, {
-    scrollTop: scrollTop,
-    ease: Power2.easeInOut,
-    onUpdate: () => {
-      window.scrollTo(0, scrollAnimation.scrollTop)
-    }
-  })
+//   const tween = TweenLite.to(scrollAnimation, 2, {
+//     scrollTop: scrollTop,
+//     ease: Power2.easeInOut,
+//     onUpdate: () => {
+//       window.scrollTo(0, scrollAnimation.scrollTop)
+//     }
+//   })
 
-  window.addEventListener(
-    'mousewheel',
-    function mouseHandler() {
-      tween.kill()
-      window.removeEventListener('mousewheel', mouseHandler, false)
-    },
-    false
-  )
-}
+//   window.addEventListener(
+//     'mousewheel',
+//     function mouseHandler() {
+//       tween.kill()
+//       window.removeEventListener('mousewheel', mouseHandler, false)
+//     },
+//     false
+//   )
+// }
 
-run()
+// run()
 
 export default Fun
