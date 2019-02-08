@@ -8,6 +8,7 @@ import {
   getDrawMode,
   getBodyPart
 } from './draw.js'
+import {hoverToChooseBrush} from './hoverButtonBrushes'
 
 import {hoverToChooseTool} from './hoverButton'
 
@@ -248,6 +249,10 @@ function detectPoseInRealTime(video, net) {
 
           //This handles the button hover functionality with LEFT hand only, for now
           hoverToChooseTool(keypoint.position.x, keypoint.position.y)
+
+          if (store.getState().expansionPanels.brush === true) {
+            hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
+          }
 
           //if somebody is there and drawMode is on, calculate drawing needs
           if (drawModeOn) {
