@@ -18,7 +18,6 @@ class BodyPartOptions extends Component {
   }
 
   render() {
-    console.log(this.props.part)
     return (
       <div id="bodypart-options">
         <p>Drawing Options</p>

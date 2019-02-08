@@ -90,7 +90,6 @@ class CameraComponent extends Component {
         primary: {main: '#FFFFFF'}
       }
     })
-    console.log('here', this.props.showLightbox)
     return (
       <div>
         {this.props.showLightbox && (

@@ -7,57 +7,63 @@ import store, {
   toggleColorPicker,
   takeSnapshot
 } from '../store'
+import {fetchZones, hoverToChooseBrush} from './hoverButtonBrushes'
 import {voiceModeStartStop} from './speechUtil'
 import {saveCanvas} from './snapshot'
 import {clearCanvas} from './draw'
 import 'lightbox-react/style.css'
 
-import Lightbox from 'lightbox-react'
-
-let hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
+export const hoverFramesCaptured = 30 //this can be adjusted for button responsiveness
 let hoveryCoords = Array(hoverFramesCaptured)
 let hoverxCoords = Array(hoverFramesCaptured)
 let frameNum = 0
-let lingerTimer = 0
+
+class LingerTimer {
+  constructor() {
+    this.voiceToggleZone = 0
+    this.drawingHandZone = 0
+    this.brushSelectionZone = 0
+    this.eraseModeToggleZone = 0
+    this.colorPickerToggleZone = 0
+    this.clearCanvasZone = 0
+    this.snapshotZone = 0
+  }
+}
+
+let lingerTimer = new LingerTimer()
+const lingers = [
+  'voiceToggleZone',
+  'drawingHandZone',
+  'brushSelectionZone',
+  'eraseModeToggleZone',
+  'colorPickerToggleZone',
+  'clearCanvasZone',
+  'snapshotZone'
+]
+export const timeToLinger = 10
+
+//This can be adjusted for fine-tuning. I find that 20 gives us about the right amount of wiggle room.
+export const inaccuracyAllowance = 30
 
 const resetCoordMarkers = () => {
   //user to reset frame info after each touch
   hoveryCoords = Array(hoverFramesCaptured)
   hoverxCoords = Array(hoverFramesCaptured)
   frameNum = 0
-  lingerTimer = 0
+  lingers.forEach(zone => (lingerTimer[zone] = 0))
 }
 
 /*eslint-disable*/
 export const hoverToChooseTool = (xCoord, yCoord) => {
-  // *** This is where the buttons are located on the canvas *** //
-  const voiceToggleZone = document
-    .getElementById('voice-button')
-    .getBoundingClientRect()
-
-  const drawingHandZone = document
-    .getElementById('body-part-option')
-    .getBoundingClientRect()
-
-  const brushSelectionZone = document
-    .getElementById('brush-button')
-    .getBoundingClientRect()
-
-  const eraseModeToggleZone = document
-    .getElementById('erase-button')
-    .getBoundingClientRect()
-  const colorPickerToggleZone = document
-    .getElementById('color-picker')
-    .getBoundingClientRect()
-
-  const clearCanvasZone = document
-    .getElementById('clear-button')
-    .getBoundingClientRect()
-
-  const snapshotZone = document
-    .getElementById('take-snapshot')
-    .getBoundingClientRect()
-
+  const {
+    voiceToggleZone,
+    drawingHandZone,
+    brushSelectionZone,
+    eraseModeToggleZone,
+    colorPickerToggleZone,
+    clearCanvasZone,
+    snapshotZone
+  } = fetchZones()
   const toolbarOffset = 215
   let toolbarLeftBorder = voiceToggleZone.left
   let toolbarRightBorder = voiceToggleZone.right + 20
@@ -77,11 +83,12 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
 
   let lastFewHoverYcoordsAverage
   let lastFewHoverXcoordsAverage
-  const offset = 45
+
+  //Our offset take different window sizes into effect
+  const offset = voiceToggleZone.top
 
   lastFewHoverYcoordsAverage =
     hoveryCoords.reduce((acc, coords) => acc + coords, 0) / hoverFramesCaptured
-  // +offset
 
   lastFewHoverYcoordsAverage += offset
 
@@ -90,103 +97,100 @@ export const hoverToChooseTool = (xCoord, yCoord) => {
       hoverFramesCaptured +
     toolbarOffset
 
-  const userLingersInZone = (allowance, y) => {
-    if (
-      Math.abs(lastFewHoverYcoordsAverage - y) <= allowance &&
-      lastFewHoverXcoordsAverage <= toolbarRightBorder &&
-      lastFewHoverXcoordsAverage >= toolbarLeftBorder
-    ) {
-      lingerTimer += 1
-    }
-    if (lingerTimer === 15) {
-      lingerTimer = 0
-      return true
-    }
-  }
-
   const buttonMidpoint = zone => {
     let middle = (zone.bottom - zone.top) / 2
     return zone.top + middle
   }
 
-  //This can be adjusted for fine-tuning. I find that 20 gives us
-  //about the right amount of wiggle room.
-  const inaccuracyAllowance = 30
-
-  // TODO: This may need some serious refactoring. It's getting crazy. -Amber
+  const insideButton = zone => {
+    if (
+      Math.abs(lastFewHoverYcoordsAverage - buttonMidpoint(zone)) <=
+        inaccuracyAllowance &&
+      lastFewHoverXcoordsAverage <= zone.right + 5 &&
+      lastFewHoverXcoordsAverage >= zone.left - 5 &&
+      lastFewHoverYcoordsAverage >= zone.top - 5 &&
+      lastFewHoverYcoordsAverage <= zone.bottom + 5
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
 
   //VOICE ON/OFF
-  if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(voiceToggleZone)) &&
-    lastFewHoverYcoordsAverage <= drawingHandZone.top
-  ) {
-    store.dispatch(toggleVoice())
-    voiceModeStartStop()
-    resetCoordMarkers()
+  if (insideButton(voiceToggleZone) === true) {
+    lingerTimer.voiceToggleZone += 1
+    if (lingerTimer.voiceToggleZone === timeToLinger) {
+      lingerTimer.voiceToggleZone = 0
+      store.dispatch(toggleVoice())
+      voiceModeStartStop()
+      resetCoordMarkers()
+    }
   }
 
   //HAND/NOSE SELECT
-  if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(drawingHandZone)) &&
-    lastFewHoverYcoordsAverage <= brushSelectionZone.top
-  ) {
-    store.dispatch(toggleBodyPart())
-    resetCoordMarkers()
+  if (insideButton(drawingHandZone) === true) {
+    lingerTimer.drawingHandZone += 1
+    console.log('brush lingering', lingerTimer.drawingHandZone)
+    if (lingerTimer.drawingHandZone === timeToLinger) {
+      lingerTimer.drawingHandZone = 0
+      store.dispatch(toggleBodyPart())
+      resetCoordMarkers()
+    }
   }
 
   //BRUSH SELECT
-  if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      buttonMidpoint(brushSelectionZone)
-    ) &&
-    lastFewHoverYcoordsAverage <= eraseModeToggleZone.top
-  ) {
-    store.dispatch(toggleBrush())
-    resetCoordMarkers()
-  }
-  //UNDO
-  if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      buttonMidpoint(eraseModeToggleZone)
-    ) &&
-    lastFewHoverYcoordsAverage <= colorPickerToggleZone.top
-  ) {
-    store.dispatch(toggleErase())
-    resetCoordMarkers()
+  if (insideButton(brushSelectionZone) === true) {
+    lingerTimer.brushSelectionZone += 1
+    if (lingerTimer.brushSelectionZone === timeToLinger) {
+      lingerTimer.brushSelectionZone = 0
+      store.dispatch(toggleBrush())
+      resetCoordMarkers()
+    }
   }
 
-  //COLOR PICKER
-  if (
-    userLingersInZone(
-      inaccuracyAllowance,
-      buttonMidpoint(colorPickerToggleZone)
-    ) &&
-    lastFewHoverYcoordsAverage <= clearCanvasZone.top
-  ) {
-    store.dispatch(toggleColorPicker())
-    resetCoordMarkers()
+  // //UNDO
+  if (insideButton(eraseModeToggleZone) === true) {
+    lingerTimer.eraseModeToggleZone += 1
+    console.log('brush lingering', lingerTimer.eraseModeToggleZone)
+    if (lingerTimer.eraseModeToggleZone === timeToLinger) {
+      lingerTimer.eraseModeToggleZone = 0
+      store.dispatch(toggleErase())
+      resetCoordMarkers()
+    }
   }
 
-  //CLEAR CANVAS
-  if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(clearCanvasZone)) &&
-    lastFewHoverYcoordsAverage <= snapshotZone.top
-  ) {
-    clearCanvas()
-    resetCoordMarkers()
+  // //COLOR PICKER
+  if (insideButton(colorPickerToggleZone) === true) {
+    lingerTimer.colorPickerToggleZone += 1
+    console.log('brush lingering', lingerTimer.colorPickerToggleZone)
+    if (lingerTimer.colorPickerToggleZone === timeToLinger) {
+      lingerTimer.colorPickerToggleZone = 0
+      store.dispatch(toggleColorPicker())
+      resetCoordMarkers()
+    }
   }
 
-  //SNAPSHOT
-  if (
-    userLingersInZone(inaccuracyAllowance, buttonMidpoint(snapshotZone)) &&
-    lastFewHoverYcoordsAverage >= clearCanvasZone.bottom
-  ) {
-    // download()
-    const imgStr = saveCanvas()
-    store.dispatch(takeSnapshot(imgStr))
-    resetCoordMarkers()
+  // ////CLEAR CANVAS
+  if (insideButton(clearCanvasZone) === true) {
+    lingerTimer.clearCanvasZone += 1
+    console.log('brush lingering', lingerTimer.clearCanvasZone)
+    if (lingerTimer.clearCanvasZone === timeToLinger) {
+      lingerTimer.clearCanvasZone = 0
+      clearCanvas()
+      resetCoordMarkers()
+    }
+  }
+
+  // ////SNAPSHOT
+  if (insideButton(snapshotZone) === true) {
+    lingerTimer.snapshotZone += 1
+    console.log('brush lingering', lingerTimer.snapshotZone)
+    if (lingerTimer.snapshotZone === timeToLinger) {
+      const imgStr = saveCanvas()
+      store.dispatch(takeSnapshot(imgStr))
+      resetCoordMarkers()
+    }
   }
 
   frameNum += 1
