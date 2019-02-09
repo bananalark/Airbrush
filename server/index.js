@@ -1,5 +1,7 @@
 const path = require('path')
 const express = require('express')
+const router = require('express').Router()
+
 const morgan = require('morgan')
 const compression = require('compression')
 const session = require('express-session')
@@ -63,14 +65,7 @@ const createApp = () => {
   app.use(passport.session())
 
   // auth and api routes
-  app.get(
-    '/.well-known/acme-challenge/bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E',
-    (req, res) => {
-      res.send(
-        'bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E.IZyfIehdv8DS7k-YNjrB7NpuNsuInHNfcK9VCeWwqi8'
-      )
-    }
-  )
+
   app.use('/auth', require('./auth'))
   app.use('/api', require('./api'))
 
@@ -87,6 +82,16 @@ const createApp = () => {
       next()
     }
   })
+
+  //https certificate
+  app.get(
+    '/.well-known/acme-challenge/bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E',
+    (req, res) => {
+      res.send(
+        'bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E.IZyfIehdv8DS7k-YNjrB7NpuNsuInHNfcK9VCeWwqi8'
+      )
+    }
+  )
 
   // sends index.html
   app.use('*', (req, res) => {
