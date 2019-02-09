@@ -83,16 +83,6 @@ const createApp = () => {
     }
   })
 
-  //https certificate
-  app.get(
-    '/.well-known/acme-challenge/bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E',
-    (req, res) => {
-      res.send(
-        'bslr3O9sa0qgf3kfkZqZ5WSlFnf_cnDcla87uFP7Y1E.IZyfIehdv8DS7k-YNjrB7NpuNsuInHNfcK9VCeWwqi8'
-      )
-    }
-  )
-
   // sends index.html
   app.use('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public/index.html'))
