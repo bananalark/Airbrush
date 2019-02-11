@@ -3,9 +3,7 @@
  * This way, we can import all of our components from the same place, rather than
  * having to figure out which file they belong to!
  */
-export {default as UserHome} from './user-home'
 export {default as CameraComponent} from './cameraComponent'
-export {Login, Signup} from './auth-form'
 export {default as LandingPage} from './landingPage'
 export {default as Privacy} from './privacy'
 export {default as About} from './about'
