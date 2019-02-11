@@ -175,7 +175,7 @@ class LandingPage extends React.Component {
           <InstructionVoice />
         </div>
 
-        {/* <div className="buttom">
+        {/* <div className="button">
           <Github/>
         </div> */}
 

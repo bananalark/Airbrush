@@ -232,7 +232,7 @@ function detectPoseInRealTime(video, net) {
 
           //****DRAWING ACTION ****/
 
-          //track gesture
+          //track gesture for MobileNet
           if (chosenPart !== 'nose') {
             trackHand(handXRight, handYRight, backgroundCanvas)
           }
@@ -255,36 +255,37 @@ function detectPoseInRealTime(video, net) {
           }
 
           //if somebody is there and drawMode is on, calculate drawing needs
-          if (drawModeOn) {
-            if (nose.score >= minPartConfidence) {
-              //determine current drawing tool and its coordinates
-              let keypoint
-              let buttonSelect //non-drawing hand selects buttons
-              let currentBodyPart = store.getState().paintTools.chosenBodyPart
-              if (currentBodyPart === 'nose') {
-                keypoint = nose
-              } else if (currentBodyPart === 'leftHand') {
-                keypoint = leftHand
-              } else {
-                keypoint = rightHand
-              }
 
-              //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+          if (nose.score >= minPartConfidence) {
+            //determine current drawing tool and its coordinates
+            let keypoint
+            let buttonSelect //non-drawing hand selects buttons
+            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+            if (currentBodyPart === 'nose') {
+              keypoint = nose
+            } else if (currentBodyPart === 'leftHand') {
+              keypoint = leftHand
+            } else {
+              keypoint = rightHand
+            }
 
-              let {x, y} = keypoint.position
+            //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
 
-              //to smooth points
-              //add to arrays for averaging over frames
-              lastFewXCoords[currentPoseNum] = x
-              lastFewYCoords[currentPoseNum] = y
+            let {x, y} = keypoint.position
 
-              if (!lastFewXCoords.includes('null')) {
-                keypoint = smooth(lastFewXCoords, lastFewYCoords)
-              }
+            //to smooth points
+            //add to arrays for averaging over frames
+            lastFewXCoords[currentPoseNum] = x
+            lastFewYCoords[currentPoseNum] = y
 
-              //draw dot
-              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+            if (!lastFewXCoords.includes('null')) {
+              keypoint = smooth(lastFewXCoords, lastFewYCoords)
+            }
 
+            //draw dot
+            drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
+            if (drawModeOn) {
               arrayOfShapes.push(path)
 
               //every time the color or brush is changed, we should start a new path of shapes.
