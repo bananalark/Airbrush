@@ -81,15 +81,7 @@ class CameraComponent extends Component {
   }
   render() {
     let {classes} = this.props
-    //for changing button color
-    const theme = createMuiTheme({
-      typography: {
-        useNextVariants: true
-      },
-      palette: {
-        primary: {main: '#FFFFFF'}
-      }
-    })
+
     return (
       <div>
         {this.props.showLightbox && (

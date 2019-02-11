@@ -13,7 +13,6 @@ export function saveCanvas() {
 
 //create a DOM element to hold download ref
 export function download() {
-  //create a DOM element to hold download ref
   let element = document.createElement('a')
   const file = fullImageStr.replace('image/png', 'image/octet-stream')
   element.href = file

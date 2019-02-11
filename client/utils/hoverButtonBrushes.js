@@ -148,7 +148,6 @@ export const hoverToChooseBrush = (xCoord, yCoord) => {
     lineMedium,
     lineThick
   } = fetchZones()
-  // const toolbarOffset = 215
   const toolbarOffset = voiceToggleZone.left
   let toolbarLeftBorder = voiceToggleZone.left
   let toolbarRightBorder = voiceToggleZone.right + 20

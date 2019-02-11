@@ -1,12 +1,7 @@
 import {expect} from 'chai'
 import configureMockStore from 'redux-mock-store'
 import thunkMiddleware from 'redux-thunk'
-import paintToolsReducer, {
-  getCommand,
-  toggleDraw,
-  toggleErase,
-  toggleVoice
-} from './paintTools'
+import paintToolsReducer, {getCommand, toggleVoice} from './paintTools'
 
 const middlewares = [thunkMiddleware]
 const mockStore = configureMockStore(middlewares)
@@ -61,7 +56,6 @@ describe('action creators', () => {
   describe('GET_COMMAND', () => {
     it('eventually dispatches the GET_COMMAND action', async () => {
       const fakeCommand = 'PAINT EVERYTHING!!'
-      // mockAxios.onGet('/api/experiences/999').replyOnce(200, fakeExperience)
       await store.dispatch(getCommand(fakeCommand))
       const actions = store.getActions()
       expect(actions[0].type).to.be.equal('GET_COMMAND')
@@ -75,8 +69,6 @@ describe('action creators', () => {
       const actions = store.getActions()
       console.log(store.getActions())
       expect(actions[0].type).to.be.equal('TOGGLE_VOICE')
-      // console.log('AFTER----->', initialState)
-      // expect(store.voiceModeOn).to.be.equal(true)
     })
   })
 })

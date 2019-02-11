@@ -7,7 +7,6 @@ import color from './color'
 import paintTools from './paintTools'
 import expansionPanels from './expansionPanels'
 const reducer = combineReducers({
-  user,
   color,
   paintTools,
   expansionPanels,
