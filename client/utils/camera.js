@@ -1,13 +1,6 @@
 import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
-import {
-  createProject,
-  drawAnything,
-  drawTracker,
-  smooth,
-  getDrawMode,
-  getBodyPart
-} from './draw.js'
+import {createProject, drawAnything, drawTracker, smooth} from './draw.js'
 import {hoverToChooseBrush} from './hoverButtonBrushes'
 
 import {hoverToChooseTool} from './hoverButton'
@@ -90,8 +83,10 @@ let arrayOfShapes = []
 let colorModeToggled = false
 let brushModeToggled = false
 
-let colorAtStart = store.getState().color.color
-let brushAtStart = store.getState().paintTools.chosenBrush
+let initialState = store.getState()
+
+let colorAtStart = initialState.color.color
+let brushAtStart = initialState.paintTools.chosenBrush
 
 let togglePoint
 
@@ -125,18 +120,20 @@ function detectPoseInRealTime(video, net) {
   'framesAveraged' to a const, so that we can easily change this
   later, as needed.*/
   let currentPoseNum = 0
-  const frames = 3
-  let lastFewXCoords = Array(frames).fill('null')
-  let lastFewYCoords = Array(frames).fill('null')
+  const frames = 5
+  let lastFewXCoords = Array(frames).fill(0)
+  let lastFewYCoords = Array(frames).fill(0)
   /*End of smoothing tech*/
 
-  let drawModeOn
-  let chosenPart
+  let drawModeOn, chosenPart, keypoint
 
   async function poseDetectionFrame(prevPoses = [], path) {
     //set draw status for frame
-    drawModeOn = getDrawMode()
-    chosenPart = getBodyPart()
+    let frameState = store.getState()
+
+    drawModeOn = frameState.paintTools.drawModeOn
+    chosenPart = frameState.paintTools.chosenBodyPart
+
     console.log(lastFewXCoords, lastFewYCoords)
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
@@ -219,51 +216,36 @@ function detectPoseInRealTime(video, net) {
 
           //****DRAWING ACTION ****/
 
-          //track gesture for MobileNet
-          if (chosenPart !== 'nose') {
-            trackHand(handXRight, handYRight, backgroundCanvas)
-          }
-          //determine current drawing tool and its coordinates
-          let keypoint
-          let currentBodyPart = store.getState().paintTools.chosenBodyPart
-          if (currentBodyPart === 'nose') {
-            keypoint = nose
-          } else if (currentBodyPart === 'rightHand') {
-            keypoint = rightHand
-          } else {
-            keypoint = leftHand
-          }
-
-          //button hover functionality
-          hoverToChooseTool(keypoint.position.x, keypoint.position.y)
-
-          if (store.getState().expansionPanels.brush === true) {
-            hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
-          }
-
           //if somebody is there and drawMode is on, calculate drawing needs
           if (nose.score >= minPartConfidence) {
             //determine current drawing tool and its coordinates
-            let keypoint
-            let currentBodyPart = store.getState().paintTools.chosenBodyPart
-            if (currentBodyPart === 'nose') {
+            if (chosenPart === 'nose') {
               keypoint = nose
-            } else if (currentBodyPart === 'leftHand') {
+            } else if (chosenPart === 'leftHand') {
               keypoint = leftHand
             } else {
               keypoint = rightHand
             }
 
-            let {x, y} = keypoint.position
+            if (chosenPart !== 'nose') {
+              //track and predict gesture
+              trackHand(handXRight, handYRight, backgroundCanvas)
+              predict(model, mobileNet)
+            }
+
+            //button hover functionality
+            hoverToChooseTool(keypoint.position.x, keypoint.position.y)
+
+            if (frameState.expansionPanels.brush === true) {
+              hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
+            }
 
             //to smooth points
             //add to arrays for averaging over frames
-            lastFewXCoords[currentPoseNum] = x
-            lastFewYCoords[currentPoseNum] = y
+            lastFewXCoords[currentPoseNum] = keypoint.position.x
+            lastFewYCoords[currentPoseNum] = keypoint.position.y
 
-            if (!lastFewXCoords.includes('null')) {
-              keypoint = smooth(lastFewXCoords, lastFewYCoords)
-            }
+            keypoint = smooth(lastFewXCoords, lastFewYCoords)
 
             //draw dot
             drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
@@ -272,18 +254,18 @@ function detectPoseInRealTime(video, net) {
               arrayOfShapes.push(path)
 
               //every time the color or brush is changed, we should start a new path of shapes.
-              if (store.getState().color.color !== colorAtStart) {
+              if (frameState.color.color !== colorAtStart) {
                 colorModeToggled = true
                 togglePoint = arrayOfShapes.length
-                colorAtStart = store.getState().color.color
+                colorAtStart = frameState.color.color
 
                 arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
                 colorModeToggled = false
               }
-              if (store.getState().paintTools.chosenBrush !== brushAtStart) {
+              if (frameState.paintTools.chosenBrush !== brushAtStart) {
                 brushModeToggled = true
                 togglePoint = arrayOfShapes.length
-                brushAtStart = store.getState().paintTools.chosenBrush
+                brushAtStart = frameState.paintTools.chosenBrush
 
                 arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
                 brushModeToggled = false
@@ -301,7 +283,7 @@ function detectPoseInRealTime(video, net) {
                 path = thisPath
               } else {
                 //erase mode
-                if (store.getState().paintTools.chosenBrush !== 'defaultLine') {
+                if (frameState.paintTools.chosenBrush !== 'defaultLine') {
                   for (let i = -1; i <= arrayOfShapes.length; i++) {
                     if (arrayOfShapes[i]) {
                       arrayOfShapes[i].removeSegment(0)
@@ -316,34 +298,28 @@ function detectPoseInRealTime(video, net) {
                     if (path.segments.length === 0) {
                       path = null
                       store.dispatch(toggleErase())
-                      if (store.getState().paintTools.drawModeOn === true) {
+                      if (frameState.paintTools.drawModeOn === true) {
                         store.dispatch(toggleDraw())
                       }
                     }
                   }
                 }
               }
+            } else {
+              //if !drawModeOn
+              path = null
+
+              paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
+              lastFewXCoords = Array(frames).fill(0)
+              lastFewYCoords = Array(frames).fill(0)
             }
           }
         }
       }
     })
 
-    //implement hand recognition from trackHand.js
-    if (chosenPart !== 'nose') {
-      predict(model, mobileNet)
-    }
-
     //increment/reset frame count
     currentPoseNum < frames - 1 ? currentPoseNum++ : (currentPoseNum = 0)
-
-    if (!drawModeOn) {
-      path = null
-
-      paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
-      lastFewXCoords = Array(frames).fill('null')
-      lastFewYCoords = Array(frames).fill('null')
-    }
 
     requestAnimationFrame(() => poseDetectionFrame(poses, path))
   }

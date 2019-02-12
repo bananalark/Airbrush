@@ -27,10 +27,6 @@ function getColor() {
   return {red: red, green: green, blue: blue}
 }
 
-export function getBodyPart() {
-  return store.getState().paintTools.chosenBodyPart
-}
-
 const prevStateDifferent = (function() {
   let prevBodyPart = store.getState().paintTools.chosenBodyPart
   return function(bodyPart) {
@@ -267,15 +263,11 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
   return triangle
 }
 
-//on-off switch with gesture
-export function getDrawMode() {
-  return store.getState().paintTools.drawModeOn === true
-}
-
 //***** TRACKING CIRCLE *****
 //Here we construct a small green circle to follow the hand or nose
 
 export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
+  console.log('drawTracker firing')
   let x = keypoint.position.x
   let y = keypoint.position.y
   paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
@@ -313,13 +305,11 @@ export function hoverButtonHandTracker(keypoint, vidWidth, vidHeight, ctx) {
   ctx.fill()
 }
 
-export function smooth(collectedXCoords, collectedYCoords) {
-  let xCoordAverage =
-    collectedXCoords.reduce((acc, curVal) => acc + curVal) /
-    collectedXCoords.length
-  let yCoordAverage =
-    collectedYCoords.reduce((acc, curVal) => acc + curVal) /
-    collectedYCoords.length
+export function smooth(xArr, yArr) {
+  const len = xArr.filter(el => el > 0).length
+
+  let xCoordAverage = xArr.reduce((acc, curVal) => acc + curVal) / len
+  let yCoordAverage = yArr.reduce((acc, curVal) => acc + curVal) / len
 
   return {position: {x: xCoordAverage, y: yCoordAverage}}
 }
