@@ -137,7 +137,7 @@ function detectPoseInRealTime(video, net) {
     //set draw status for frame
     drawModeOn = getDrawMode()
     chosenPart = getBodyPart()
-
+    console.log(lastFewXCoords, lastFewYCoords)
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
@@ -335,7 +335,7 @@ function detectPoseInRealTime(video, net) {
     }
 
     //increment/reset frame count
-    currentPoseNum < 4 ? currentPoseNum++ : (currentPoseNum = 0)
+    currentPoseNum < frames - 1 ? currentPoseNum++ : (currentPoseNum = 0)
 
     if (!drawModeOn) {
       path = null
