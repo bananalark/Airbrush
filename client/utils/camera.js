@@ -14,7 +14,7 @@ import {hoverToChooseTool} from './hoverButton'
 
 import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
-//will be moved to UI
+
 let minPartConfidence = 0.75
 let model
 let mobileNet
@@ -32,13 +32,11 @@ if (3 * parent.innerWidth / 4 > parent.innerHeight) {
   videoHeight = Math.ceil(3 * parent.innerWidth / 4)
 }
 
-//this is a fix for a current issue - if we attempt to render a full size video feed (larger than ~723px high), we are thrown a WebGL error and the <video> HTML element is rendered incorrectly
+//this is a fix for a current issue
 videoHeight = 723
 videoWidth = 964
 
-/*
- Loads a the camera to be used on canvas
- */
+//Loads a the camera to be used on canvas
 async function setupCamera() {
   const video = document.getElementById('video')
   video.width = videoWidth
@@ -86,11 +84,6 @@ const guiState = {
   net: null
 }
 
-/**
- * Feeds an image to posenet to estimate poses - this is where the magic
- * happens. This function loops with a requestAnimationFrame method.
- */
-
 let rightHand
 let leftHand
 let arrayOfShapes = []
@@ -102,6 +95,7 @@ let brushAtStart = store.getState().paintTools.chosenBrush
 
 let togglePoint
 
+//initiate frame loop
 function detectPoseInRealTime(video, net) {
   const canvas = document.getElementById('output')
   const ctx = canvas.getContext('2d')
@@ -114,13 +108,6 @@ function detectPoseInRealTime(video, net) {
   paintingPointerCanvas.height = videoHeight
   const paintingPointerCtx = paintingPointerCanvas.getContext('2d')
   paintingPointerCtx.globalCompositeOperation = 'destination-over'
-
-  // const hoverButtonHandCanvas = document.getElementById('buttonHand-pointer')
-  // hoverButtonHandCanvas.width = videoWidth
-  // hoverButtonHandCanvas.height = videoHeight
-  // const hoverButtonHandCtx = hoverButtonHandCanvas.getContext('2d')
-  // hoverButtonHandCtx.globalCompositeOperation = 'destination-over'
-
   const flipHorizontal = true
 
   canvas.width = videoWidth
@@ -128,6 +115,7 @@ function detectPoseInRealTime(video, net) {
 
   backgroundCanvas.width = videoWidth
   backgroundCanvas.height = videoHeight
+
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas, ctx)
 
@@ -208,7 +196,7 @@ function detectPoseInRealTime(video, net) {
 
           //hand "keypoint" defintion: manual definition for each hand smooths rendering
 
-          //define "hand" on the right arm using wrist and elbow position
+          //define "hand" on the right or left arm using wrist and elbow position
           const yDiffRight = leftWrist.position.y - leftElbow.position.y
           const handYRight = yDiffRight / 2 + leftWrist.position.y
           const xDiffRight = leftWrist.position.x - leftElbow.position.x
@@ -219,7 +207,6 @@ function detectPoseInRealTime(video, net) {
           }
           keypoints[17] = rightHand
 
-          //here we define "hand" on the left arm using wrist and elbow position
           const yDiffLeft = rightWrist.position.y - rightElbow.position.y
           const handYLeft = yDiffLeft / 2 + rightWrist.position.y
           const xDiffLeft = rightWrist.position.x - rightElbow.position.x
@@ -232,7 +219,7 @@ function detectPoseInRealTime(video, net) {
 
           //****DRAWING ACTION ****/
 
-          //track gesture
+          //track gesture for MobileNet
           if (chosenPart !== 'nose') {
             trackHand(handXRight, handYRight, backgroundCanvas)
           }
@@ -247,7 +234,7 @@ function detectPoseInRealTime(video, net) {
             keypoint = leftHand
           }
 
-          //This handles the button hover functionality with LEFT hand only, for now
+          //button hover functionality
           hoverToChooseTool(keypoint.position.x, keypoint.position.y)
 
           if (store.getState().expansionPanels.brush === true) {
@@ -255,36 +242,33 @@ function detectPoseInRealTime(video, net) {
           }
 
           //if somebody is there and drawMode is on, calculate drawing needs
-          if (drawModeOn) {
-            if (nose.score >= minPartConfidence) {
-              //determine current drawing tool and its coordinates
-              let keypoint
-              let buttonSelect //non-drawing hand selects buttons
-              let currentBodyPart = store.getState().paintTools.chosenBodyPart
-              if (currentBodyPart === 'nose') {
-                keypoint = nose
-              } else if (currentBodyPart === 'leftHand') {
-                keypoint = leftHand
-              } else {
-                keypoint = rightHand
-              }
+          if (nose.score >= minPartConfidence) {
+            //determine current drawing tool and its coordinates
+            let keypoint
+            let currentBodyPart = store.getState().paintTools.chosenBodyPart
+            if (currentBodyPart === 'nose') {
+              keypoint = nose
+            } else if (currentBodyPart === 'leftHand') {
+              keypoint = leftHand
+            } else {
+              keypoint = rightHand
+            }
 
-              //When the user is hovering near the toolbar, kick off selection funcs (utils/draw.js)
+            let {x, y} = keypoint.position
 
-              let {x, y} = keypoint.position
+            //to smooth points
+            //add to arrays for averaging over frames
+            lastFewXCoords[currentPoseNum] = x
+            lastFewYCoords[currentPoseNum] = y
 
-              //to smooth points
-              //add to arrays for averaging over frames
-              lastFewXCoords[currentPoseNum] = x
-              lastFewYCoords[currentPoseNum] = y
+            if (!lastFewXCoords.includes('null')) {
+              keypoint = smooth(lastFewXCoords, lastFewYCoords)
+            }
 
-              if (!lastFewXCoords.includes('null')) {
-                keypoint = smooth(lastFewXCoords, lastFewYCoords)
-              }
+            //draw dot
+            drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
-              //draw dot
-              drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-
+            if (drawModeOn) {
               arrayOfShapes.push(path)
 
               //every time the color or brush is changed, we should start a new path of shapes.
@@ -316,8 +300,7 @@ function detectPoseInRealTime(video, net) {
                 )
                 path = thisPath
               } else {
-                //WHAT HAPPENS WHEN ERASE MODE IS ON
-
+                //erase mode
                 if (store.getState().paintTools.chosenBrush !== 'defaultLine') {
                   for (let i = -1; i <= arrayOfShapes.length; i++) {
                     if (arrayOfShapes[i]) {
@@ -347,7 +330,6 @@ function detectPoseInRealTime(video, net) {
     })
 
     //implement hand recognition from trackHand.js
-
     if (chosenPart !== 'nose') {
       predict(model, mobileNet)
     }
@@ -370,7 +352,6 @@ function detectPoseInRealTime(video, net) {
 }
 /*eslint-enable*/
 
-//also highly-trained model it was built on
 async function loadTruncatedMobileNet() {
   const mobilenet = await tf.loadModel(
     'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json'

@@ -15,18 +15,6 @@ function Footer(props) {
   return (
     <div className={classes.root}>
       <Grid container spacing={24}>
-        {/* <Grid item xs={6} sm={3}>
-          Amber
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          Kathleen
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          Laura
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          Wenyi
-        </Grid> */}
         <div className="footer">
           <Link to="/privacy">
             <Typography variant="button" gutterBottom>

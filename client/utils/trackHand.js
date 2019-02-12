@@ -50,8 +50,6 @@ function cropImage(img) {
   return img.slice([beginHeight, beginWidth, 0], [span, span, 3])
 }
 
-//TODO: turn off for nose??
-
 //layer of certainty
 const frameCount = 10
 let lastFewPredicts = Array(frameCount)
@@ -79,9 +77,7 @@ export async function predict(myModel, mobileModel) {
 
   lastFewPredicts[count] = latestClass
 
-  //require higher certainty for "draw on"
-  //this is not working
-
+  //require higher certainty to switch to "draw on"
   if (latestClass === 0) {
     if (lastFewPredicts.reduce((a, x) => a + x, 0) === 0 && latestSureClass) {
       store.dispatch(drawOn())

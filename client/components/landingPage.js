@@ -6,7 +6,7 @@ import {
   scroller
 } from 'react-scroll'
 import About from './about'
-//import Fun from './fun'
+import Fun from './fun'
 import InstructionAccessibility from './instructionAccessibility'
 import InstructionMotion from './instructionMotion'
 import InstructionVoice from './instructionVoice'
@@ -32,7 +32,7 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 2
   },
   heroUnit: {
-    backgroundColor: 'EFCF3E' //'#F2EED'
+    backgroundColor: 'EFCF3E'
   },
   heroContent: {
     maxWidth: 600,
@@ -45,10 +45,6 @@ const styles = theme => ({
     padding: theme.spacing.unit * 6
   }
 })
-
-// const Github = () => (
-//   <a href="https://github.com/bananalark/Airbrush" rel="noopener" target="_blank" className="buttom">GitHub</a>
-// );
 
 class LandingPage extends React.Component {
   constructor(props) {
@@ -175,7 +171,7 @@ class LandingPage extends React.Component {
           <InstructionVoice />
         </div>
 
-        {/* <div className="buttom">
+        {/* <div className="button">
           <Github/>
         </div> */}
 
