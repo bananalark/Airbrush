@@ -107,6 +107,9 @@ class LandingPage extends React.Component {
     return (
       <div>
         {/* <Fun /> */}
+        <div id="logo-space">
+          <img src="https://i.imgur.com/sY5Qeh2.png" />
+        </div>
         <div className={classes.heroUnit}>
           <div className={classes.heroContent}>
             <Grid
@@ -117,9 +120,6 @@ class LandingPage extends React.Component {
               alignItems="center"
               justify="space-between"
             >
-              <Grid item xs={12} sm={6}>
-                <Typography variant="h1">Airbrush</Typography>
-              </Grid>
               <Grid item xs={12} sm={6}>
                 <RouterLink to="/camera">
                   <Fab

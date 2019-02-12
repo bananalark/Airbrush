@@ -290,3 +290,15 @@ canvas {
   background-color: #f7f4e6;
   border-color: #f7f4e6;
 }
+
+#logo-space {
+  display: inline-block;
+  justify-content: left;
+  max-width: 1200px;
+  /* max-height: 1000px; */
+}
+
+#logo-space img {
+  max-width: 100%;
+  height: auto;
+}
