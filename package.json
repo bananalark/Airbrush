@@ -34,7 +34,7 @@
       "git add"
     ]
   },
-  "author": "Fullstack Academy of Code",
+  "author": "Amber Rodriguez, Kathleen Gilbert, Laura Waters, Wenyi Zheng",
   "license": "MIT",
   "dependencies": {
     "@material-ui/core": "^3.9.0",
