@@ -2,9 +2,7 @@ import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
 import {createProject, drawAnything, drawTracker, smooth} from './draw.js'
 import {hoverToChooseBrush} from './hoverButtonBrushes'
-
 import {hoverToChooseTool} from './hoverButton'
-
 import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
 
@@ -25,7 +23,7 @@ if (3 * parent.innerWidth / 4 > parent.innerHeight) {
   videoHeight = Math.ceil(3 * parent.innerWidth / 4)
 }
 
-//this is a fix for a current issue
+//hardcoded to prevent GPU overload
 videoHeight = 723
 videoWidth = 964
 
@@ -67,7 +65,6 @@ const guiState = {
     imageScaleFactor: 0.5
   },
   singlePoseDetection: {
-    minPoseConfidence: 0.1,
     minPartConfidence //moved to top for ease of change
   },
   output: {
@@ -127,21 +124,18 @@ function detectPoseInRealTime(video, net) {
 
   let drawModeOn, chosenPart, keypoint
 
-  async function poseDetectionFrame(prevPoses = [], path) {
+  async function poseDetectionFrame(prevPose = {}, path) {
     //set draw status for frame
     let frameState = store.getState()
 
     drawModeOn = frameState.paintTools.drawModeOn
     chosenPart = frameState.paintTools.chosenBodyPart
 
-    console.log(lastFewXCoords, lastFewYCoords)
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
     const imageScaleFactor = guiState.input.imageScaleFactor
     const outputStride = +guiState.input.outputStride
 
-    let poses = []
-    let minPoseConfidence
     let minPartConfidence
     /*eslint-disable*/
 
@@ -151,9 +145,7 @@ function detectPoseInRealTime(video, net) {
       flipHorizontal,
       outputStride
     )
-    poses.push(pose)
 
-    minPoseConfidence = +guiState.singlePoseDetection.minPoseConfidence
     minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
 
     /*eslint-enable*/
@@ -164,164 +156,165 @@ function detectPoseInRealTime(video, net) {
     backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
     backgroundctx.restore()
 
-    // For each pose (i.e. person) detected in an image (though we have only one at present), draw line from the chosen keypoint
     /*eslint-disable*/
-    poses.forEach(({score, keypoints}) => {
-      if (score >= minPoseConfidence) {
-        if (prevPoses.length) {
-          let eraseMode = document.getElementById('erase-button')
-          let eraseModeValue = eraseMode.attributes.value.nodeValue
-          const [
-            nose,
-            leftEye,
-            rightEye,
-            leftEar,
-            rightEar,
-            leftShoulder,
-            rightShoulder,
-            leftElbow,
-            rightElbow,
-            leftWrist,
-            rightWrist,
-            leftHip,
-            rightHip,
-            leftKnee,
-            rightKnee,
-            leftAnkle,
-            rightAnkle
-          ] = keypoints
 
-          //hand "keypoint" defintion: manual definition for each hand smooths rendering
+    let {keypoints} = pose
 
-          //define "hand" on the right or left arm using wrist and elbow position
-          const yDiffRight = leftWrist.position.y - leftElbow.position.y
-          const handYRight = yDiffRight / 2 + leftWrist.position.y
-          const xDiffRight = leftWrist.position.x - leftElbow.position.x
-          const handXRight = xDiffRight / 2 + leftWrist.position.x
-          rightHand = {
-            score: leftWrist.score,
-            position: {y: handYRight, x: handXRight}
+    //continue if we have at least two frames to compare
+    if (prevPose.score) {
+      let eraseMode = document.getElementById('erase-button')
+      let eraseModeValue = eraseMode.attributes.value.nodeValue
+      const [
+        nose,
+        leftEye,
+        rightEye,
+        leftEar,
+        rightEar,
+        leftShoulder,
+        rightShoulder,
+        leftElbow,
+        rightElbow,
+        leftWrist,
+        rightWrist,
+        leftHip,
+        rightHip,
+        leftKnee,
+        rightKnee,
+        leftAnkle,
+        rightAnkle
+      ] = keypoints
+
+      //hand "keypoint" defintion: manual definition for each hand smooths rendering
+
+      //define "hand" on the right or left arm using wrist and elbow position
+      const yDiffRight = leftWrist.position.y - leftElbow.position.y
+      const handYRight = yDiffRight / 2 + leftWrist.position.y
+      const xDiffRight = leftWrist.position.x - leftElbow.position.x
+      const handXRight = xDiffRight / 2 + leftWrist.position.x
+
+      rightHand = {
+        score: leftWrist.score,
+        position: {y: handYRight, x: handXRight}
+      }
+      keypoints[17] = rightHand
+
+      const yDiffLeft = rightWrist.position.y - rightElbow.position.y
+      const handYLeft = yDiffLeft / 2 + rightWrist.position.y
+      const xDiffLeft = rightWrist.position.x - rightElbow.position.x
+      const handXLeft = xDiffLeft / 2 + rightWrist.position.x
+      leftHand = {
+        score: rightWrist.score,
+        position: {y: handYLeft, x: handXLeft}
+      }
+      keypoints[18] = leftHand
+
+      //****DRAWING ACTION ****/
+
+      //if somebody is there and drawMode is on, calculate drawing needs
+      if (nose.score >= minPartConfidence) {
+        //determine current drawing tool and its coordinates
+        if (chosenPart === 'nose') {
+          keypoint = nose
+        } else if (chosenPart === 'leftHand') {
+          keypoint = leftHand
+        } else {
+          keypoint = rightHand
+        }
+
+        if (chosenPart !== 'nose') {
+          //track and predict gesture
+          trackHand(handXRight, handYRight, backgroundCanvas)
+          predict(model, mobileNet)
+        }
+
+        //button hover functionality
+        hoverToChooseTool(keypoint.position.x, keypoint.position.y)
+
+        if (frameState.expansionPanels.brush === true) {
+          hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
+        }
+
+        //to smooth points
+        //add to arrays for averaging over frames
+        lastFewXCoords[currentPoseNum] = keypoint.position.x
+        lastFewYCoords[currentPoseNum] = keypoint.position.y
+
+        keypoint = smooth(lastFewXCoords, lastFewYCoords)
+
+        //draw dot
+        drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
+        if (drawModeOn) {
+          arrayOfShapes.push(path)
+          console.log(arrayOfShapes)
+
+          //every time the color or brush is changed, we should start a new path of shapes.
+          if (frameState.color.color !== colorAtStart) {
+            colorModeToggled = true
+            togglePoint = arrayOfShapes.length
+            colorAtStart = frameState.color.color
+
+            arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
+            colorModeToggled = false
           }
-          keypoints[17] = rightHand
+          if (frameState.paintTools.chosenBrush !== brushAtStart) {
+            brushModeToggled = true
+            togglePoint = arrayOfShapes.length
+            brushAtStart = frameState.paintTools.chosenBrush
 
-          const yDiffLeft = rightWrist.position.y - rightElbow.position.y
-          const handYLeft = yDiffLeft / 2 + rightWrist.position.y
-          const xDiffLeft = rightWrist.position.x - rightElbow.position.x
-          const handXLeft = xDiffLeft / 2 + rightWrist.position.x
-          leftHand = {
-            score: rightWrist.score,
-            position: {y: handYLeft, x: handXLeft}
+            arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
+            brushModeToggled = false
           }
-          keypoints[18] = leftHand
 
-          //****DRAWING ACTION ****/
-
-          //if somebody is there and drawMode is on, calculate drawing needs
-          if (nose.score >= minPartConfidence) {
-            //determine current drawing tool and its coordinates
-            if (chosenPart === 'nose') {
-              keypoint = nose
-            } else if (chosenPart === 'leftHand') {
-              keypoint = leftHand
-            } else {
-              keypoint = rightHand
-            }
-
-            if (chosenPart !== 'nose') {
-              //track and predict gesture
-              trackHand(handXRight, handYRight, backgroundCanvas)
-              predict(model, mobileNet)
-            }
-
-            //button hover functionality
-            hoverToChooseTool(keypoint.position.x, keypoint.position.y)
-
-            if (frameState.expansionPanels.brush === true) {
-              hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
-            }
-
-            //to smooth points
-            //add to arrays for averaging over frames
-            lastFewXCoords[currentPoseNum] = keypoint.position.x
-            lastFewYCoords[currentPoseNum] = keypoint.position.y
-
-            keypoint = smooth(lastFewXCoords, lastFewYCoords)
-
-            //draw dot
-            drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-
-            if (drawModeOn) {
-              arrayOfShapes.push(path)
-
-              //every time the color or brush is changed, we should start a new path of shapes.
-              if (frameState.color.color !== colorAtStart) {
-                colorModeToggled = true
-                togglePoint = arrayOfShapes.length
-                colorAtStart = frameState.color.color
-
-                arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
-                colorModeToggled = false
-              }
-              if (frameState.paintTools.chosenBrush !== brushAtStart) {
-                brushModeToggled = true
-                togglePoint = arrayOfShapes.length
-                brushAtStart = frameState.paintTools.chosenBrush
-
-                arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
-                brushModeToggled = false
-              }
-
-              if (eraseModeValue === 'false') {
-                ctx.globalCompositeOperation = 'source-over'
-                const thisPath = drawAnything(
-                  keypoint,
-                  path,
-                  leftHand,
-                  rightHand,
-                  nose
-                )
-                path = thisPath
-              } else {
-                //erase mode
-                if (frameState.paintTools.chosenBrush !== 'defaultLine') {
-                  for (let i = -1; i <= arrayOfShapes.length; i++) {
-                    if (arrayOfShapes[i]) {
-                      arrayOfShapes[i].removeSegment(0)
-                    }
-                  }
-                } else {
-                  if (path) {
-                    //this prevents a weird bug where clicking erase with nothing on screen throws an error
-                    path.removeSegment(path.segments.length - 1)
-
-                    //this turns off both erase and draw mode once there are no more segments to remove
-                    if (path.segments.length === 0) {
-                      path = null
-                      store.dispatch(toggleErase())
-                      if (frameState.paintTools.drawModeOn === true) {
-                        store.dispatch(toggleDraw())
-                      }
-                    }
-                  }
+          if (eraseModeValue === 'false') {
+            ctx.globalCompositeOperation = 'source-over'
+            const thisPath = drawAnything(
+              keypoint,
+              path,
+              leftHand,
+              rightHand,
+              nose
+            )
+            path = thisPath
+          } else {
+            //erase mode
+            if (frameState.paintTools.chosenBrush !== 'defaultLine') {
+              for (let i = -1; i <= arrayOfShapes.length; i++) {
+                if (arrayOfShapes[i]) {
+                  arrayOfShapes[i].removeSegment(0)
                 }
               }
             } else {
-              //if !drawModeOn
-              path = null
+              if (path) {
+                //this prevents a weird bug where clicking erase with nothing on screen throws an error
+                path.removeSegment(path.segments.length - 1)
 
-              paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
-              lastFewXCoords = Array(frames).fill(0)
-              lastFewYCoords = Array(frames).fill(0)
+                //this turns off both erase and draw mode once there are no more segments to remove
+                if (path.segments.length === 0) {
+                  path = null
+                  store.dispatch(toggleErase())
+                  if (frameState.paintTools.drawModeOn === true) {
+                    store.dispatch(toggleDraw())
+                  }
+                }
+              }
             }
           }
+        } else {
+          //if !drawModeOn
+          path = null
+
+          paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
+          lastFewXCoords = Array(frames).fill(0)
+          lastFewYCoords = Array(frames).fill(0)
         }
       }
-    })
+    }
 
     //increment/reset frame count
     currentPoseNum < frames - 1 ? currentPoseNum++ : (currentPoseNum = 0)
 
-    requestAnimationFrame(() => poseDetectionFrame(poses, path))
+    requestAnimationFrame(() => poseDetectionFrame(pose, path))
   }
 
   poseDetectionFrame()

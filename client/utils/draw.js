@@ -267,7 +267,6 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
 //Here we construct a small green circle to follow the hand or nose
 
 export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
-  console.log('drawTracker firing')
   let x = keypoint.position.x
   let y = keypoint.position.y
   paintingPointerCtx.clearRect(0, 0, vidWidth, vidHeight)
