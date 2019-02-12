@@ -292,12 +292,15 @@ canvas {
 }
 
 #logo-space {
-  display: inline-block;
-  justify-content: left;
-  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+  display: flex;
+  max-width: 800px;
+  padding: 50px;
 }
 
 #logo-space img {
+  align-content: center;
   max-width: 100%;
-  height: auto;
+  height: 200px;
 }
