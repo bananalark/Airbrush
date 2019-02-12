@@ -369,10 +369,11 @@ export async function bindPage() {
   mobileNet = await loadTruncatedMobileNet()
   model = await tf.loadModel('mymodel-demo.json')
 
-  let video
-
   document.getElementById('display').style.display = 'block'
   document.getElementById('main').style.display = 'block'
+
+  let video
+
   try {
     video = await loadVideo()
   } catch (e) {

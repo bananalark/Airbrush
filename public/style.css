@@ -295,7 +295,6 @@ canvas {
   display: inline-block;
   justify-content: left;
   max-width: 1200px;
-  /* max-height: 1000px; */
 }
 
 #logo-space img {
