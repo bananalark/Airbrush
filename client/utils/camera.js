@@ -5,6 +5,7 @@ import {hoverToChooseBrush} from './hoverButtonBrushes'
 import {hoverToChooseTool} from './hoverButton'
 import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
+import handleShapes from './drawShapes'
 
 let minPartConfidence = 0.75
 let model
@@ -77,15 +78,10 @@ const guiState = {
 let rightHand
 let leftHand
 let arrayOfShapes = []
-let colorModeToggled = false
-let brushModeToggled = false
 
 let initialState = store.getState()
-
 let colorAtStart = initialState.color.color
 let brushAtStart = initialState.paintTools.chosenBrush
-
-let togglePoint
 
 //initiate frame loop
 function detectPoseInRealTime(video, net) {
@@ -111,8 +107,8 @@ function detectPoseInRealTime(video, net) {
   //begin the paper.js project, located in utils/draw.js
   createProject(window, canvas, ctx)
 
-  // ***** SELECTION CIRCLE SMOOTHING TECH *****
-  /*The following is used for smoothing the tracking circle
+  // ***** SMOOTHING TECH *****
+  /*The following is used for smoothing the line and circle
   An average is collected of the last five frames. Assigned
   'framesAveraged' to a const, so that we can easily change this
   later, as needed.*/
@@ -245,29 +241,23 @@ function detectPoseInRealTime(video, net) {
         drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
         if (drawModeOn) {
-          arrayOfShapes.push(path)
-          console.log(arrayOfShapes)
-
-          //every time the color or brush is changed, we should start a new path of shapes.
-          if (frameState.color.color !== colorAtStart) {
-            colorModeToggled = true
-            togglePoint = arrayOfShapes.length
-            colorAtStart = frameState.color.color
-
-            arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
-            colorModeToggled = false
-          }
-          if (frameState.paintTools.chosenBrush !== brushAtStart) {
-            brushModeToggled = true
-            togglePoint = arrayOfShapes.length
-            brushAtStart = frameState.paintTools.chosenBrush
-
-            arrayOfShapes = arrayOfShapes.slice(togglePoint - 2)
-            brushModeToggled = false
+          //if drawing shapes, make a meta-path of each path as a 'segment'
+          if (
+            frameState.paintTools.chosenBrush !== 'defaultLine' &&
+            path !== null
+          ) {
+            handleShapes(
+              arrayOfShapes,
+              path,
+              frameState,
+              colorAtStart,
+              brushAtStart
+            )
           }
 
           if (eraseModeValue === 'false') {
             ctx.globalCompositeOperation = 'source-over'
+
             const thisPath = drawAnything(
               keypoint,
               path,
@@ -300,20 +290,19 @@ function detectPoseInRealTime(video, net) {
               }
             }
           }
-        } else {
-          //if !drawModeOn
+        } else if (path !== null) {
+          //if drawMode is off but nothing has yet been cleared
           path = null
-
           paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
           lastFewXCoords = Array(frames).fill(0)
           lastFewYCoords = Array(frames).fill(0)
+          arrayOfShapes = []
         }
       }
     }
 
     //increment/reset frame count
     currentPoseNum < frames - 1 ? currentPoseNum++ : (currentPoseNum = 0)
-
     requestAnimationFrame(() => poseDetectionFrame(pose, path))
   }
 
