@@ -16,23 +16,10 @@ import {handleShapes, isShape} from './drawShapes'
 let minPartConfidence = 0.75
 let model
 let mobileNet
-/*
-Setup video size
-*/
-let videoHeight
-let videoWidth
-
-if (3 * parent.innerWidth / 4 > parent.innerHeight) {
-  videoHeight = parent.innerHeight
-  videoWidth = Math.ceil(4 * parent.innerHeight / 3)
-} else {
-  videoWidth = parent.innerWidth
-  videoHeight = Math.ceil(3 * parent.innerWidth / 4)
-}
 
 //hardcoded to prevent GPU overload
-videoHeight = 723
-videoWidth = 964
+let videoHeight = 723
+let videoWidth = 964
 
 //Loads a the camera to be used on canvas
 async function setupCamera() {
@@ -124,7 +111,7 @@ function detectPoseInRealTime(video, net) {
   let lastFewYCoords = Array(frames).fill(0)
   /*End of smoothing tech*/
 
-  let drawModeOn, chosenPart, keypoint
+  let drawModeOn, chosenPart, keypoint, eraseModeOn
 
   async function poseDetectionFrame(prevPose = {}, path) {
     //set draw status for frame
@@ -132,6 +119,7 @@ function detectPoseInRealTime(video, net) {
 
     drawModeOn = frameState.paintTools.drawModeOn
     chosenPart = frameState.paintTools.chosenBodyPart
+    eraseModeOn = frameState.paintTools.eraseModeOn
 
     // Scale an image down to a certain factor. Too large of an image will slow
     // down the GPU
@@ -160,8 +148,6 @@ function detectPoseInRealTime(video, net) {
 
     //continue if we have at least two frames to compare
     if (prevPose.score) {
-      let eraseMode = document.getElementById('erase-button')
-      let eraseModeValue = eraseMode.attributes.value.nodeValue
       const [
         nose,
         leftEye,
@@ -174,7 +160,12 @@ function detectPoseInRealTime(video, net) {
         rightElbow,
         leftWrist,
         rightWrist,
-        ...rest
+        leftHip,
+        rightHip,
+        leftKnee,
+        rightKnee,
+        leftAnkle,
+        rightAnkle
       ] = keypoints
 
       //hand "keypoint" defintion: manual definition for each hand
@@ -219,68 +210,67 @@ function detectPoseInRealTime(video, net) {
           trackHand(handXRight, handYRight, backgroundCanvas)
           predict(model, mobileNet)
         }
-
         //button hover functionality
         if (
           (chosenPart !== 'rightHand' && keypoint.position.x < 200) ||
           (chosenPart === 'rightHand' && keypoint.position.x > videoWidth - 200)
         )
           hoverToChooseTool(keypoint.position.x, keypoint.position.y)
-      }
 
-      if (frameState.expansionPanels.brush === true) {
-        hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
-      }
-
-      //to smooth points
-      //add to arrays for averaging over frames
-      lastFewXCoords[currentPoseNum] = keypoint.position.x
-      lastFewYCoords[currentPoseNum] = keypoint.position.y
-
-      keypoint = smooth(lastFewXCoords, lastFewYCoords)
-
-      //draw dot
-      drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
-
-      if (drawModeOn) {
-        if (eraseModeValue === 'false') {
-          ctx.globalCompositeOperation = 'source-over'
-
-          const thisPath = drawAnything(
-            keypoint,
-            path,
-            leftHand,
-            rightHand,
-            nose
-          )
-
-          path = thisPath
-
-          //if drawing shapes, make a meta-path of each path as a 'segment'
-          if (isShape(path)) {
-            handleShapes(
-              arrayOfShapes,
-              path,
-              frameState,
-              colorAtStart,
-              brushAtStart
-            )
-          }
-        } else {
-          //erase mode
-
-          if (isShape(path)) {
-            arrayOfShapes.forEach(path => path.removeSegment(0))
-          } else if (path) {
-            handleErase(path)
-          }
+        if (frameState.expansionPanels.brush === true) {
+          hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
         }
-      } else if (path !== null) {
-        //if drawMode is off but nothing has yet been cleared
-        path = null
-        lastFewXCoords = Array(frames).fill(0)
-        lastFewYCoords = Array(frames).fill(0)
-        arrayOfShapes = []
+
+        //to smooth points
+        //add to arrays for averaging over frames
+        lastFewXCoords[currentPoseNum] = keypoint.position.x
+        lastFewYCoords[currentPoseNum] = keypoint.position.y
+
+        keypoint = smooth(lastFewXCoords, lastFewYCoords)
+
+        //draw dot
+        drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+
+        if (drawModeOn) {
+          if (eraseModeOn === false) {
+            ctx.globalCompositeOperation = 'source-over'
+
+            const thisPath = drawAnything(
+              keypoint,
+              path,
+              leftHand,
+              rightHand,
+              nose
+            )
+
+            path = thisPath
+
+            //if drawing shapes, make a meta-path of each path as a 'segment'
+            if (isShape(path)) {
+              handleShapes(
+                arrayOfShapes,
+                path,
+                frameState,
+                colorAtStart,
+                brushAtStart
+              )
+            }
+          } else {
+            //erase mode
+
+            if (isShape(path)) {
+              arrayOfShapes.forEach(path => path.removeSegment(0))
+            } else if (path) {
+              handleErase(path)
+            }
+          }
+        } else if (path !== null) {
+          //if drawMode is off but nothing has yet been cleared
+          path = null
+          lastFewXCoords = Array(frames).fill(0)
+          lastFewYCoords = Array(frames).fill(0)
+          arrayOfShapes = []
+        }
       }
     }
 
