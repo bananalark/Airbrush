@@ -1,5 +1,5 @@
 const paper = require('paper')
-import store, {drawOff} from '../store'
+import store, {drawOff, toggleErase} from '../store'
 import {Size, Path} from 'paper'
 import {videoHeight, videoWidth} from './camera'
 import KalmanFilter from 'kalmanjs'
@@ -25,10 +25,6 @@ function getColor() {
   const green = color.g / 255
   const blue = color.b / 255
   return {red: red, green: green, blue: blue}
-}
-
-export function getBodyPart() {
-  return store.getState().paintTools.chosenBodyPart
 }
 
 const prevStateDifferent = (function() {
@@ -267,14 +263,8 @@ function drawTriangleShape(oneKeypoint, secondKeypoint, pixelWidth) {
   return triangle
 }
 
-//on-off switch with gesture
-export function getDrawMode() {
-  return store.getState().paintTools.drawModeOn === true
-}
-
 //***** TRACKING CIRCLE *****
 //Here we construct a small green circle to follow the hand or nose
-
 export function drawTracker(keypoint, vidWidth, vidHeight, paintingPointerCtx) {
   let x = keypoint.position.x
   let y = keypoint.position.y
@@ -313,13 +303,21 @@ export function hoverButtonHandTracker(keypoint, vidWidth, vidHeight, ctx) {
   ctx.fill()
 }
 
-export function smooth(collectedXCoords, collectedYCoords) {
-  let xCoordAverage =
-    collectedXCoords.reduce((acc, curVal) => acc + curVal) /
-    collectedXCoords.length
-  let yCoordAverage =
-    collectedYCoords.reduce((acc, curVal) => acc + curVal) /
-    collectedYCoords.length
+export function smooth(xArr, yArr) {
+  const len = xArr.filter(el => !!el).length
+  let xCoordAverage = xArr.reduce((acc, curVal) => acc + curVal) / len
+  let yCoordAverage = yArr.reduce((acc, curVal) => acc + curVal) / len
 
   return {position: {x: xCoordAverage, y: yCoordAverage}}
+}
+
+export function handleErase(path) {
+  path.removeSegment(path.segments.length - 1)
+
+  //this turns off both erase and draw mode once there are no more segments to remove
+  if (path.segments.length === 0) {
+    path = null
+    store.dispatch(toggleErase())
+    store.dispatch(drawOff())
+  }
 }
