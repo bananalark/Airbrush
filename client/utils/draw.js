@@ -304,8 +304,7 @@ export function hoverButtonHandTracker(keypoint, vidWidth, vidHeight, ctx) {
 }
 
 export function smooth(xArr, yArr) {
-  const len = xArr.filter(el => el > 0).length
-
+  const len = xArr.filter(el => !!el).length
   let xCoordAverage = xArr.reduce((acc, curVal) => acc + curVal) / len
   let yCoordAverage = yArr.reduce((acc, curVal) => acc + curVal) / len
 

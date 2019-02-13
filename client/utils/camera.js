@@ -10,7 +10,7 @@ import {
 import {hoverToChooseBrush} from './hoverButtonBrushes'
 import {hoverToChooseTool} from './hoverButton'
 import {trackHand, predict} from './trackHand'
-import store, {toggleErase, toggleDraw} from '../store'
+import store from '../store'
 import {handleShapes, isShape} from './drawShapes'
 
 let minPartConfidence = 0.75
@@ -107,8 +107,8 @@ function detectPoseInRealTime(video, net) {
   later, as needed.*/
   let currentPoseNum = 0
   const frames = 5
-  let lastFewXCoords = Array(frames).fill(0)
-  let lastFewYCoords = Array(frames).fill(0)
+  let lastFewXCoords = Array(frames)
+  let lastFewYCoords = Array(frames)
   /*End of smoothing tech*/
 
   let drawModeOn, eraseModeOn, chosenPart, keypoint
@@ -252,18 +252,17 @@ function detectPoseInRealTime(video, net) {
             }
           } else {
             //erase mode
-
-            if (isShape(path)) {
-              arrayOfShapes.forEach(path => path.removeSegment(0))
-            } else if (path) {
+            if (path) {
               handleErase(path)
+            } else if (isShape(path)) {
+              arrayOfShapes.forEach(path => path.removeSegment(0))
             }
           }
         } else if (path !== null) {
           //if drawMode is off but nothing has yet been cleared
           path = null
-          lastFewXCoords = Array(frames).fill(0)
-          lastFewYCoords = Array(frames).fill(0)
+          lastFewXCoords = Array(frames)
+          lastFewYCoords = Array(frames)
           arrayOfShapes = []
         }
       }
