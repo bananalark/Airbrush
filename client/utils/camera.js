@@ -389,4 +389,4 @@ export async function bindPage() {
 }
 
 // kick off the demo
-bindPage()
+// bindPage()
