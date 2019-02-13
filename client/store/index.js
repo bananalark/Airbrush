@@ -19,11 +19,13 @@ const middleware = composeWithDevTools(
 const store = createStore(reducer, middleware)
 
 store.subscribe(() => {
-  localStorage.setItem('color', JSON.stringify(store.getState().color))
-  localStorage.setItem(
-    'paintTools',
-    JSON.stringify(store.getState().paintTools)
-  )
+  if (localStorage) {
+    localStorage.setItem('color', JSON.stringify(store.getState().color))
+    localStorage.setItem(
+      'paintTools',
+      JSON.stringify(store.getState().paintTools)
+    )
+  }
 })
 
 export default store
