@@ -150,15 +150,11 @@ function detectPoseInRealTime(video, net) {
 
     minPartConfidence = +guiState.singlePoseDetection.minPartConfidence
 
-    /*eslint-enable*/
-
     backgroundctx.save()
     backgroundctx.scale(-1, 1)
     backgroundctx.translate(-videoWidth, 0)
     backgroundctx.drawImage(video, 0, 0, videoWidth, videoHeight)
     backgroundctx.restore()
-
-    /*eslint-disable*/
 
     let {keypoints} = pose
 
@@ -178,15 +174,10 @@ function detectPoseInRealTime(video, net) {
         rightElbow,
         leftWrist,
         rightWrist,
-        leftHip,
-        rightHip,
-        leftKnee,
-        rightKnee,
-        leftAnkle,
-        rightAnkle
+        ...rest
       ] = keypoints
 
-      //hand "keypoint" defintion: manual definition for each hand smooths rendering
+      //hand "keypoint" defintion: manual definition for each hand
 
       //define "hand" on the right or left arm using wrist and elbow position
       const yDiffRight = leftWrist.position.y - leftElbow.position.y
@@ -230,63 +221,66 @@ function detectPoseInRealTime(video, net) {
         }
 
         //button hover functionality
-        hoverToChooseTool(keypoint.position.x, keypoint.position.y)
+        if (
+          (chosenPart !== 'rightHand' && keypoint.position.x < 200) ||
+          (chosenPart === 'rightHand' && keypoint.position.x > videoWidth - 200)
+        )
+          hoverToChooseTool(keypoint.position.x, keypoint.position.y)
+      }
 
-        if (frameState.expansionPanels.brush === true) {
-          hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
-        }
+      if (frameState.expansionPanels.brush === true) {
+        hoverToChooseBrush(keypoint.position.x, keypoint.position.y)
+      }
 
-        //to smooth points
-        //add to arrays for averaging over frames
-        lastFewXCoords[currentPoseNum] = keypoint.position.x
-        lastFewYCoords[currentPoseNum] = keypoint.position.y
+      //to smooth points
+      //add to arrays for averaging over frames
+      lastFewXCoords[currentPoseNum] = keypoint.position.x
+      lastFewYCoords[currentPoseNum] = keypoint.position.y
 
-        keypoint = smooth(lastFewXCoords, lastFewYCoords)
+      keypoint = smooth(lastFewXCoords, lastFewYCoords)
 
-        //draw dot
-        drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
+      //draw dot
+      drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
-        if (drawModeOn) {
-          if (eraseModeValue === 'false') {
-            ctx.globalCompositeOperation = 'source-over'
+      if (drawModeOn) {
+        if (eraseModeValue === 'false') {
+          ctx.globalCompositeOperation = 'source-over'
 
-            const thisPath = drawAnything(
-              keypoint,
+          const thisPath = drawAnything(
+            keypoint,
+            path,
+            leftHand,
+            rightHand,
+            nose
+          )
+
+          path = thisPath
+
+          //if drawing shapes, make a meta-path of each path as a 'segment'
+          if (isShape(path)) {
+            handleShapes(
+              arrayOfShapes,
               path,
-              leftHand,
-              rightHand,
-              nose
+              frameState,
+              colorAtStart,
+              brushAtStart
             )
-
-            path = thisPath
-
-            //if drawing shapes, make a meta-path of each path as a 'segment'
-            if (isShape(path)) {
-              handleShapes(
-                arrayOfShapes,
-                path,
-                frameState,
-                colorAtStart,
-                brushAtStart
-              )
-            }
-          } else {
-            //erase mode
-
-            if (isShape(path)) {
-              arrayOfShapes.forEach(path => path.removeSegment(0))
-            } else if (path) {
-              handleErase(path)
-            }
           }
-        } else if (path !== null) {
-          //if drawMode is off but nothing has yet been cleared
-          path = null
-          paintingPointerCtx.clearRect(0, 0, videoWidth, videoHeight)
-          lastFewXCoords = Array(frames).fill(0)
-          lastFewYCoords = Array(frames).fill(0)
-          arrayOfShapes = []
+        } else {
+          //erase mode
+
+          if (isShape(path)) {
+            arrayOfShapes.forEach(path => path.removeSegment(0))
+          } else if (path) {
+            handleErase(path)
+          }
         }
+      } else if (path !== null) {
+        //if drawMode is off but nothing has yet been cleared
+        path = null
+        lastFewXCoords = Array(frames).fill(0)
+        lastFewYCoords = Array(frames).fill(0)
+        arrayOfShapes = []
       }
     }
 
