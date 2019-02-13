@@ -67,7 +67,6 @@ class CameraComponent extends Component {
   }
 
   componentDidMount() {
-    // require('../utils/camera')
     bindPage()
   }
   componentDidUpdate(prevProps) {
