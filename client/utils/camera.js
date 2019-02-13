@@ -111,7 +111,7 @@ function detectPoseInRealTime(video, net) {
   let lastFewYCoords = Array(frames).fill(0)
   /*End of smoothing tech*/
 
-  let drawModeOn, chosenPart, keypoint, eraseModeOn
+  let drawModeOn, eraseModeOn, chosenPart, keypoint
 
   async function poseDetectionFrame(prevPose = {}, path) {
     //set draw status for frame
@@ -168,28 +168,23 @@ function detectPoseInRealTime(video, net) {
         rightAnkle
       ] = keypoints
 
-      //hand "keypoint" defintion: manual definition for each hand
+      //define mirrored "hand" on the right or left arm using wrist and elbow position
+      function calculateHand(wrist, elbow) {
+        const yDiff = wrist.position.y - elbow.position.y
+        const handY = yDiff / 2 + wrist.position.y
+        const xDiff = wrist.position.x - elbow.position.x
+        const handX = xDiff / 2 + wrist.position.x
 
-      //define "hand" on the right or left arm using wrist and elbow position
-      const yDiffRight = leftWrist.position.y - leftElbow.position.y
-      const handYRight = yDiffRight / 2 + leftWrist.position.y
-      const xDiffRight = leftWrist.position.x - leftElbow.position.x
-      const handXRight = xDiffRight / 2 + leftWrist.position.x
-
-      rightHand = {
-        score: leftWrist.score,
-        position: {y: handYRight, x: handXRight}
+        return {
+          score: wrist.score,
+          position: {y: handY, x: handX}
+        }
       }
+
+      rightHand = calculateHand(leftWrist, leftElbow)
       keypoints[17] = rightHand
 
-      const yDiffLeft = rightWrist.position.y - rightElbow.position.y
-      const handYLeft = yDiffLeft / 2 + rightWrist.position.y
-      const xDiffLeft = rightWrist.position.x - rightElbow.position.x
-      const handXLeft = xDiffLeft / 2 + rightWrist.position.x
-      leftHand = {
-        score: rightWrist.score,
-        position: {y: handYLeft, x: handXLeft}
-      }
+      leftHand = calculateHand(rightWrist, rightElbow)
       keypoints[18] = leftHand
 
       //****DRAWING ACTION ****/
@@ -207,7 +202,7 @@ function detectPoseInRealTime(video, net) {
 
         if (chosenPart !== 'nose') {
           //track and predict gesture
-          trackHand(handXRight, handYRight, backgroundCanvas)
+          trackHand(keypoint.position.x, keypoint.position.y, backgroundCanvas)
           predict(model, mobileNet)
         }
         //button hover functionality
