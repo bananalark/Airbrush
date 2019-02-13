@@ -1,4 +1,4 @@
-function handleShapes(
+export function handleShapes(
   arrayOfShapes,
   path,
   frameState,
@@ -25,4 +25,6 @@ function handleShapes(
   }
 }
 
-export default handleShapes
+export function isShape(path) {
+  return path !== null && path.style.strokeCap !== 'round'
+}

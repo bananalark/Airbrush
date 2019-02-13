@@ -1,11 +1,17 @@
 import * as tf from '@tensorflow/tfjs'
 import * as posenet from '@tensorflow-models/posenet'
-import {createProject, drawAnything, drawTracker, smooth} from './draw.js'
+import {
+  createProject,
+  drawAnything,
+  drawTracker,
+  smooth,
+  handleErase
+} from './draw.js'
 import {hoverToChooseBrush} from './hoverButtonBrushes'
 import {hoverToChooseTool} from './hoverButton'
 import {trackHand, predict} from './trackHand'
 import store, {toggleErase, toggleDraw} from '../store'
-import handleShapes from './drawShapes'
+import {handleShapes, isShape} from './drawShapes'
 
 let minPartConfidence = 0.75
 let model
@@ -241,20 +247,6 @@ function detectPoseInRealTime(video, net) {
         drawTracker(keypoint, videoWidth, videoHeight, paintingPointerCtx)
 
         if (drawModeOn) {
-          //if drawing shapes, make a meta-path of each path as a 'segment'
-          if (
-            frameState.paintTools.chosenBrush !== 'defaultLine' &&
-            path !== null
-          ) {
-            handleShapes(
-              arrayOfShapes,
-              path,
-              frameState,
-              colorAtStart,
-              brushAtStart
-            )
-          }
-
           if (eraseModeValue === 'false') {
             ctx.globalCompositeOperation = 'source-over'
 
@@ -265,29 +257,26 @@ function detectPoseInRealTime(video, net) {
               rightHand,
               nose
             )
+
             path = thisPath
+
+            //if drawing shapes, make a meta-path of each path as a 'segment'
+            if (isShape(path)) {
+              handleShapes(
+                arrayOfShapes,
+                path,
+                frameState,
+                colorAtStart,
+                brushAtStart
+              )
+            }
           } else {
             //erase mode
-            if (frameState.paintTools.chosenBrush !== 'defaultLine') {
-              for (let i = -1; i <= arrayOfShapes.length; i++) {
-                if (arrayOfShapes[i]) {
-                  arrayOfShapes[i].removeSegment(0)
-                }
-              }
-            } else {
-              if (path) {
-                //this prevents a weird bug where clicking erase with nothing on screen throws an error
-                path.removeSegment(path.segments.length - 1)
 
-                //this turns off both erase and draw mode once there are no more segments to remove
-                if (path.segments.length === 0) {
-                  path = null
-                  store.dispatch(toggleErase())
-                  if (frameState.paintTools.drawModeOn === true) {
-                    store.dispatch(toggleDraw())
-                  }
-                }
-              }
+            if (isShape(path)) {
+              arrayOfShapes.forEach(path => path.removeSegment(0))
+            } else if (path) {
+              handleErase(path)
             }
           }
         } else if (path !== null) {
