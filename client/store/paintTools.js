@@ -14,19 +14,15 @@ const CHOOSE_SIZE = 'CHOOSE_SIZE'
 /**
  * INITIAL STATE
  */
-
-const initialState =
-  localStorage && localStorage.getItem('paintTools')
-    ? JSON.parse(localStorage.getItem('paintTools'))
-    : {
-        currentCommand: '',
-        eraseModeOn: false,
-        voiceModeOn: false,
-        drawModeOn: false,
-        chosenBrush: 'defaultLine',
-        chosenBodyPart: 'leftHand',
-        size: 'small'
-      }
+const initialState = {
+  currentCommand: '',
+  eraseModeOn: false,
+  voiceModeOn: false,
+  drawModeOn: false,
+  chosenBrush: 'defaultLine',
+  chosenBodyPart: 'leftHand',
+  size: 'small'
+}
 
 /**
  * ACTION CREATORS
