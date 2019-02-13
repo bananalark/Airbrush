@@ -11,6 +11,7 @@ import store from '../store'
 import {takeSnapshot, lightboxOff} from '../store/lightbox'
 import {connect} from 'react-redux'
 import {Switch, withStyles, FormControlLabel} from '@material-ui/core'
+import {bindPage} from '../utils/camera'
 
 const styles = theme => ({
   colorBar: {},
@@ -66,7 +67,7 @@ class CameraComponent extends Component {
   }
 
   componentDidMount() {
-    require('../utils/camera')
+    bindPage()
   }
   componentDidUpdate(prevProps) {
     return prevProps.showLightbox !== this.props.showLightbox

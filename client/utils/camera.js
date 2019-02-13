@@ -328,6 +328,3 @@ export async function bindPage() {
 
   setTimeout(() => detectPoseInRealTime(video, net, model, mobileNet), 1000)
 }
-
-// kick off the demo
-bindPage()
