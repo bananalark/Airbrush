@@ -1,6 +1,12 @@
 import React from 'react'
 import About from './about'
 import {Link as RouterLink} from 'react-router-dom'
+import {
+  Link as ScrollLink,
+  Events,
+  animateScroll as scroll,
+  scroller
+} from 'react-scroll'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -10,6 +16,61 @@ import Button from 'react-bootstrap/Button'
 import ModalFooter from 'react-bootstrap/ModalFooter'
 
 class LandingPage extends React.Component {
+  constructor(props) {
+    super(props)
+    this.scrollToTop = this.scrollToTop.bind(this)
+  }
+
+  componentDidMount() {
+    Events.scrollEvent.register('begin', function() {
+      console.log('begin', arguments)
+    })
+    Events.scrollEvent.register('end', function() {
+      console.log('end', arguments)
+    })
+  }
+
+  scrollToTop() {
+    scroll.scrollToTop()
+  }
+
+  scrollTo() {
+    scroller.scrollTo('scroll-to-element', {
+      duration: 800,
+      delay: 0,
+      smooth: 'easeInOutQuart'
+    })
+  }
+
+  scrollToWithContainer() {
+    let goToContainer = new Promise((resolve, reject) => {
+      Events.scrollEvent.register('end', () => {
+        resolve()
+        Events.scrollEvent.remove('end')
+      })
+
+      scroller.scrollTo('scroll-container', {
+        duration: 800,
+        delay: 0,
+        smooth: 'easeInOutQuart'
+      })
+    })
+
+    goToContainer.then(() =>
+      scroller.scrollTo('scroll-container-second-element', {
+        duration: 800,
+        delay: 0,
+        smooth: 'easeInOutQuart',
+        containerId: 'scroll-container'
+      })
+    )
+  }
+
+  componentWillUnmount() {
+    Events.scrollEvent.remove('begin')
+    Events.scrollEvent.remove('end')
+  }
+
   render() {
     return (
       <Container>
@@ -52,17 +113,35 @@ class LandingPage extends React.Component {
           </RouterLink>
         </Row>
         <Row className="show-grid text-center" id="button-row">
-          <RouterLink to="/camera">
+          <ScrollLink
+            activeClass="active"
+            className="test6"
+            to="anchor"
+            spy={true}
+            smooth={true}
+            duration={500}
+          >
             <Button className="landing-page-button" id="learn-more-button">
-              learn more
+              Learn More
             </Button>
-          </RouterLink>
+          </ScrollLink>
         </Row>
-        <ModalFooter>
-          <RouterLink to="/privacy">
-            <h5>privacy policy</h5>
-          </RouterLink>
-        </ModalFooter>
+
+        <div id="anchor" className="element">
+          <h1>ONE</h1>
+        </div>
+
+        <div id="anchor2" className="element">
+          <h1>TWO</h1>
+        </div>
+
+        <div id="anchor3" className="element">
+          <h1>THREE</h1>
+        </div>
+
+        <div id="anchor4" className="element">
+          <h1>FOUR</h1>
+        </div>
       </Container>
     )
   }
