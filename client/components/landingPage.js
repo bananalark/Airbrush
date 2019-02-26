@@ -1,19 +1,12 @@
 import React from 'react'
-import About from './about'
 import {Link as RouterLink} from 'react-router-dom'
-import {
-  Link as ScrollLink,
-  Events,
-  animateScroll as scroll,
-  scroller
-} from 'react-scroll'
+import {Link as ScrollLink, animateScroll as scroll} from 'react-scroll'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Button from 'react-bootstrap/Button'
-import ModalFooter from 'react-bootstrap/ModalFooter'
 
 class LandingPage extends React.Component {
   constructor(props) {
@@ -21,54 +14,8 @@ class LandingPage extends React.Component {
     this.scrollToTop = this.scrollToTop.bind(this)
   }
 
-  componentDidMount() {
-    Events.scrollEvent.register('begin', function() {
-      console.log('begin', arguments)
-    })
-    Events.scrollEvent.register('end', function() {
-      console.log('end', arguments)
-    })
-  }
-
   scrollToTop() {
     scroll.scrollToTop()
-  }
-
-  scrollTo() {
-    scroller.scrollTo('scroll-to-element', {
-      duration: 800,
-      delay: 0,
-      smooth: 'easeInOutQuart'
-    })
-  }
-
-  scrollToWithContainer() {
-    let goToContainer = new Promise((resolve, reject) => {
-      Events.scrollEvent.register('end', () => {
-        resolve()
-        Events.scrollEvent.remove('end')
-      })
-
-      scroller.scrollTo('scroll-container', {
-        duration: 800,
-        delay: 0,
-        smooth: 'easeInOutQuart'
-      })
-    })
-
-    goToContainer.then(() =>
-      scroller.scrollTo('scroll-container-second-element', {
-        duration: 800,
-        delay: 0,
-        smooth: 'easeInOutQuart',
-        containerId: 'scroll-container'
-      })
-    )
-  }
-
-  componentWillUnmount() {
-    Events.scrollEvent.remove('begin')
-    Events.scrollEvent.remove('end')
   }
 
   render() {
@@ -82,8 +29,9 @@ class LandingPage extends React.Component {
             <Image src="tutorial-hand-mode.jpg" className="landing-card" />
             <h4>hand mode</h4>
             <p>
-              Find a neutral, well-lit background, and place your upper body in
-              the camera frame. Raise a fist and open it to start drawing!
+              Enable your front-facing camera, find a neutral, well-lit
+              background, and place your upper body in the camera frame. Raise a
+              fist and open it to start drawing!
             </p>
           </Col>
           <Col sm={4}>
@@ -115,7 +63,6 @@ class LandingPage extends React.Component {
         <Row className="show-grid text-center" id="button-row">
           <ScrollLink
             activeClass="active"
-            className="test6"
             to="anchor"
             spy={true}
             smooth={true}
@@ -126,22 +73,60 @@ class LandingPage extends React.Component {
             </Button>
           </ScrollLink>
         </Row>
-
-        <div id="anchor" className="element">
-          <h1>ONE</h1>
-        </div>
-
-        <div id="anchor2" className="element">
-          <h1>TWO</h1>
-        </div>
-
-        <div id="anchor3" className="element">
-          <h1>THREE</h1>
-        </div>
-
-        <div id="anchor4" className="element">
-          <h1>FOUR</h1>
-        </div>
+        <Row className="show-grid text-center scroll-link">
+          <div id="anchor" className="element">
+            <h1>ONE</h1>
+            <ScrollLink
+              activeClass="active"
+              to="anchor2"
+              spy={true}
+              smooth={true}
+              duration={500}
+            >
+              <Button size="small" color="primary">
+                go down
+              </Button>
+            </ScrollLink>
+          </div>
+        </Row>
+        <Row className="show-grid text-center scroll-link">
+          <div id="anchor2" className="element">
+            <h1>TWO</h1>
+            <ScrollLink
+              activeClass="active"
+              to="anchor3"
+              spy={true}
+              smooth={true}
+              duration={500}
+            >
+              <Button size="small" color="primary">
+                still down
+              </Button>
+            </ScrollLink>
+          </div>
+        </Row>
+        <Row className="show-grid text-center scroll-link">
+          <div id="anchor3" className="element">
+            <h1>THREE</h1>
+            <ScrollLink
+              activeClass="active"
+              to="anchor4"
+              spy={true}
+              smooth={true}
+              duration={500}
+            >
+              <Button size="small" color="primary">
+                one more
+              </Button>
+            </ScrollLink>
+          </div>
+        </Row>
+        <Row className="show-grid text-center scroll-link">
+          <div id="anchor4" className="element">
+            <h1>FOUR</h1>
+          </div>
+        </Row>
+        <button onClick={this.scrollToTop}>back to ze top</button>
       </Container>
     )
   }
