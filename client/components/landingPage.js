@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link as RouterLink} from 'react-router-dom'
-import {Link as ScrollLink, animateScroll as scroll} from 'react-scroll'
+import {Link as ScrollLink, Events, animateScroll as scroll} from 'react-scroll'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -12,6 +12,16 @@ class LandingPage extends React.Component {
   constructor(props) {
     super(props)
     this.scrollToTop = this.scrollToTop.bind(this)
+  }
+
+  componentDidMount() {
+    Events.scrollEvent.register('begin')
+    Events.scrollEvent.register('end')
+  }
+
+  componentWillUnmount() {
+    Events.scrollEvent.remove('begin')
+    Events.scrollEvent.remove('end')
   }
 
   scrollToTop() {
