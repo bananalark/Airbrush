@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link as RouterLink} from 'react-router-dom'
-import {Link as ScrollLink, Events, animateScroll as scroll} from 'react-scroll'
+import {Link as ScrollLink, animateScroll as scroll} from 'react-scroll'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -11,27 +11,13 @@ import Button from 'react-bootstrap/Button'
 class LandingPage extends React.Component {
   constructor(props) {
     super(props)
-    this.scrollToTop = this.scrollToTop.bind(this)
-  }
-
-  componentDidMount() {
-    Events.scrollEvent.register('begin')
-    Events.scrollEvent.register('end')
-  }
-
-  componentWillUnmount() {
-    Events.scrollEvent.remove('begin')
-    Events.scrollEvent.remove('end')
-  }
-
-  scrollToTop() {
-    scroll.scrollToTop()
+    this.scrollToTop = scroll.scrollToTop.bind(this)
   }
 
   render() {
     return (
       <Container>
-        <Jumbotron className="text-center">
+        <Jumbotron className="text-center" id="header">
           <Image src="airbrush-logo-new.png" id="logo" />
         </Jumbotron>
         <Row className="show-grid text-center">
@@ -55,7 +41,7 @@ class LandingPage extends React.Component {
           </Col>
           <Col sm={4}>
             <Image src="tutorial-nose-mode.jpg" className="landing-card" />
-            <h4>stuck at your desk?TEST</h4>
+            <h4>stuck at your desk?</h4>
             <p>
               ...or if your background is visually noisy, using your nose to
               draw works best. Make sure there's only one person in the frame at
@@ -73,6 +59,7 @@ class LandingPage extends React.Component {
         <Row className="show-grid text-center" id="button-row">
           <ScrollLink
             activeClass="active"
+            className="test6"
             to="anchor"
             spy={true}
             smooth={true}
@@ -88,6 +75,7 @@ class LandingPage extends React.Component {
             <h1>ONE</h1>
             <ScrollLink
               activeClass="active"
+              className="test6"
               to="anchor2"
               spy={true}
               smooth={true}
@@ -104,6 +92,7 @@ class LandingPage extends React.Component {
             <h1>TWO</h1>
             <ScrollLink
               activeClass="active"
+              className="test6"
               to="anchor3"
               spy={true}
               smooth={true}
@@ -120,6 +109,7 @@ class LandingPage extends React.Component {
             <h1>THREE</h1>
             <ScrollLink
               activeClass="active"
+              className="test6"
               to="anchor4"
               spy={true}
               smooth={true}

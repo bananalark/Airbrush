@@ -327,5 +327,9 @@ a {
 }
 
 .scroll-link {
-  margin: 50em !important;
+  margin: 5em !important;
+}
+
+#header {
+  background-color: white;
 }
