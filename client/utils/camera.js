@@ -270,6 +270,7 @@ function detectPoseInRealTime(video, net) {
 
     //increment/reset frame count
     currentPoseNum < frames - 1 ? currentPoseNum++ : (currentPoseNum = 0)
+
     requestAnimationFrame(() => poseDetectionFrame(pose, path))
   }
 

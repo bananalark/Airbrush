@@ -109,12 +109,12 @@ class CameraComponent extends Component {
         >
           <Grid container direction="column">
             <div id="display">
-              <video id="video" plays-inline="true" style={{display: 'none'}} />
               <Toolbar openLightbox={this.openLightbox} />
               <div style={{position: 'relative'}}>
-                <canvas id="background" />
+                <video id="video" plays-inline="true" />
+                {/* <canvas id="background" />
                 <canvas id="output" />
-                <canvas id="painting-pointer" />
+                <canvas id="painting-pointer" /> */}
                 <div id="OnOffButton">
                   <FormControlLabel
                     control={

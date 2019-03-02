@@ -1,6 +1,8 @@
 body {
   font-family: sans-serif;
   margin: 0;
+  background-color: rgb(187, 187, 0);
+  background: url('groovepaper.png') !important;
 }
 
 a {
@@ -278,7 +280,7 @@ canvas {
 }
 
 #logo {
-  max-width: 80%;
+  max-width: 100%;
 }
 
 #button-row {
@@ -303,15 +305,16 @@ canvas {
 
 #learn-more-button {
   background-color: rgb(214, 214, 214);
-  border-color: rgb(214, 214, 214);
+  border-color: rgb(214, 214, 214) !important;
 }
 
 #learn-more-button:hover {
   background-color: rgb(187, 187, 0);
-  border-color: rgb(187, 187, 0);
+  border-color: rgb(187, 187, 0) !important;
 }
 
 .jumbotron {
+  background: url('groovepaper.png') !important;
   margin-top: 2rem !important;
   margin-bottom: 3rem !important;
 }
@@ -332,4 +335,35 @@ a {
 
 #header {
   background-color: white;
+  padding-top: 12em;
+  padding-bottom: 10em;
+}
+
+.landing-card-description {
+  padding: 8px;
+}
+
+#back-to-top {
+  background-color: rgb(214, 214, 214);
+  border-color: rgb(214, 214, 214);
+}
+
+#back-to-top:hover {
+  background-color: rgb(187, 187, 0);
+  border-color: rgb(187, 187, 0);
+}
+
+#buttons {
+  padding-bottom: 10em;
+  padding-top: 2em;
+}
+
+#tutorial {
+  padding-top: 4em;
+}
+
+.subheader {
+  font-family: 'Fascinate Inline', cursive, sans-serif;
+  font-size: 6em;
+  color: darkgreen;
 }
