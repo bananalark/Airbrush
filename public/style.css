@@ -224,7 +224,7 @@ canvas {
   height: 0;
 }
 .footer {
-  background-color: rgb(97, 92, 85);
+  background-color: rgb(97, 92, 85) !important;
   position: relative;
   left: 0;
   bottom: 0;
@@ -293,6 +293,10 @@ canvas {
   min-width: 25rem !important;
 }
 
+.landing-page-button:focus {
+  outline: none !important;
+}
+
 #start-draw-button {
   background-color: darkgreen;
   border-color: darkgreen;
@@ -314,7 +318,7 @@ canvas {
 }
 
 .jumbotron {
-  background: url('groovepaper.png') !important;
+  background: url('groovepaper-hc.png') !important;
   margin-top: 2rem !important;
   margin-bottom: 3rem !important;
 }
@@ -346,6 +350,7 @@ a {
 #back-to-top {
   background-color: rgb(214, 214, 214);
   border-color: rgb(214, 214, 214);
+  margin: 2rem;
 }
 
 #back-to-top:hover {
@@ -354,7 +359,7 @@ a {
 }
 
 #buttons {
-  padding-bottom: 10em;
+  padding-bottom: 2em;
   padding-top: 2em;
 }
 
@@ -364,6 +369,44 @@ a {
 
 .subheader {
   font-family: 'Fascinate Inline', cursive, sans-serif;
-  font-size: 6em;
+  font-size: 68px;
   color: darkgreen;
+  padding-top: 65px;
+}
+
+#down-button {
+  border-radius: 50% !important;
+  margin: 5em;
+  padding: 1em 1.5em !important;
+  background-color: rgb(214, 214, 214);
+  border: none !important;
+}
+
+#down-button:hover {
+  background-color: rgb(187, 187, 0);
+}
+
+#about {
+  background: url('groovepaper-hc.png') !important;
+  font-family: 'Fascinate Inline', cursive, sans-serif;
+  font-size: 68px;
+}
+
+#about-col {
+  padding: 28px;
+}
+
+#github-button {
+  background-color: rgba(126, 124, 32, 0.534);
+  color: white;
+  border: none;
+}
+
+#github-button:hover {
+  background-color: rgba(95, 94, 23, 0.534);
+  color: white;
+}
+
+p {
+  color: gray;
 }

@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col'
 import Image from 'react-bootstrap/Image'
 import Jumbotron from 'react-bootstrap/Jumbotron'
 import Button from 'react-bootstrap/Button'
+import ModalFooter from 'react-bootstrap/ModalFooter'
 import Paper from '@material-ui/core/Paper'
 
 class LandingPage extends React.Component {
@@ -27,7 +28,7 @@ class LandingPage extends React.Component {
           <Row className="show-grid text-center" id="button-row">
             <RouterLink to="/camera">
               <Button className="landing-page-button" id="start-draw-button">
-                start drawing
+                Start drawing
               </Button>
             </RouterLink>
           </Row>
@@ -94,17 +95,66 @@ class LandingPage extends React.Component {
           </Col>
         </Row>
 
-        {/* learn more section */}
-        <Row className="show-grid text-center scroll-link">
-          <ScrollLink
-            activeClass="active"
-            className="test6"
-            to="anchor2"
-            spy={true}
-            smooth={true}
-            duration={500}
-          />
+        <Row className="show-grid text-center">
+          <Col>
+            <ScrollLink
+              activeClass="active"
+              className="test6"
+              to="anchor2"
+              spy={true}
+              smooth={true}
+              duration={500}
+            >
+              <Button id="down-button">v</Button>
+            </ScrollLink>
+          </Col>
         </Row>
+
+        <div id="anchor2" className="element" />
+        <Jumbotron className="text-center" id="header" style={{padding: '1em'}}>
+          <Row className="show-grid text-center">
+            <Col className="subheader">ABOUT</Col>
+          </Row>
+
+          <Row className="text-center">
+            <Col id="about-col">
+              <p>
+                We wanted to create the most unique drawing experience you've
+                ever had. So, we built a canvas web application that unlocks
+                your body motions to draw in the air, displaying your strokes in
+                real time.
+              </p>
+
+              <p>
+                To make the magic happen, we used PoseNet, a model of Google
+                Brain's TensorFlow.js library. PoseNet’s heatmap tensors analyze
+                webcam images to track 17 body points, including nose,
+                shoulders, elbows and wrists, to track your body as it moves. We
+                applied filters to the output data for the smoothest possible
+                path, as well as a custom-trained MobileNet model to trigger
+                line changes by opening or closing one’s hand. You can also
+                guide the output of larger shapes (courtesy of vector graphics
+                library Paper.js) by moving your hand relative to your face,
+                which will be the center.
+              </p>
+
+              <p>
+                For the best experience, please open the canvas in Chrome. We
+                hope you have fun!
+              </p>
+              <p>- the Airbrush team: Laura, Wenyi, Amber + Kathleen</p>
+            </Col>
+          </Row>
+
+          <Row className="show-grid text-center" id="button-row">
+            <a href="https://github.com/bananalark/Airbrush">
+              <Button className="landing-page-button" id="github-button">
+                visit our Github
+              </Button>
+            </a>
+          </Row>
+        </Jumbotron>
+
         <Row className="show-grid text-center" id="button-row">
           <Button
             className="landing-page-button"
@@ -114,6 +164,9 @@ class LandingPage extends React.Component {
             back to top
           </Button>
         </Row>
+        <ModalFooter>
+          <p>a Fullstack Academy project</p>
+        </ModalFooter>
       </Container>
     )
   }
