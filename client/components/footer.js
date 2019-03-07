@@ -18,7 +18,7 @@ function Footer(props) {
         <div className="footer">
           <Link to="/privacy">
             <Typography variant="button" gutterBottom>
-              Privacy Policy
+              a Fullstack Academy project
             </Typography>
           </Link>
         </div>
